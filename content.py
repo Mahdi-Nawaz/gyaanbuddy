@@ -176,6 +176,14 @@ PHYSICS = {
         activity_en="Rub your palms together quickly for 10 seconds. Feel them get warm? That is friction creating heat!",
         activity_hi="Apni dono hatheliyon ko tezi se 10 second ragdo. Garam lagti hain? Yeh friction ki wajah se heat banti hai!",
         keywords=["friction", "gharshan", "grip", "slip", "sliding", "rolling", "heat", "brakes", "rough", "smooth"]),
+    "push_pull": dict(
+        title_en="Push & Pull Forces (How Things Move)", title_hi="Push aur Pull Force (Cheezein Kaise Chalti Hain)",
+        en="Every movement starts with a push or a pull! Pushing moves things away from you (like kicking a ball or rolling a toy car). Pulling brings things towards you (like pulling a wagon or a rope)!",
+        hi="Har gati push ya pull se shuru hoti hai! Dhakka dene (push) se cheez door jaati hai jaise ball ko kick karna. Kheenchna (pull) cheez ko paas lata hai jaise wagon kheenchna!",
+        formula="Push (Away) • Pull (Towards)",
+        activity_en="Roll a toy car on the floor. First push it gently, then pull it back with a string!",
+        activity_hi="Floor par toy car ko chalao. Pehle dhakka do, phir dhaage se apni taraf kheencho!",
+        keywords=["push", "pull", "force", "dhakka", "kheenchna", "toy car", "move", "movement"]),
 }
 
 # ----------------------------------------------------------------------------- chemistry
@@ -449,6 +457,24 @@ MATH_TOPICS = {
         hi="Equation ko ek tarazu ki tarah samjhein. Dono taraf ek jaisa operation karke x ka sahi maan nikalein.",
         formula="ax + b = c  ➔  ax = c - b  ➔  x = (c - b) / a",
         keywords=["algebra", "equation", "samikaran", "variable", "linear", "solve", "balance", "scale"]),
+    "counting": dict(
+        title_en="🔢 Counting 1 to 10 (Apples & Stars)", title_hi="🔢 Ginti 1 se 10 (Seb aur Taare)",
+        en="Count along with juicy red apples and glowing yellow stars! 1, 2, 3, 4, 5, 6, 7, 8, 9, 10! Each number represents one more object.",
+        hi="Lal-lal seb aur chamakte sitaron ke saath ginti seekho! 1, 2, 3, 4, 5, 6, 7, 8, 9, 10! Har number ek naye object ko darshata hai.",
+        formula="1, 2, 3, 4, 5, 6, 7, 8, 9, 10",
+        keywords=["count", "counting", "ginti", "number", "numbers", "apple", "apples", "seb", "star", "one", "two", "three"]),
+    "shapes": dict(
+        title_en="🔴 Basic Shapes (Circle, Square, Triangle, Star)", title_hi="🔴 Aakaar / Basic Shapes (Circle, Square, Triangle)",
+        en="Shapes are all around us! A circle is round like a clock, a square has 4 equal sides like a slice of bread, a triangle has 3 sides like pizza, and a star has 5 glowing points!",
+        hi="Aakaar humare aas-paas hain! Circle gol hota hai jaise ghadi, square ke 4 barabar kone hote hain jaise bread, triangle ke 3 kone hote hain jaise samosa, aur star ke 5 kone hote hain!",
+        formula="Circle (0 sides) • Square (4 sides) • Triangle (3 sides) • Star (5 points)",
+        keywords=["shape", "shapes", "circle", "square", "triangle", "star", "aakaar", "varg", "tribhuj", "gol"]),
+    "candy_addition": dict(
+        title_en="🍬 Visual Candy Addition (Combining Groups)", title_hi="🍬 Jod / Candy Addition (Jodna)",
+        en="Addition is putting two groups of things together! If you have 2 candies and a friend gives you 3 more candies, you have 2 + 3 = 5 sweet treats!",
+        hi="Jod (addition) ka matlab do cheezon ke samooh ko ikattha karna hota hai! Agar tumhare paas 2 toffee hain aur 3 aur mil jayein, toh 2 + 3 = 5 toffee ban jaati hain!",
+        formula="a + b = Total Sum",
+        keywords=["addition", "add", "plus", "jod", "jodna", "candy", "candies", "sum", "total"]),
 }
 
 # ----------------------------------------------------------------------------- general science (trees & animals)
@@ -495,6 +521,27 @@ NATURE_TOPICS = {
         hi="Sabhi jeev aahar shrinkhla (food chain) se jude hain! Suraj ki dhoop se Paudhe (Producers) bante hain. Hiran ya khargosh ghaas khate hain. Sher unka shikaar karta hai. Baad mein mushrooms (decomposers) mitti ko poshan lautate hain jisse naye ped ug sakein!",
         formula="Sun ➔ Producer (Plant) ➔ Herbivore (Deer) ➔ Predator (Lion) ➔ Decomposer (Soil)",
         keywords=["food chain", "food web", "producer", "consumer", "predator", "ecosystem", "aahar shrinkhla", "forest", "jungle", "wildlife", "grass", "deer", "lion", "decomposer"]),
+    "cute_animals": dict(
+        title_en="🐶 Animals & Their Babies (Dog, Cat, Cow, Lion)",
+        title_hi="🐶 Jaanwar aur Unke Bachhe (Puppy, Kitten, Bachhda)",
+        en="Animals take care of their cute babies: Dogs have puppies that love to wag tails, cats have soft purring kittens, cows give milk to baby calves, and lions raise strong little cubs!",
+        hi="Jaanwar apne pyare bachhon ka dhyan rakhte hain: Kutta puppy ke saath khelta hai, billi ke soft kittens hote hain, gaay bachhde ko doodh deti hai, aur sher ke shavak (cubs) hote hain!",
+        formula="Parent ➔ Baby (Dog & Puppy • Cat & Kitten • Cow & Calf • Lion & Cub)",
+        keywords=["animal", "animals", "baby", "puppy", "kitten", "dog", "cat", "cow", "lion", "cub", "jaanwar", "bachha", "kutta", "billi", "gaay"]),
+    "seed_growth": dict(
+        title_en="🌱 Seed to Plant: How Seeds Grow",
+        title_hi="🌱 Beej se Paudha Kaise Banta Hai",
+        en="A plant starts as a tiny seed asleep in warm soil. With water and warm sunshine, baby roots grow down to drink water and a bright green sprout shoots up to make green leaves and flowers!",
+        hi="Paudha ek chhote beej se shuru hota hai. Paani aur dhoop milne par jad zameen mein jaati hai aur ek chhota ankur bahar nikal kar hari pattiyan aur phool banata hai!",
+        formula="Seed in Soil ➔ Roots ➔ Green Sprout ➔ Stem & Leaves ➔ Flower",
+        keywords=["seed", "sprout", "grow", "growth", "plant", "beej", "ankur", "soil", "mitti", "sunflower", "flower"]),
+    "water_cycle": dict(
+        title_en="💧 The Water Cycle (Sun, Clouds & Rain)",
+        title_hi="💧 Jal Chakra (Dhoop, Baadal aur Baarish)",
+        en="The Sun heats ocean and river water, turning it into invisible water vapour (evaporation). High in the sky it cools into clouds (condensation), and when full, drops fall as rain (precipitation)!",
+        hi="Suraj ki garmi se paani bhaap bankar aasman mein jaata hai (evaporation). Wahan thanda hokar baadal bante hain (condensation), aur phir baarish bankar zameen par baraste hain (precipitation)!",
+        formula="Evaporation ➔ Condensation (Clouds) ➔ Precipitation (Rain) ➔ Collection",
+        keywords=["water cycle", "water", "cycle", "rain", "clouds", "evaporation", "jal chakra", "baarish", "baadal", "paani"]),
 }
 
 # ----------------------------------------------------------------------------- hinglish helpers

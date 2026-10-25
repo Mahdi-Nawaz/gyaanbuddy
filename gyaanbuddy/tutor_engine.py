@@ -16,11 +16,13 @@ DEFAULT_MODEL = os.getenv("GYAAN_MODEL", "claude-sonnet-5-5")
 
 MATH_VISUALS = [
     "math:circle", "math:rectangle", "math:cylinder", "math:triangle",
-    "math:pythagoras", "math:fractions", "math:algebra"
+    "math:pythagoras", "math:fractions", "math:algebra",
+    "math:count", "math:shapes", "math:addition"
 ]
 
 NATURE_VISUALS = [
-    "nature:tree", "nature:plant", "nature:photosynthesis", "nature:butterfly", "nature:foodchain"
+    "nature:tree", "nature:plant", "nature:photosynthesis", "nature:butterfly", "nature:foodchain",
+    "nature:animals", "nature:seed", "nature:water_cycle"
 ]
 
 ALLOWED_VISUALS = (
@@ -108,6 +110,9 @@ def _build_lessons() -> list[dict]:
             "frog_lifecycle": "nature:butterfly",
             "animal_diets": "nature:foodchain",
             "food_chain": "nature:foodchain",
+            "cute_animals": "nature:animals:dog",
+            "seed_growth": "nature:seed:3",
+            "water_cycle": "nature:water_cycle",
         }
         for k, n in C.NATURE_TOPICS.items():
             lessons.append(dict(key=f"nature_{k}", subject="General Science", topic=n["title_en"],
@@ -272,20 +277,5 @@ def answer(question: str, lang: str = "en", age: str = "9-12", history: list[dic
     if not ok:
         return TutorReply(safe_text, blocked=True, category="output_filter", topic="blocked:output")
     reply.text, reply.notice = safe_text, notice
-
-    # Record interaction to persistent student memory & fine-tuning dataset
-    try:
-        import student_memory
-        student_memory.record_student_chat(
-            grade=age,
-            lang=lang,
-            question=q,
-            answer_text=reply.text,
-            subject=reply.subject,
-            topic=reply.topic,
-            visual=reply.visual
-        )
-    except Exception:
-        pass
-
     return reply
+

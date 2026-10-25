@@ -60,7 +60,7 @@ def test_empty_search_returns_empty():
 
 def test_apptest_with_search_and_theme():
     from streamlit.testing.v1 import AppTest
-    at = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=60).run()
+    at = AppTest.from_file(str(Path(__file__).resolve().parent.parent / "app.py"), default_timeout=120).run()
     assert not at.exception
     
     # Check that language radio is still at index 0

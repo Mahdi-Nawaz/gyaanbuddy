@@ -201,12 +201,34 @@ def apply_theme(theme_name: str):
         -webkit-text-fill-color: #64748b !important;
     }}
 
-    /* Hide Streamlit default clutter and badges that overlap mobile footer */
+    /* Clean Streamlit Header - KEEP sidebar toggle button 100% visible on mobile and desktop */
+    header[data-testid="stHeader"] {{
+        background: transparent !important;
+        visibility: visible !important;
+        height: auto !important;
+        z-index: 999990 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] {{
+        visibility: visible !important;
+        display: flex !important;
+        background: #ffffff !important;
+        border: 2px solid #6366f1 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+        margin: 6px 0 0 8px !important;
+        z-index: 999999 !important;
+        color: #4f46e5 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] button {{
+        color: #4f46e5 !important;
+    }}
+    [data-testid="stSidebarCollapsedControl"] svg {{
+        fill: #4f46e5 !important;
+        stroke: #4f46e5 !important;
+    }}
+    .stDeployButton {{display: none !important;}}
     #MainMenu {{visibility: hidden !important; display: none !important;}}
     footer {{visibility: hidden !important; display: none !important;}}
-    header {{visibility: hidden !important;}}
-    .viewerBadge_container {{display: none !important;}}
-    .stDeployButton {{display: none !important;}}
     div[data-testid="stToolbar"] {{visibility: hidden !important;}}
 
     .hero-banner {{
@@ -355,6 +377,48 @@ def apply_theme(theme_name: str):
         color: #ffffff !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 8px 22px rgba(79, 70, 229, 0.42) !important;
+    }}
+
+    /* 📥 Universal Responsive Download Buttons (Phone, Tablet, Laptop) */
+    [data-testid="stDownloadButton"] {{
+        width: 100% !important;
+        margin: 4px 0 !important;
+    }}
+    [data-testid="stDownloadButton"] > button,
+    [data-testid="stDownloadButton"] button {{
+        width: 100% !important;
+        min-height: 44px !important;
+        padding: 10px 14px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 0.92rem !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        color: #1e293b !important;
+        border: 1.5px solid #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        line-height: 1.35 !important;
+        white-space: normal !important;
+        word-break: normal !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+    }}
+    [data-testid="stDownloadButton"] button:hover {{
+        background: #f8fafc !important;
+        color: #4f46e5 !important;
+        border-color: #6366f1 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.22) !important;
+    }}
+    [data-testid="stDownloadButton"] button:active {{
+        transform: translateY(0) !important;
+    }}
+    [data-testid="stDownloadButton"] * {{
+        color: inherit !important;
     }}
 
     /* Audio Recorder Widget - High contrast white card */
@@ -554,6 +618,97 @@ def apply_theme(theme_name: str):
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
+
+    # 📱 Phone Back Camera, Live Camera Flip & Mobile Sidebar Enhancement Script
+    js_camera = """
+    <script>
+    (function() {
+        // 1. Mobile Camera getUserMedia Interceptor (Back Camera Preference)
+        function patchGUM(win) {
+            try {
+                if (win && win.navigator && win.navigator.mediaDevices && win.navigator.mediaDevices.getUserMedia) {
+                    if (!win.__gb_gum_patched) {
+                        win.__gb_gum_patched = true;
+                        win.__gb_prefer_back_cam = true;
+                        const orig = win.navigator.mediaDevices.getUserMedia.bind(win.navigator.mediaDevices);
+                        win.navigator.mediaDevices.getUserMedia = function(constraints) {
+                            const isMobile = /Android|iPhone|iPad|iPod/i.test(win.navigator.userAgent) || (win.innerWidth <= 768);
+                            if (constraints && constraints.video && (win.__gb_prefer_back_cam && isMobile)) {
+                                if (typeof constraints.video === 'object') {
+                                    constraints.video.facingMode = { ideal: "environment" };
+                                } else {
+                                    constraints.video = { facingMode: { ideal: "environment" } };
+                                }
+                            }
+                            return orig(constraints);
+                        };
+                    }
+                }
+            } catch(e) {}
+        }
+        patchGUM(window);
+        if (window.parent && window.parent !== window) { patchGUM(window.parent); }
+
+        // 2. Attach capture="environment" to file uploaders on mobile devices for direct phone rear camera
+        function attachMobileCameraAttrs() {
+            try {
+                const win = window.parent || window;
+                const doc = win.document;
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(win.navigator.userAgent) || (win.innerWidth <= 768);
+                if (isMobile) {
+                    const inputs = doc.querySelectorAll('input[type="file"]');
+                    inputs.forEach(inp => {
+                        if (!inp.hasAttribute('data-camera-patched')) {
+                            inp.setAttribute('data-camera-patched', 'true');
+                            if (!inp.accept || inp.accept.includes('image')) {
+                                inp.setAttribute('capture', 'environment');
+                            }
+                        }
+                    });
+                }
+            } catch(e) {}
+        }
+        setInterval(attachMobileCameraAttrs, 1200);
+
+        // 3. Inject "🔄 Flip Camera (Back / Front)" Button onto every Streamlit Camera Input
+        function injectCameraFlipBtn() {
+            try {
+                const win = window.parent || window;
+                const doc = win.document;
+                const camWidgets = doc.querySelectorAll('[data-testid="stCameraInput"]');
+                camWidgets.forEach(cam => {
+                    if (!cam.querySelector('.gb-flip-cam-btn')) {
+                        const flipBtn = doc.createElement('button');
+                        flipBtn.className = 'gb-flip-cam-btn';
+                        flipBtn.type = 'button';
+                        flipBtn.innerHTML = '🔄 Switch Camera (Back / Front)';
+                        flipBtn.style.cssText = 'display:block;margin:6px auto 10px auto;padding:8px 16px;background:linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);color:#ffffff;font-size:0.85rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;box-shadow:0 4px 14px rgba(79,70,229,0.35);transition:transform 0.15s ease;';
+                        flipBtn.onmouseover = function() { flipBtn.style.transform = 'scale(1.02)'; };
+                        flipBtn.onmouseout = function() { flipBtn.style.transform = 'scale(1)'; };
+                        flipBtn.onclick = function(e) {
+                            e.preventDefault();
+                            win.__gb_prefer_back_cam = !win.__gb_prefer_back_cam;
+                            const video = cam.querySelector('video');
+                            if (video && video.srcObject) {
+                                const tracks = video.srcObject.getTracks();
+                                tracks.forEach(t => t.stop());
+                                const facing = win.__gb_prefer_back_cam ? 'environment' : 'user';
+                                win.navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing } } })
+                                    .then(stream => { video.srcObject = stream; })
+                                    .catch(err => console.log('Camera switch failed:', err));
+                            }
+                            flipBtn.innerHTML = win.__gb_prefer_back_cam ? '🔄 Active: Phone Back Camera (Tap to Flip)' : '🔄 Active: Front Selfie Camera (Tap to Flip)';
+                        };
+                        cam.prepend(flipBtn);
+                    }
+                });
+            } catch(e) {}
+        }
+        setInterval(injectCameraFlipBtn, 1200);
+    })();
+    </script>
+    """
+    st.markdown(js_camera, unsafe_allow_html=True)
 
 
 TXT = {
@@ -1167,6 +1322,56 @@ def handle_section_query(q_text: str, sec_label: str, lang: str, age: str = "10-
     return ans
 
 
+def get_grade_tier(class_level: str | None = None) -> tuple[str, str, str]:
+    """Determine curriculum stage:
+    - 'early': Nursery, LKG, UKG, Class 1, Class 2 (Ages 3-7)
+    - 'primary': Class 3, Class 4, Class 5 (Ages 8-10)
+    - 'middle': Class 6, Class 7, Class 8 (Ages 11-14)
+    Returns (tier_id, tier_name_en, tier_name_hi).
+    """
+    if class_level is None:
+        class_level = str(st.session_state.get("class_level", "5")).replace("Class ", "")
+    c_str = str(class_level).strip()
+    if c_str in ("Nursery", "LKG", "UKG", "1", "2"):
+        return "early", f"Class {c_str} • Early Explorers (Nursery - Class 2)", f"Class {c_str} • Nannhe Vaigyanik (Nursery se 2nd)"
+    elif c_str in ("3", "4", "5"):
+        return "primary", f"Class {c_str} • Junior Discoverers (Class 3 - 5)", f"Class {c_str} • Junior Khoji (3rd se 5th)"
+    else:
+        return "middle", f"Class {c_str} • Senior Scholars (Class 6 - 8)", f"Class {c_str} • Senior Vigyan (6th se 8th)"
+
+
+def render_class_tier_header(sec_id: str, lang: str) -> str:
+    """Prominent badge + Quick Class Switcher dropdown inside every lab tab."""
+    tier_id, name_en, name_hi = get_grade_tier()
+    c_badge, c_picker = st.columns([2.6, 1.4])
+    with c_badge:
+        st.markdown(f"""
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:rgba(99,102,241,0.12);border:1.5px solid rgba(99,102,241,0.3);border-radius:20px;font-weight:700;color:#3730a3;font-size:0.9rem;margin-bottom:8px;">
+          <span>🎓</span>
+          <span>{name_en if lang == 'en' else name_hi}</span>
+        </div>
+        """, unsafe_allow_html=True)
+    with c_picker:
+        opts = ["Nursery", "LKG", "UKG", "1", "2", "3", "4", "5", "6", "7", "8"]
+        curr = str(st.session_state.get("class_level", "5")).replace("Class ", "")
+        idx = opts.index(curr) if curr in opts else 5
+        q_key = f"{sec_id}_class_quick_switch"
+        if q_key in st.session_state and st.session_state[q_key] != curr:
+            st.session_state[q_key] = curr
+        picked = st.selectbox(
+            "Quick Class Switcher",
+            opts,
+            index=idx,
+            key=q_key,
+            label_visibility="collapsed",
+            help="Switch grade level to view class-specific curriculum and experiments!"
+        )
+        if picked != curr:
+            st.session_state["class_level"] = picked
+            st.rerun()
+    return tier_id
+
+
 def render_section_tools(sec_id: str, sec_label: str, placeholder: str, lang: str, age: str = "10-12", api_key: str | None = None, model: str | None = None) -> str:
     """Standardized tool bar for every section:
     1. Text search bar with direct Search button
@@ -1210,12 +1415,15 @@ def render_section_tools(sec_id: str, sec_label: str, placeholder: str, lang: st
     # Camera, Upload & Screenshot Paste Drawer
     if st.session_state.get(f"{sec_id}_show_cam", False):
         with st.container(border=True):
-            st.markdown("##### 📷 " + ("Question Photo Solver (Upload, Camera or Screenshot)" if lang == "en" else "Photo Sawaal Solver (Upload, Camera ya Screenshot)"))
+            st.markdown("##### 📷 " + ("Question Photo Solver (Phone Back Camera, Live Camera or Screenshot)" if lang == "en" else "Photo Sawaal Solver (Phone Back Camera, Live Camera ya Screenshot)"))
+            st.caption("📱 " + ("On phone: Use 'Phone Back Camera' to directly snap photos of your notebook or textbook with autofocus!" if lang == "en" else "Phone par: Notebook ya kitaab ke page ki photo lene ke liye 'Phone Back Camera' use karein!"))
             cc1, cc2 = st.columns([1.1, 1.1])
             with cc1:
-                cam_img = st.camera_input("Take photo of question", key=f"{sec_id}_cam_widget")
+                st.markdown("**📸 " + ("Phone Back Camera (Notebook & Book Photos)" if lang == "en" else "Phone Back Camera (Copy ya Kitaab)") + "**")
+                file_img = st.file_uploader("Take photo with phone back camera or upload photo", type=["png", "jpg", "jpeg", "webp"], key=f"{sec_id}_file_widget")
             with cc2:
-                file_img = st.file_uploader("Upload question photo", type=["png", "jpg", "jpeg", "webp"], key=f"{sec_id}_file_widget")
+                st.markdown("**🤳 " + ("Selfie / Live Webcam" if lang == "en" else "Webcam / Live Camera") + "**")
+                cam_img = st.camera_input("Take photo of question", key=f"{sec_id}_cam_widget")
                 try:
                     import streamlit_paste_button as spb
                     p_res = spb.paste_image_button(
@@ -1286,12 +1494,7 @@ def render_section_tools(sec_id: str, sec_label: str, placeholder: str, lang: st
 
 def init_state():
     ss = st.session_state
-    if "messages" not in ss or not ss["messages"]:
-        try:
-            import student_memory
-            ss["messages"] = student_memory.load_all_chats()
-        except Exception:
-            ss.setdefault("messages", [])
+    ss.setdefault("messages", [])
     ss.setdefault("events", [])
     ss.setdefault("body_i", 0)
     ss.setdefault("body_highlight", None)
@@ -1407,16 +1610,62 @@ def sidebar():
                 st.markdown(f"📈 **Practicing:** {', '.join(practicing[-3:])}")
 
             ds_bytes = student_memory.get_training_dataset_bytes()
-            if ds_bytes:
-                st.download_button(
-                    "📥 " + ("Download Training Data (.jsonl)" if lang == "en" else "Training Data Download Karein"),
-                    data=ds_bytes,
-                    file_name="gyaanbuddy_student_training.jsonl",
-                    mime="application/jsonlines",
-                    key="btn_dl_train_ds",
-                    help="Export logged student conversations formatted for fine-tuning LLMs."
-                )
-            if st.button("🔄 " + ("Reset Profile Memory" if lang == "en" else "Profile Reset Karein"), key="btn_reset_student_prof"):
+            if not ds_bytes:
+                init_sample = {
+                    "messages": [
+                        {"role": "system", "content": f"You are GyaanBuddy, an AI tutor for school students in India. Target: Class {chosen_class}."},
+                        {"role": "user", "content": f"Hello Buddy! I am ready to study Class {chosen_class} science and math."},
+                        {"role": "assistant", "content": f"Welcome, {prof.get('student_name', s_name)}! I am your AI learning buddy."}
+                    ]
+                }
+                ds_bytes = (json.dumps(init_sample, ensure_ascii=False) + "\n").encode("utf-8")
+
+            # Universal download for Phone, Laptop, and Tablet (.jsonl)
+            st.caption("📥 **Export & Sync:** 📱 Phone • 📟 Tab • 💻 Laptop")
+            st.download_button(
+                "📥 " + ("Download Dataset (.jsonl)" if lang == "en" else "Dataset Download Karein (.jsonl)"),
+                data=ds_bytes,
+                file_name=f"gyaanbuddy_dataset_class_{chosen_class}.jsonl",
+                mime="application/octet-stream",
+                use_container_width=True,
+                key="btn_dl_train_ds",
+                help="Universal format for fine-tuning AI models. Downloads smoothly on iOS Safari, Android, and Desktop!"
+            )
+
+            # Mobile/Tablet Instant View & Copy Expander
+            with st.expander("👁️ " + ("Preview / Copy Dataset" if lang == "en" else "Dataset Dekhein / Copy Karein")):
+                st.caption("Tap copy to use training data without needing a .jsonl app on mobile:")
+                st.code(ds_bytes.decode("utf-8", errors="ignore")[:2500], language="json")
+
+            # Universal download for Phone, Tablet, and Laptop (.txt readable notes)
+            report_lines = [
+                f"🧠 GYAANBUDDY STUDENT LEARNING NOTES",
+                f"====================================",
+                f"Student: {prof.get('student_name', s_name)}",
+                f"Grade Level: Class {chosen_class}",
+                f"Total Chats: {prof.get('total_chats', len(st.session_state.get('messages', [])))}",
+                f"Assessed Level: {prof.get('assessed_level', 'Rising Explorer')}",
+                f"Mastered Topics: {', '.join(prof.get('topics_mastered', ['General Science', 'Mathematics']))}",
+                f"Generated on: {datetime.now().strftime('%d %B %Y, %I:%M %p')}",
+                f"",
+                f"--- RECENT STUDY CHATS ---",
+            ]
+            for m in st.session_state.get("messages", [])[-15:]:
+                role = "Student" if m.get("role") == "user" else "GyaanBuddy"
+                report_lines.append(f"[{role}]: {m.get('text', '')}")
+                report_lines.append("")
+            report_txt = "\n".join(report_lines).encode("utf-8")
+
+            st.download_button(
+                "📄 " + ("Download Study Notes (.txt)" if lang == "en" else "Study Notes Download Karein (.txt)"),
+                data=report_txt,
+                file_name=f"gyaanbuddy_notes_class_{chosen_class}.txt",
+                mime="text/plain; charset=utf-8",
+                use_container_width=True,
+                key="btn_dl_student_notes",
+                help="Universal text notes: opens smoothly on every iPhone, iPad, Android phone, and laptop!"
+            )
+            if st.button("🔄 " + ("Reset Profile Memory" if lang == "en" else "Profile Reset Karein"), key="btn_reset_student_prof", use_container_width=True):
                 student_memory.reset_student_profile()
                 st.toast("Student profile memory reset!")
                 st.rerun()
@@ -1458,22 +1707,24 @@ def tab_chat(lang, age, api_key, model):
     t = TXT[lang]
     st.subheader(t["tabs"][0])
 
-    # 🎤 Voice Question Input for Young Students (Nursery to 8th Class)
-    voice_rec = st.audio_input(
-        "🎤 " + ("Record voice question (auto-transcribed)" if lang == "en" else "Awaaz record karein (auto-transcribed)"),
-        key="voice_rec_input"
-    )
-    if voice_rec:
-        with st.spinner("🎧 Listening to your voice recording… 🎙️" if lang == "en" else "Awaaz sun raha hoon… 🎙️"):
-            spoken_text = transcribe_audio(voice_rec, lang)
-        if spoken_text:
-            st.success(f"🗣️ " + (f"Heard: \"{spoken_text}\"" if lang == "en" else f"Suna: \"{spoken_text}\""))
-            st.session_state["pending"] = spoken_text
-            st.rerun()
-        else:
-            st.info("💡 " + ("Voice recorded! Buddy is listening. Ask in chat below:" if lang == "en" else "Awaaz record ho gayi! Neeche chat mein poochhein:"))
+    # 🎤 Optional Voice Question Input
+    with st.expander("🎙️ " + ("Voice Question (Speak to Buddy)" if lang == "en" else "Awaaz Se Poochhein (Bol kar sawaal karein)"), expanded=False):
+        voice_rec = st.audio_input(
+            "Record voice question",
+            key="voice_rec_input",
+            label_visibility="collapsed"
+        )
+        if voice_rec:
+            with st.spinner("🎧 Listening to your voice recording… 🎙️" if lang == "en" else "Awaaz sun raha hoon… 🎙️"):
+                spoken_text = transcribe_audio(voice_rec, lang)
+            if spoken_text:
+                st.success(f"🗣️ " + (f"Heard: \"{spoken_text}\"" if lang == "en" else f"Suna: \"{spoken_text}\""))
+                st.session_state["pending"] = spoken_text
+                st.rerun()
 
-    st.divider()
+    if not st.session_state["messages"]:
+        st.info("👋 " + ("Hello! Ask any question about Science or Math below, or explore the interactive labs above!"
+                         if lang == "en" else "Namaste! Science ya Maths ke baare mein kuch bhi poochhein ya upar labs explore karein!"))
 
     for i, m in enumerate(st.session_state["messages"]):
         with st.chat_message(m["role"], avatar="🧒" if m["role"] == "user" else "🧠"):
@@ -1563,9 +1814,11 @@ def tab_snap_solve(lang, age, api_key, model):
     # Camera & Image Upload
     snap_col1, snap_col2 = st.columns([1, 1])
     with snap_col1:
-        cam_img = st.camera_input("📷 " + ("Take photo of question" if lang == "en" else "Sawaal ki photo lein"), key="snap_cam_input")
+        st.markdown("**📸 " + ("Phone Back Camera (Notebook & Book Photos)" if lang == "en" else "Phone Back Camera (Copy ya Kitaab)") + "**")
+        file_img = st.file_uploader("📁 " + ("Take photo with back camera or choose photo" if lang == "en" else "Back camera se photo lein ya upload karein"), type=["png", "jpg", "jpeg", "webp"], key="snap_file_input")
     with snap_col2:
-        file_img = st.file_uploader("📁 " + ("Or upload question photo" if lang == "en" else "Ya image upload karein"), type=["png", "jpg", "jpeg", "webp"], key="snap_file_input")
+        st.markdown("**🤳 " + ("Selfie / Live Webcam" if lang == "en" else "Webcam / Live Camera") + "**")
+        cam_img = st.camera_input("📷 " + ("Live camera snapshot" if lang == "en" else "Live camera snapshot"), key="snap_cam_input")
 
     active_img = cam_img or file_img
     if active_img:
@@ -1779,57 +2032,135 @@ def tab_nature(lang, age="10-12", api_key=None, model=None):
         lang, age, api_key, model
     )
 
-    # 2. Interactive Study & Experiment Section
-    st.markdown("#### 🔬 " + ("Interactive Trees, Plants & Animals Lab" if lang == "en" else "Interactive Ped, Paudhe aur Jeev Vigyan Lab"))
+    # 2. Dynamic Class-Tier Curriculum
+    tier_id = render_class_tier_header("nature", lang)
 
-    topics = [
-        ("🌳 " + ("Parts of a Tree & Plant Anatomy" if lang == "en" else "Ped aur Paudhe ke Bhaag (Anatomy)"), "tree_parts"),
-        ("☀️ " + ("Photosynthesis: How Plants Make Food" if lang == "en" else "Photosynthesis: Paudhe Bhojan Kaise Banate Hain"), "photosynthesis"),
-        ("🦋 " + ("Butterfly Metamorphosis Life Cycle" if lang == "en" else "Titli Ka Jeevan Chakra (Metamorphosis)"), "butterfly_lifecycle"),
-        ("🐸 " + ("Frog Amphibian Life Cycle" if lang == "en" else "Mendhak Ka Jeevan Chakra (Frog Life Cycle)"), "frog_lifecycle"),
-        ("🦁 " + ("Animal Diets (Herbivores, Carnivores, Omnivores)" if lang == "en" else "Jaanwaron Ka Bhojan (Shakahari, Mansahari)"), "animal_diets"),
-        ("🌱 " + ("Food Chain & Ecosystem Flow" if lang == "en" else "Khaadya Shrinkhala (Food Chain Flow)"), "food_chain"),
-    ]
+    if tier_id == "early":
+        st.markdown("#### 🐣 " + ("Early Nature Explorers (Nursery to Class 2)" if lang == "en" else "Nannhe Khoji: Ped, Paudhe aur Jaanwar (Nursery se 2nd)"))
+        e_topics = [
+            ("🐶 " + ("Cute Animals & Their Babies" if lang == "en" else "Pyare Jaanwar aur Unke Bachhe"), "cute_animals"),
+            ("🌱 " + ("How a Tiny Seed Grows into a Sunflower" if lang == "en" else "Beej se Sunflower Kaise Khilta Hai"), "seed_growth"),
+            ("🍎 " + ("Yummy Fruits & Healthy Veggies" if lang == "en" else "Mazedaar Phal aur Sabziyan"), "fruits"),
+            ("🌈 " + ("Nature Senses & Rainbow Colors" if lang == "en" else "Rainbow ke Rang aur 5 Senses"), "rainbow_senses"),
+        ]
+        e_pick = st.selectbox("Choose Activity", range(len(e_topics)), format_func=lambda idx: e_topics[idx][0], key="nat_early_topic")
+        key = e_topics[e_pick][1]
 
-    selected_idx = st.selectbox(
-        "Choose Nature Study Topic",
-        range(len(topics)),
-        format_func=lambda idx: topics[idx][0],
-        key="nature_topic_select",
-        label_visibility="collapsed"
-    )
-    selected_key = topics[selected_idx][1]
-    nature_data = C.NATURE_TOPICS.get(selected_key, {})
-    title = nature_data.get("title_hi" if lang == "hi" else "title_en", "")
-    desc = nature_data.get("hi" if lang == "hi" else "en", "")
-    fact = nature_data.get("fact_hi" if lang == "hi" else "fact_en", "")
-    act = nature_data.get("activity_hi" if lang == "hi" else "activity_en", "")
+        if key == "cute_animals":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                a_sub = st.radio("Choose Animal Friend", ["🐶 Dog & Puppy", "🐱 Cat & Kitten", "🐮 Cow & Calf", "🦁 Lion & Cub"], horizontal=True, key="nat_animal_sub")
+                a_key = "dog" if "Dog" in a_sub else ("cat" if "Cat" in a_sub else ("cow" if "Cow" in a_sub else "lion"))
+                show_svg(V.cute_animals_svg(a_key, lang), 480)
+            with col2:
+                st.markdown(f"### {a_sub}")
+                st.markdown("Animals care for their babies just like our families care for us! They feed them, teach them to play, and keep them cozy and safe.")
+                read_aloud(f"Animal friend: {a_sub}", key=f"aud_a_{a_key}", lang=lang)
+                if st.button("⭐ " + ("I Learned This! (+15 XP)" if lang == "en" else "Maine Seekha! (+15 XP)"), key=f"btn_xp_a_{a_key}"):
+                    add_xp(15, f"Learned about {a_sub}!", badge_id="animal_friend", badge_name="Animal Friend")
 
-    col_vis, col_info = st.columns([1.2, 1])
-    with col_vis:
-        if selected_key == "tree_parts":
-            show_svg(V.tree_plant_svg(lang), 480)
-        elif selected_key == "photosynthesis":
-            show_svg(V.photosynthesis_svg(lang), 480)
-        elif selected_key == "butterfly_lifecycle":
-            show_svg(V.butterfly_lifecycle_svg(lang), 480)
-        elif selected_key == "frog_lifecycle":
-            show_svg(V.butterfly_lifecycle_svg(lang), 480)
+        elif key == "seed_growth":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                stage = st.slider("Plant Growth Stage", 1, 4, 3, format_func=lambda s: f"Stage {s}: {'Seed in Soil 🌰' if s==1 else ('Baby Sprout 🌱' if s==2 else ('Growing Stem 🌿' if s==3 else 'Sunflower Bloom! 🌻'))}")
+                show_svg(V.seed_plant_svg(stage, lang), 480)
+            with col2:
+                st.markdown("### 🌱 From Tiny Seed to Big Sunflower!")
+                st.markdown("1. **Seed**: Sleeps warm in dark brown soil.<br>2. **Sprout**: Roots drink water, green shoot pops up!<br>3. **Stem**: Green leaves catch golden sunshine.<br>4. **Bloom**: Bright yellow flower turns to face the Sun!", unsafe_allow_html=True)
+                read_aloud("Seed growth cycle", key="aud_seed", lang=lang)
+                if st.button("⭐ " + ("I Learned This! (+15 XP)" if lang == "en" else "Maine Seekha! (+15 XP)"), key="btn_xp_seed"):
+                    add_xp(15, "Learned how seeds grow into plants!", badge_id="green_thumb", badge_name="Green Thumb")
+
+        elif key == "fruits":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.counting_fruits_svg(6, lang), 480)
+            with col2:
+                st.markdown("### 🍎 Healthy Fruits and Vegetables")
+                st.markdown("Fruits like juicy sweet apples, yellow bananas, and oranges give us vitamins! Crunchy carrots grow under the soil.")
+                if st.button("⭐ " + ("I Learned This! (+15 XP)" if lang == "en" else "Maine Seekha! (+15 XP)"), key="btn_xp_fruit"):
+                    add_xp(15, "Learned healthy fruits and veggies!")
+
         else:
-            show_svg(V.nature_foodchain_svg(lang), 480)
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.five_senses_body_svg("all", lang), 480)
+            with col2:
+                st.markdown("### 🌈 Nature's 5 Senses")
+                st.markdown("Your eyes see colorful butterflies, your ears hear singing birds, your nose smells sweet roses, your tongue tastes juicy mangoes, and your hands touch soft puppy fur!")
+                if st.button("⭐ " + ("I Learned This! (+15 XP)" if lang == "en" else "Maine Seekha! (+15 XP)"), key="btn_xp_nat_sens"):
+                    add_xp(15, "Learned nature's 5 senses!")
 
-    with col_info:
-        st.markdown(f"### {title}")
-        st.markdown(desc)
-        if fact:
-            st.markdown(f"<div class='fact'>💡 <b>{'Mazedaar Baat:' if lang == 'hi' else 'Fun Fact:'}</b> {fact}</div>", unsafe_allow_html=True)
-        if act:
-            st.markdown(f"<div class='act' style='margin-top:10px;'>🧪 <b>{'Ghar par karke dekho:' if lang == 'hi' else 'Try at home:'}</b> {act}</div>", unsafe_allow_html=True)
+    elif tier_id == "primary":
+        st.markdown("#### 🌳 " + ("Junior Nature & Environmental Science (Class 3 - 5)" if lang == "en" else "Junior Vigyan: Ped, Titli aur Jal Chakra (3rd se 5th)"))
+        p_topics = [
+            ("🌳 " + ("Parts of a Tree & Plant Anatomy" if lang == "en" else "Ped ke Hisse (Jad, Tana, Patti)"), "tree_parts"),
+            ("🦋 " + ("Butterfly Metamorphosis Life Cycle" if lang == "en" else "Titli Ka Jeevan Chakra (4 Stages)"), "butterfly_lifecycle"),
+            ("💧 " + ("The Water Cycle: Evaporation, Clouds & Rain" if lang == "en" else "Jal Chakra (Evaporation, Baadal, Baarish)"), "water_cycle"),
+            ("🦁 " + ("Animal Diets (Herbivores, Carnivores, Omnivores)" if lang == "en" else "Jaanwaron Ka Khana (Shakahari, Mansahari)"), "animal_diets"),
+            ("🐸 " + ("Frog Amphibian Life Cycle" if lang == "en" else "Mendhak Ka Jeevan Chakra"), "frog_lifecycle"),
+        ]
+        p_pick = st.selectbox("Choose Junior Topic", range(len(p_topics)), format_func=lambda idx: p_topics[idx][0], key="nat_prim_topic")
+        p_key = p_topics[p_pick][1]
 
-        read_aloud(f"{title}. {desc} {fact}", key=f"aud_nat_{selected_key}", lang=lang)
-        if st.button("⭐ " + ("I Learned This Topic! (+15 XP)" if lang == "en" else "Maine Yeh Seekha! (+15 XP)"), key=f"btn_xp_nat_{selected_key}"):
-            add_xp(15, f"Mastered {title}!", badge_id="nature_explorer", badge_name="Nature Explorer")
-            log("learned", "General Science", selected_key)
+        col1, col2 = st.columns([1.2, 1])
+        with col1:
+            if p_key == "tree_parts":
+                show_svg(V.tree_plant_svg(lang), 480)
+            elif p_key == "butterfly_lifecycle":
+                show_svg(V.butterfly_lifecycle_svg(lang), 480)
+            elif p_key == "water_cycle":
+                show_svg(V.water_cycle_svg(lang), 480)
+            elif p_key == "frog_lifecycle":
+                show_svg(V.butterfly_lifecycle_svg(lang), 480)
+            else:
+                show_svg(V.nature_foodchain_svg(lang), 480)
+        with col2:
+            info = C.NATURE_TOPICS.get(p_key, {})
+            t_title = info.get("title_hi" if lang == "hi" else "title_en", "")
+            t_desc = info.get("hi" if lang == "hi" else "en", "")
+            t_form = info.get("formula", "")
+            st.markdown(f"### {t_title}")
+            st.markdown(t_desc)
+            if t_form:
+                st.markdown(f"<div class='formula'>{t_form}</div>", unsafe_allow_html=True)
+            read_aloud(f"{t_title}. {t_desc}", key=f"aud_prim_{p_key}", lang=lang)
+            if st.button("⭐ " + ("I Mastered This! (+15 XP)" if lang == "en" else "Maine Seekh Liya! (+15 XP)"), key=f"xp_prim_{p_key}"):
+                add_xp(15, f"Mastered {t_title}!", badge_id="nature_explorer", badge_name="Nature Explorer")
+
+    else:
+        st.markdown("#### 🔬 " + ("Middle School Biology & Ecology Lab (Class 6 - 8)" if lang == "en" else "Middle School Biology & Ecology Lab (6th se 8th)"))
+        m_topics = [
+            ("☀️ " + ("Photosynthesis Bio-Reaction & Chemical Flow" if lang == "en" else "Photosynthesis: Rasayanik Kriya aur Urja"), "photosynthesis"),
+            ("🌱 " + ("Forest Food Chains, Trophic Levels & 10% Energy Rule" if lang == "en" else "Khaadya Shrinkhala aur Trophic Levels"), "food_chain"),
+            ("🐸 " + ("Amphibian Metamorphosis & Ecology" if lang == "en" else "Mendhak Ka Jeevan Chakra aur Ecology"), "frog_lifecycle"),
+            ("🌳 " + ("Advanced Plant Anatomy & Vascular Transport" if lang == "en" else "Paudhon Ki Xylem aur Phloem Naliyan"), "tree_parts"),
+        ]
+        m_pick = st.selectbox("Middle School Biology Topic", range(len(m_topics)), format_func=lambda idx: m_topics[idx][0], key="nat_mid_topic")
+        m_key = m_topics[m_pick][1]
+
+        col1, col2 = st.columns([1.2, 1])
+        with col1:
+            if m_key == "photosynthesis":
+                show_svg(V.photosynthesis_svg(lang), 480)
+            elif m_key == "food_chain":
+                show_svg(V.nature_foodchain_svg(lang), 480)
+            elif m_key == "frog_lifecycle":
+                show_svg(V.butterfly_lifecycle_svg(lang), 480)
+            else:
+                show_svg(V.tree_plant_svg(lang), 480)
+        with col2:
+            info = C.NATURE_TOPICS.get(m_key, {})
+            t_title = info.get("title_hi" if lang == "hi" else "title_en", "")
+            t_desc = info.get("hi" if lang == "hi" else "en", "")
+            t_form = info.get("formula", "")
+            st.markdown(f"### {t_title}")
+            st.markdown(t_desc)
+            if t_form:
+                st.markdown(f"<div class='formula'>{t_form}</div>", unsafe_allow_html=True)
+            read_aloud(f"{t_title}. {t_desc}", key=f"aud_mid_{m_key}", lang=lang)
+            if st.button("⭐ " + ("I Mastered This! (+20 XP)" if lang == "en" else "Maine Seekh Liya! (+20 XP)"), key=f"xp_mid_{m_key}"):
+                add_xp(20, f"Mastered {t_title}!", badge_id="bio_scholar", badge_name="Bio Scholar")
 
 
 # ----------------------------------------------------------------------------- body tab
@@ -1844,155 +2175,198 @@ def tab_body(lang, age="10-12", api_key=None, model=None):
         lang, age, api_key, model
     )
 
-    parts = C.BODY_PARTS
+    tier_id = render_class_tier_header("body", lang)
 
+    if tier_id == "early":
+        st.markdown("#### 👶 " + ("Early Body & Wonder Senses (Nursery to Class 2)" if lang == "en" else "Nannha Sharir aur 5 Senses (Nursery se 2nd)"))
+        e_b_topics = [
+            ("👀 " + ("My 5 Wonder Senses" if lang == "en" else "Meri 5 Wonder Senses"), "senses"),
+            ("🪥 " + ("Clean Teeth & Sparkly Smile" if lang == "en" else "Saaf Daant aur Chamakti Smile"), "teeth"),
+            ("💓 " + ("Feeling My Thump-Thump Heart" if lang == "en" else "Dil Ki Dhadkan Suno"), "heartbeat"),
+        ]
+        e_pick = st.selectbox("Choose Body Wonder", range(len(e_b_topics)), format_func=lambda idx: e_b_topics[idx][0], key="body_early_pick")
+        e_key = e_b_topics[e_pick][1]
 
-    # Body System Filters (per Bing anatomical diagram categories)
-    systems = [
-        ("🌟 " + ("All Organs" if lang == "en" else "Sabhi Organs"), None),
-        ("🫀 " + ("Circulatory" if lang == "en" else "Circulatory (Dil)"), "Circulatory system"),
-        ("🫁 " + ("Respiratory" if lang == "en" else "Respiratory (Fefde)"), "Respiratory system"),
-        ("🍕 " + ("Digestive" if lang == "en" else "Digestive (Pet/Jigar)"), "Digestive system"),
-        ("🧠 " + ("Nervous" if lang == "en" else "Nervous (Dimaag)"), "Nervous system"),
-        ("🦴 " + ("Skeletal" if lang == "en" else "Skeletal (Haddiyan)"), "Skeletal system"),
-        ("🫘 " + ("Urinary" if lang == "en" else "Urinary (Gurde)"), "Urinary system"),
-    ]
-    sys_cols = st.columns(len(systems))
-    for s_idx, (s_label, s_sys) in enumerate(systems):
-        if sys_cols[s_idx].button(s_label, key=f"body_sys_{s_idx}", width="stretch"):
-            if s_sys is not None:
-                for o_idx, bp in enumerate(parts):
-                    if bp.get("system") == s_sys:
-                        st.session_state["body_i"] = o_idx
-                        break
+        if e_key == "senses":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                s_pick = st.radio("Pick a Sense", ["🌈 All 5 Senses", "👀 Eyes (Sight)", "👂 Ears (Sound)", "👃 Nose (Smell)", "👅 Tongue (Taste)", "✋ Skin (Touch)"], horizontal=True, key="early_sense_rad")
+                s_code = "eyes" if "Eyes" in s_pick else ("ears" if "Ears" in s_pick else ("nose" if "Nose" in s_pick else ("tongue" if "Tongue" in s_pick else ("hands" if "Skin" in s_pick else "all"))))
+                show_svg(V.five_senses_body_svg(s_code, lang), 480)
+            with col2:
+                st.markdown(f"### {s_pick}")
+                st.markdown("Your body is an amazing machine! Your 5 senses send secret messages to your brain every millisecond to help you explore the world.")
+                read_aloud(f"My 5 Wonder Senses. {s_pick}", key=f"aud_s_{s_code}", lang=lang)
+                if st.button("⭐ " + ("I Learned My Senses! (+15 XP)" if lang == "en" else "Maine Senses Seekhein! (+15 XP)"), key=f"btn_xp_s_{s_code}"):
+                    add_xp(15, "Learned the 5 senses!", badge_id="body_explorer", badge_name="Body Wonder")
+
+        elif e_key == "teeth":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.clean_teeth_svg(lang), 480)
+            with col2:
+                st.markdown("### 🪥 Brushing for Strong, Happy Teeth!")
+                st.markdown("• Brush in little circles twice a day (morning & before bed).<br>• Clean the front, back, and chewing tops!<br>• Keep sugar bugs away with fresh water!", unsafe_allow_html=True)
+                read_aloud("Brush your teeth twice a day in gentle circles.", key="aud_teeth", lang=lang)
+                if st.button("⭐ " + ("I Brushed Today! (+15 XP)" if lang == "en" else "Maine Daant Saaf Kiye! (+15 XP)"), key="btn_xp_teeth"):
+                    add_xp(15, "Learned healthy dental hygiene!", badge_id="clean_smile", badge_name="Bright Smile")
+
+        else:
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.vital_signs_svg(75, lang), 440)
+            with col2:
+                st.markdown("### 💓 Lub-Dub! Put Your Hand on Your Chest")
+                st.markdown("Your heart is a strong muscle about the size of your fist. It beats around 80 times every minute to send fresh blood all the way to your toes!")
+                read_aloud("Your heart beats steadily to keep you energized.", key="aud_hb_early", lang=lang)
+                if st.button("⭐ " + ("I Felt My Heartbeat! (+15 XP)" if lang == "en" else "Maine Dhadkan Mehsoos Ki! (+15 XP)"), key="btn_xp_hb_early"):
+                    add_xp(15, "Discovered how the heart pumps blood!")
+
+    elif tier_id == "primary":
+        st.markdown("#### 👤 " + ("Junior Anatomy & Organ Systems (Class 3 - 5)" if lang == "en" else "Junior Sharir Vigyan (3rd se 5th)"))
+        parts = C.BODY_PARTS
+
+        # Body System Filters
+        systems = [
+            ("🌟 " + ("All Organs" if lang == "en" else "Sabhi Organs"), None),
+            ("🫀 Circulatory", "Circulatory system"),
+            ("🫁 Respiratory", "Respiratory system"),
+            ("🍕 Digestive", "Digestive system"),
+            ("🧠 Nervous", "Nervous system"),
+            ("🦴 Skeletal", "Skeletal system"),
+        ]
+        sys_cols = st.columns(len(systems))
+        for s_idx, (s_label, s_sys) in enumerate(systems):
+            if sys_cols[s_idx].button(s_label, key=f"body_p_sys_{s_idx}", width="stretch"):
+                if s_sys is not None:
+                    for o_idx, bp in enumerate(parts):
+                        if bp.get("system") == s_sys:
+                            st.session_state["body_i"] = o_idx
+                            break
+                st.rerun()
+
+        i = st.session_state.get("body_i", 0) % len(parts)
+        c1, c2, c3 = st.columns([1, 1, 4])
+        if c1.button(t["prev"], key="b_p_prev"):
+            st.session_state["body_i"] = (i - 1) % len(parts)
+            st.rerun()
+        if c2.button(t["next"], key="b_p_next"):
+            st.session_state["body_i"] = (i + 1) % len(parts)
+            st.rerun()
+        names = [(b["hi_name"] if lang == "hi" else b["en_name"]) for b in parts]
+        pick = c3.selectbox("Part", names, index=i, label_visibility="collapsed", key="b_p_select")
+        if names.index(pick) != i:
+            st.session_state["body_i"] = names.index(pick)
             st.rerun()
 
-    # Organ Mastered Progress Counter
-    learned_count = len(st.session_state["learned_organs"])
-    st.markdown(f"🏆 **Organs Mastered:** {learned_count}/{len(parts)} " +
-                ("• Master all 8 to become an Anatomy Ace!" if lang == "en" else "• Saare 8 seekh kar Anatomy Ace bano!"))
-
-    show_all = st.toggle(t["all"], value=False)
-    if show_all:
-        left, right = st.columns([1.1, 1])
-        with left:
-            show_svg(V.body_svg(None, lang), 470)
-        with right:
-            for b in parts:
-                st.markdown(f"**{b['hi_name'] if lang == 'hi' else b['en_name']}**: {b[lang].split('.')[0]}.")
-        return
-
-    i = st.session_state["body_i"] % len(parts)
-    c1, c2, c3 = st.columns([1, 1, 4])
-    if c1.button(t["prev"], key="bprev"):
-        st.session_state["body_i"] = (i - 1) % len(parts)
-        st.rerun()
-    if c2.button(t["next"], key="bnext"):
-        st.session_state["body_i"] = (i + 1) % len(parts)
-        st.rerun()
-    names = [(b["hi_name"] if lang == "hi" else b["en_name"]) for b in parts]
-    pick = c3.selectbox("Part", names, index=i, label_visibility="collapsed")
-    if names.index(pick) != i:
-        st.session_state["body_i"] = names.index(pick)
-        st.rerun()
-
-    b = parts[i]
-    if b["key"] == "brain":
-        b_view = st.radio(
-            "Brain View Mode",
-            ["🔬 " + ("Detailed Brain Lobes & Functions" if lang == "en" else "Dimaag Ki Banawat & Lobes"),
-             "👤 " + ("Whole Body Position" if lang == "en" else "Sharir Mein Sthiti")],
-            horizontal=True,
-            key="brain_view_selector"
-        )
-        left, right = st.columns([1.2, 1])
-        with left:
-            if "Whole Body" in b_view or "Sharir Mein" in b_view:
-                show_svg(V.body_svg(b["key"], lang), 470)
-            else:
-                show_svg(V.brain_detail_svg(lang), 540)
-    elif b["key"] == "kidneys":
-        k_view = st.radio(
-            "Kidney View Mode",
-            ["🔬 " + ("Realistic Cross-Section & Nephron" if lang == "en" else "Realistic Banawat & Nephron"),
-             "👤 " + ("Whole Body Position" if lang == "en" else "Sharir Mein Sthiti")],
-            horizontal=True,
-            key="kidney_view_selector"
-        )
-        left, right = st.columns([1.2, 1])
-        with left:
-            if "Whole Body" in k_view or "Sharir Mein" in k_view:
-                show_svg(V.body_svg(b["key"], lang), 470)
-            else:
-                show_svg(V.kidney_detail_svg(lang), 540)
-    else:
+        b = parts[i]
         left, right = st.columns([1.1, 1])
         with left:
             show_svg(V.body_svg(b["key"], lang), 470)
+        with right:
+            st.markdown(f"### {names[i]}")
+            st.caption(f"{b['system']} • {i + 1}/{len(parts)}")
+            st.write(b[lang])
+            st.markdown(f"<div class='fact'>💡 <b>{t['fact']}:</b> {b['fact_' + lang]}</div>", unsafe_allow_html=True)
+            read_aloud(f"{names[i]}. {b[lang]}", key=f"body_p_ra_{b['key']}", lang=lang)
+            if st.button("✅ " + ("I Learned This (+15 XP)" if lang == "en" else "Maine Seekh Liya (+15 XP)"), key=f"learn_p_{b['key']}"):
+                add_xp(15, f"Mastered {names[i]}!", badge_id="anatomy_ace", badge_name="Anatomy Ace")
+                st.toast("Great job! 🌟")
 
-    with right:
-        st.markdown(f"### {names[i]}")
-        st.caption(f"{b['system']}  •  {i + 1}/{len(parts)}")
-        st.write(b[lang])
-        st.markdown(f"<div class='fact'>💡 <b>{t['fact']}:</b> {b['fact_' + lang]}</div>", unsafe_allow_html=True)
+        st.divider()
+        st.markdown("#### 💓 " + ("Heartbeat & Exercise Simulator" if lang == "en" else "Dil Ki Dhadkan Simulator"))
+        v1, v2 = st.columns([1, 1.2])
+        with v1:
+            bpm = st.select_slider("Activity", options=[70, 95, 125, 160], value=70, key="b_p_bpm",
+                                   format_func=lambda v: "🛋️ Resting (70 BPM)" if v==70 else ("🚶 Walking (95 BPM)" if v==95 else ("🏃 Running (125 BPM)" if v==125 else "⚡ Sprint (160 BPM)")))
+        with v2:
+            show_svg(V.vital_signs_svg(bpm, lang), 420)
 
-        if b["key"] == "brain":
-            st.markdown(f"""
-            <div style="margin-top:12px;padding:12px 14px;background:rgba(236,64,122,0.12);border-left:4px solid #ec407a;border-radius:10px;font-size:0.9rem;">
-              <b>🧠 {('Brain Functional Lobes' if lang == 'en' else 'Dimaag Ke 4 Khaas Hisse')}:</b><br>
-              • <b>{('Frontal Lobe' if lang == 'en' else 'Frontal Lobe')}:</b> {('Planning, decisions, emotions & speech.' if lang == 'en' else 'Sochna, faisle lena aur bolna.')}<br>
-              • <b>{('Parietal Lobe' if lang == 'en' else 'Parietal Lobe')}:</b> {('Touch, taste, temperature & spatial awareness.' if lang == 'en' else 'Chhoona, swaad aur disha.')}<br>
-              • <b>{('Temporal Lobe' if lang == 'en' else 'Temporal Lobe')}:</b> {('Memory storage & sound/hearing processing.' if lang == 'en' else 'Yaaddasht aur sunna.')}<br>
-              • <b>{('Occipital Lobe' if lang == 'en' else 'Occipital Lobe')}:</b> {('Processes everything your eyes see.' if lang == 'en' else 'Nazar aur dekhne ka center.')}<br>
-              • <b>{('Cerebellum & Brainstem' if lang == 'en' else 'Cerebellum & Brainstem')}:</b> {('Balance, posture, heart rate & breathing.' if lang == 'en' else 'Santulan aur dil ki dhadkan/saans.')}
-            </div>
-            """, unsafe_allow_html=True)
-        elif b["key"] == "kidneys":
-            st.markdown(f"""
-            <div style="margin-top:12px;padding:12px 14px;background:rgba(220,38,38,0.12);border-left:4px solid #dc2626;border-radius:10px;font-size:0.9rem;">
-              <b>🔬 {('Internal Kidney Anatomy' if lang == 'en' else 'Gurde Ki Andaruni Banawat')}:</b><br>
-              • <b>{('Renal Cortex' if lang == 'en' else 'Renal Cortex')}:</b> {('Outer filtration zone with 1,000,000+ microscopic nephrons.' if lang == 'en' else 'Bahar ka hissa jahan 10 lakh+ nephrons khoon chhaante hain.')}<br>
-              • <b>{('Renal Pyramids' if lang == 'en' else 'Renal Pyramids')}:</b> {('Medullary lobes collecting filtered urine.' if lang == 'en' else 'Peshab ko ikattha karne wale medullary lobes.')}<br>
-              • <b>{('Pelvis &amp; Ureter' if lang == 'en' else 'Pelvis aur Ureter')}:</b> {('Central funnel draining urine down into the urinary bladder.' if lang == 'en' else 'Peshab ko bladder tak pahunchane wali nali.')}
-            </div>
-            """, unsafe_allow_html=True)
+    else:
+        st.markdown("#### 🔬 " + ("Middle School Anatomy & Physiology (Class 6 - 8)" if lang == "en" else "Middle School Sharir Vigyan & Physiology (6th se 8th)"))
+        parts = C.BODY_PARTS
 
-        read_aloud(f"{names[i]}. {b[lang]} {b['fact_' + lang]}", key=f"body_ra_{b['key']}", lang=lang)
+        systems = [
+            ("🌟 " + ("All Organs" if lang == "en" else "Sabhi Organs"), None),
+            ("🫀 " + ("Circulatory" if lang == "en" else "Circulatory (Dil)"), "Circulatory system"),
+            ("🫁 " + ("Respiratory" if lang == "en" else "Respiratory (Fefde)"), "Respiratory system"),
+            ("🍕 " + ("Digestive" if lang == "en" else "Digestive (Pet/Jigar)"), "Digestive system"),
+            ("🧠 " + ("Nervous" if lang == "en" else "Nervous (Dimaag)"), "Nervous system"),
+            ("🦴 " + ("Skeletal" if lang == "en" else "Skeletal (Haddiyan)"), "Skeletal system"),
+            ("🫘 " + ("Urinary" if lang == "en" else "Urinary (Gurde)"), "Urinary system"),
+        ]
+        sys_cols = st.columns(len(systems))
+        for s_idx, (s_label, s_sys) in enumerate(systems):
+            if sys_cols[s_idx].button(s_label, key=f"body_m_sys_{s_idx}", width="stretch"):
+                if s_sys is not None:
+                    for o_idx, bp in enumerate(parts):
+                        if bp.get("system") == s_sys:
+                            st.session_state["body_i"] = o_idx
+                            break
+                st.rerun()
 
-        already_learned = b["key"] in st.session_state["learned_organs"]
-        btn_label = ("🌟 Mastered!" if already_learned else ("✅ I learned this" if lang == "en" else "✅ Maine seekh liya"))
-        if st.button(btn_label, key=f"learn{b['key']}", disabled=already_learned):
-            st.session_state["learned_organs"].append(b["key"])
-            log("learned", "Human body", b["en_name"])
-            badge = "anatomy_master" if len(st.session_state["learned_organs"]) >= 6 else None
-            add_xp(15, f"Mastered {names[i]}!", badge_id=badge, badge_name="Anatomy Ace")
-            st.toast("Great job! 🌟" if lang == "en" else "Shabaash! 🌟")
+        learned_count = len(st.session_state["learned_organs"])
+        st.markdown(f"🏆 **Organs Mastered:** {learned_count}/{len(parts)} " +
+                    ("• Master all 8 to become an Anatomy Ace!" if lang == "en" else "• Saare 8 seekh kar Anatomy Ace bano!"))
+
+        i = st.session_state.get("body_i", 0) % len(parts)
+        c1, c2, c3 = st.columns([1, 1, 4])
+        if c1.button(t["prev"], key="b_m_prev"):
+            st.session_state["body_i"] = (i - 1) % len(parts)
+            st.rerun()
+        if c2.button(t["next"], key="b_m_next"):
+            st.session_state["body_i"] = (i + 1) % len(parts)
+            st.rerun()
+        names = [(b["hi_name"] if lang == "hi" else b["en_name"]) for b in parts]
+        pick = c3.selectbox("Part", names, index=i, label_visibility="collapsed", key="b_m_select")
+        if names.index(pick) != i:
+            st.session_state["body_i"] = names.index(pick)
             st.rerun()
 
-    st.divider()
-
-    # Interactive Vital Signs / Live Heartbeat Simulator
-    st.markdown("#### 💓 " + ("Live Heartbeat & Breathing Simulator" if lang == "en" else "Live Dil Ki Dhadkan & Saans Simulator"))
-    st.caption("Slide to change physical activity and watch the heart pump and lungs breathe faster!" if lang == "en" else
-               "Activity badal kar dekho ki exercise karne par dil kitna tezi se khoon pump karta hai!")
-    v_col1, v_col2 = st.columns([1, 1.3])
-    with v_col1:
-        bpm = st.select_slider(
-            "Physical Activity State",
-            options=[70, 95, 125, 160],
-            value=70,
-            format_func=lambda v: (
-                "🛋️ Resting on Couch (70 BPM)" if v == 70 else
-                ("🚶 Walking to School (95 BPM)" if v == 95 else
-                 ("🏃 Jogging in Park (125 BPM)" if v == 125 else "⚡ Full Sprint Race (160 BPM)"))
-            )
-        )
-        if bpm >= 125:
-            st.info("💪 When exercising, your muscles need 3x more oxygen, so the brain commands your heart and lungs to speed up!")
+        b = parts[i]
+        if b["key"] == "brain":
+            b_view = st.radio("Brain View Mode", ["🔬 " + ("Detailed Brain Lobes & Functions" if lang == "en" else "Dimaag Ki Banawat & Lobes"), "👤 Whole Body Position"], horizontal=True, key="brain_m_sel")
+            left, right = st.columns([1.2, 1])
+            with left:
+                show_svg(V.body_svg(b["key"], lang) if "Whole Body" in b_view else V.brain_detail_svg(lang), 520)
+        elif b["key"] == "kidneys":
+            k_view = st.radio("Kidney View Mode", ["🔬 " + ("Realistic Cross-Section & Nephron" if lang == "en" else "Nephron Banawat"), "👤 Whole Body Position"], horizontal=True, key="kidney_m_sel")
+            left, right = st.columns([1.2, 1])
+            with left:
+                show_svg(V.body_svg(b["key"], lang) if "Whole Body" in k_view else V.kidney_detail_svg(lang), 520)
         else:
-            st.success("🧘 When resting, your heart pumps steadily and saves energy for thinking and cell growth.")
-    with v_col2:
-        show_svg(V.vital_signs_svg(bpm, lang), 440)
+            left, right = st.columns([1.1, 1])
+            with left:
+                show_svg(V.body_svg(b["key"], lang), 470)
+
+        with right:
+            st.markdown(f"### {names[i]}")
+            st.caption(f"{b['system']} • {i + 1}/{len(parts)}")
+            st.write(b[lang])
+            st.markdown(f"<div class='fact'>💡 <b>{t['fact']}:</b> {b['fact_' + lang]}</div>", unsafe_allow_html=True)
+            read_aloud(f"{names[i]}. {b[lang]} {b['fact_' + lang]}", key=f"body_m_ra_{b['key']}", lang=lang)
+
+            already_learned = b["key"] in st.session_state["learned_organs"]
+            btn_label = ("🌟 Mastered!" if already_learned else ("✅ I learned this" if lang == "en" else "✅ Maine seekh liya"))
+            if st.button(btn_label, key=f"learn_m_{b['key']}", disabled=already_learned):
+                st.session_state["learned_organs"].append(b["key"])
+                log("learned", "Human body", b["en_name"])
+                add_xp(20, f"Mastered {names[i]}!", badge_id="anatomy_ace", badge_name="Anatomy Ace")
+                st.toast("Great job! 🌟")
+                st.rerun()
+
+        st.divider()
+        st.markdown("#### 💓 " + ("Clinical Vital Signs & Cardiac Pumping Simulator" if lang == "en" else "Clinical Vital Signs Simulator"))
+        v1, v2 = st.columns([1, 1.3])
+        with v1:
+            bpm = st.select_slider("Physiological State", options=[70, 95, 125, 160], value=70, key="b_m_bpm",
+                                   format_func=lambda v: "🛋️ Basal Resting (70 BPM)" if v==70 else ("🚶 Moderate Ambulation (95 BPM)" if v==95 else ("🏃 Aerobic Exercise (125 BPM)" if v==125 else "⚡ Peak VO2 Max Sprint (160 BPM)")))
+            if bpm >= 125:
+                st.info("💪 Sympathetic autonomic system increases stroke volume and respiration frequency.")
+            else:
+                st.success("🧘 Parasympathetic vagus nerve maintains homeostasis.")
+        with v2:
+            show_svg(V.vital_signs_svg(bpm, lang), 440)
 
 
 # ----------------------------------------------------------------------------- physics tab
@@ -2007,83 +2381,171 @@ def tab_physics(lang, age="10-12", api_key=None, model=None):
         lang, age, api_key, model
     )
 
-    p_keys = list(C.PHYSICS.keys())
-    p_titles = {k: C.PHYSICS[k]["title_" + lang] for k in p_keys}
+    tier_id = render_class_tier_header("physics", lang)
 
-    key = st.selectbox(
-        "🔬 " + ("Choose Experiment:" if lang == "en" else "Experiment Chunein:"),
-        p_keys,
-        format_func=lambda k: p_titles[k],
-        key="phys_exp_select"
-    )
-    p = C.PHYSICS[key]
-    st.write(p[lang])
-    st.markdown(f"<div class='formula'>{p['formula']}</div>", unsafe_allow_html=True)
-    st.write("")
+    if tier_id == "early":
+        st.markdown("#### 🎈 " + ("Early Physics: Forces & Light (Nursery to Class 2)" if lang == "en" else "Nannha Physics: Push, Pull aur Roshni (Nursery se 2nd)"))
+        e_p_topics = [
+            ("🛒 " + ("Push vs Pull: How Things Move" if lang == "en" else "Push aur Pull: Cheezein Kaise Hilti Hain"), "push_pull"),
+            ("💡 " + ("Light Bulb & Battery Switch" if lang == "en" else "Bulb aur Battery Switch"), "bulb_switch"),
+            ("🍎 " + ("Why Things Fall Down (Gravity Magic)" if lang == "en" else "Cheezein Niche Kyun Girti Hain"), "gravity_magic"),
+        ]
+        e_pick = st.selectbox("Choose Activity", range(len(e_p_topics)), format_func=lambda idx: e_p_topics[idx][0], key="phys_early_pick")
+        e_key = e_p_topics[e_pick][1]
 
-    if key == "projectile":
-        c1, c2, c3 = st.columns(3)
-        speed = c1.slider("Speed (m/s)", 5, 40, 20)
-        angle = c2.slider("Angle (°)", 5, 85, 45)
-        planet = c3.selectbox("Planet", list(V.PLANETS))
-        st.plotly_chart(V.projectile_fig(speed, angle, planet), width="stretch", key="proj")
+        if e_key == "push_pull":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                action = st.radio("Choose Action", ["🛒 Pushing a Toy Forward", "🛞 Pulling a Wagon Closer"], horizontal=True, key="early_push_pull_rad")
+                a_mode = "push" if "Pushing" in action else "pull"
+                show_svg(V.push_pull_svg(a_mode, lang), 480)
+            with col2:
+                st.markdown(f"### {action}")
+                st.markdown("• **Push:** Moves things AWAY from you (kicking a ball, rolling a toy car).<br>• **Pull:** Brings things CLOSER to you (pulling a wagon, opening a door)!", unsafe_allow_html=True)
+                read_aloud(f"Push moves things away. Pull brings things closer.", key=f"aud_pp_{a_mode}", lang=lang)
+                if st.button("⭐ " + ("I Mastered Push & Pull! (+15 XP)" if lang == "en" else "Maine Push Pull Seekha! (+15 XP)"), key=f"btn_xp_pp_{a_mode}"):
+                    add_xp(15, "Learned push and pull forces!", badge_id="physics_wizard", badge_name="Physics Pro")
 
-        # Interactive Target Practice Challenge Game
-        st.markdown("##### 🎯 Target Challenge Mode")
-        st.caption("Can you calculate the right angle and speed to hit the flag target?" if lang == "en" else
-                   "Sahi angle aur speed chun kar target flag ko hit karo!")
-        tg_col1, tg_col2 = st.columns([1, 2])
-        target_m = tg_col1.slider("Target Distance (m)", 15, 60, 35)
-        g = V.PLANETS.get(planet, 9.8)
-        th = math.radians(angle)
-        actual_range = (speed ** 2 * math.sin(2 * th)) / g
-        diff = abs(actual_range - target_m)
-        with tg_col2:
-            if diff <= 1.5:
-                st.success(f"🎯 BULLSEYE DIRECT HIT! Range: {actual_range:.1f} m (Target: {target_m} m) 🎉")
-                add_xp(25, "Bullseye Target Hit!", badge_id="physics_wizard", badge_name="Physics Pro")
-            elif diff <= 4.0:
-                st.warning(f"Almost there! Ball landed at {actual_range:.1f} m (Off by {diff:.1f} m). Adjust angle slightly!")
-            else:
-                st.info(f"Ball landed at {actual_range:.1f} m (Target: {target_m} m). Try adjusting your speed or angle!")
+        elif e_key == "bulb_switch":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                switch_on = st.toggle("🔌 Switch ON / OFF", value=True, key="early_bulb_switch")
+                show_svg(V.circuit_bulb_svg(switch_on, lang), 480)
+            with col2:
+                st.markdown("### 💡 Click the Switch to Glow!")
+                st.markdown("When the switch is closed, invisible electricity flows in a complete loop from the battery into the bulb's tiny wire, making it glow bright sunny yellow!")
+                read_aloud("Electricity flows in a complete circuit to light up the bulb.", key="aud_bulb", lang=lang)
+                if st.button("⭐ " + ("I Made the Bulb Glow! (+15 XP)" if lang == "en" else "Maine Bulb Jalaya! (+15 XP)"), key="btn_xp_bulb"):
+                    add_xp(15, "Explored electric circuits and switches!")
 
-    elif key == "pendulum":
-        c1, c2 = st.columns(2)
-        length = c1.slider("String length (m)", 0.2, 3.0, 1.0, 0.1)
-        amp = c2.slider("Starting angle (°)", 5, 40, 20)
-        st.plotly_chart(V.pendulum_fig(length, amp), width="stretch", key="pend")
-        st.metric("Time period T", f"{V.pendulum_metrics(length):.2f} s")
-    elif key == "ohm":
-        c1, c2 = st.columns(2)
-        volts = c1.slider("Voltage V (volts)", 1, 12, 6)
-        ohms = c2.slider("Resistance R (ohms)", 1, 20, 3)
-        left, right = st.columns(2)
-        with left:
-            show_svg(V.circuit_svg(volts, ohms), 440)
-        with right:
-            st.plotly_chart(V.vi_fig(volts, ohms), width="stretch", key="vi")
-        st.caption("Make R bigger and watch the bulb get dimmer!" if lang == "en" else
-                   "R badhao aur dekho bulb dim hota jaata hai!")
-    elif key == "force":
-        show_svg(V.force_svg(lang), 480)
-    elif key == "sky":
-        show_svg(V.blue_sky_svg(lang), 480)
-    elif key == "gravity":
-        show_svg(V.gravity_svg(lang), 480)
-    elif key == "friction":
-        show_svg(V.friction_svg(lang), 480)
+        else:
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.gravity_svg(lang), 480)
+            with col2:
+                st.markdown("### 🍎 Sir Isaac Newton & The Falling Apple")
+                st.markdown("Whenever you jump up in the air or drop a red apple, Earth's invisible superpower called **Gravity** gently pulls you right back down to the ground!")
+                if st.button("⭐ " + ("I Learned Gravity! (+15 XP)" if lang == "en" else "Maine Gravity Seekhi! (+15 XP)"), key="btn_xp_grav"):
+                    add_xp(15, "Learned about Earth's gravity!")
+
+    elif tier_id == "primary":
+        st.markdown("#### ⚡ " + ("Junior Physics & Energy (Class 3 - 5)" if lang == "en" else "Junior Physics aur Urja (3rd se 5th)"))
+        p_topics = [
+            ("⚡ " + ("Electric Circuits & Resistance" if lang == "en" else "Bijli Ka Circuit aur Resistance"), "circuits"),
+            ("⛸️ " + ("Friction on Different Surfaces" if lang == "en" else "Friction (Gharshan)"), "friction"),
+            ("🍎 " + ("Earth's Gravity & Free Fall" if lang == "en" else "Gravity aur Free Fall"), "gravity"),
+            ("🌤️ " + ("Why is the Sky Blue?" if lang == "en" else "Aasman Neela Kyun Hai?"), "sky"),
+        ]
+        p_pick = st.selectbox("Choose Experiment", range(len(p_topics)), format_func=lambda idx: p_topics[idx][0], key="phys_prim_pick")
+        p_key = p_topics[p_pick][1]
+
+        if p_key == "circuits":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                v = st.slider("Battery Voltage V (volts)", 1, 12, 6, key="p_prim_v")
+                r = st.slider("Bulb Resistance R (ohms)", 1, 15, 3, key="p_prim_r")
+                show_svg(V.circuit_svg(v, r), 440)
+            with col2:
+                current = v / r
+                st.markdown(f"### ⚡ Electric Flow: {current:.1f} Amps")
+                st.markdown("Higher voltage pushes more electric current, making the bulb brighter! Higher resistance slows current down.")
+                read_aloud(f"Battery voltage {v} volts produces {current:.1f} amperes of current.", key="aud_circ_prim", lang=lang)
+        elif p_key == "friction":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.friction_svg(lang), 480)
+            with col2:
+                st.markdown("### ⛸️ Rough vs Smooth Friction")
+                st.markdown("Smooth ice has very low friction so skaters glide fast! Rough carpet has high friction so toy cars slow down quickly.")
+        elif p_key == "gravity":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.gravity_svg(lang), 480)
+            with col2:
+                st.markdown("### 🍎 Gravity Pulls Everything Down")
+                st.markdown("Earth attracts every object towards its center at $9.8 \\text{ m/s}^2$. Without gravity, people, water, and air would float away into space!")
+        else:
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.blue_sky_svg(lang), 480)
+            with col2:
+                st.markdown("### 🌤️ Rayleigh Scattering")
+                st.markdown("Sunlight looks white, but contains all rainbow colors. Earth's atmosphere scatters short blue wavelengths much more than red, making our sky blue!")
+
     else:
-        c1, c2, c3 = st.columns(3)
-        m1 = c1.selectbox("Top material", list(V.MEDIA), index=0)
-        m2 = c2.selectbox("Bottom material", list(V.MEDIA), index=1)
-        ang = c3.slider("Angle of light (°)", 5, 80, 40)
-        st.plotly_chart(V.refraction_fig(V.MEDIA[m1], V.MEDIA[m2], ang), width="stretch", key="refr")
+        st.markdown("#### 🎯 " + ("Middle School Mechanics & Wave Optics (Class 6 - 8)" if lang == "en" else "Middle School Mechanics & Wave Optics (6th se 8th)"))
+        p_keys = list(C.PHYSICS.keys())
+        p_titles = {k: C.PHYSICS[k]["title_" + lang] for k in p_keys}
 
-    st.markdown(f"<div class='act'>🏠 <b>{t['tryit']}:</b> {p['activity_' + lang]}</div>", unsafe_allow_html=True)
-    if st.button("🧪 I tried it" if lang == "en" else "🧪 Maine try kiya", key=f"tried{key}"):
-        log("practical", "Physics", p["title_en"])
-        add_xp(20, f"Tried {p['title_en']} experiment!", badge_id="physics_wizard", badge_name="Physics Pro")
-        st.toast("Scientist in the making! 🔬" if lang == "en" else "Chhota scientist! 🔬")
+        key = st.selectbox(
+            "🔬 " + ("Choose Experiment:" if lang == "en" else "Experiment Chunein:"),
+            p_keys,
+            format_func=lambda k: p_titles[k],
+            key="phys_exp_select"
+        )
+        p = C.PHYSICS[key]
+        st.write(p[lang])
+        st.markdown(f"<div class='formula'>{p['formula']}</div>", unsafe_allow_html=True)
+        st.write("")
+
+        if key == "projectile":
+            c1, c2, c3 = st.columns(3)
+            speed = c1.slider("Speed (m/s)", 5, 40, 20)
+            angle = c2.slider("Angle (°)", 5, 85, 45)
+            planet = c3.selectbox("Planet", list(V.PLANETS))
+            st.plotly_chart(V.projectile_fig(speed, angle, planet), width="stretch", key="proj")
+
+            st.markdown("##### 🎯 Target Challenge Mode")
+            tg_col1, tg_col2 = st.columns([1, 2])
+            target_m = tg_col1.slider("Target Distance (m)", 15, 60, 35)
+            g = V.PLANETS.get(planet, 9.8)
+            th = math.radians(angle)
+            actual_range = (speed ** 2 * math.sin(2 * th)) / g
+            diff = abs(actual_range - target_m)
+            with tg_col2:
+                if diff <= 1.5:
+                    st.success(f"🎯 BULLSEYE DIRECT HIT! Range: {actual_range:.1f} m (Target: {target_m} m) 🎉")
+                    add_xp(25, "Bullseye Target Hit!", badge_id="physics_wizard", badge_name="Physics Pro")
+                elif diff <= 4.0:
+                    st.warning(f"Almost there! Ball landed at {actual_range:.1f} m (Off by {diff:.1f} m).")
+                else:
+                    st.info(f"Ball landed at {actual_range:.1f} m (Target: {target_m} m).")
+
+        elif key == "pendulum":
+            c1, c2 = st.columns(2)
+            length = c1.slider("String length (m)", 0.2, 3.0, 1.0, 0.1)
+            amp = c2.slider("Starting angle (°)", 5, 40, 20)
+            st.plotly_chart(V.pendulum_fig(length, amp), width="stretch", key="pend")
+            st.metric("Time period T", f"{V.pendulum_metrics(length):.2f} s")
+        elif key == "ohm":
+            c1, c2 = st.columns(2)
+            volts = c1.slider("Voltage V (volts)", 1, 12, 6)
+            ohms = c2.slider("Resistance R (ohms)", 1, 20, 3)
+            left, right = st.columns(2)
+            with left:
+                show_svg(V.circuit_svg(volts, ohms), 440)
+            with right:
+                st.plotly_chart(V.vi_fig(volts, ohms), width="stretch", key="vi")
+        elif key == "force":
+            show_svg(V.force_svg(lang), 480)
+        elif key == "sky":
+            show_svg(V.blue_sky_svg(lang), 480)
+        elif key == "gravity":
+            show_svg(V.gravity_svg(lang), 480)
+        elif key == "friction":
+            show_svg(V.friction_svg(lang), 480)
+        else:
+            c1, c2, c3 = st.columns(3)
+            m1 = c1.selectbox("Top material", list(V.MEDIA), index=0)
+            m2 = c2.selectbox("Bottom material", list(V.MEDIA), index=1)
+            ang = c3.slider("Angle of light (°)", 5, 80, 40)
+            st.plotly_chart(V.refraction_fig(V.MEDIA[m1], V.MEDIA[m2], ang), width="stretch", key="refr")
+
+        st.markdown(f"<div class='act'>🏠 <b>{t['tryit']}:</b> {p['activity_' + lang]}</div>", unsafe_allow_html=True)
+        if st.button("🧪 I tried it" if lang == "en" else "🧪 Maine try kiya", key=f"tried{key}"):
+            log("practical", "Physics", p["title_en"])
+            add_xp(20, f"Tried {p['title_en']} experiment!", badge_id="physics_wizard", badge_name="Physics Pro")
+            st.toast("Scientist in the making! 🔬")
 
 
 # ----------------------------------------------------------------------------- chemistry tab
@@ -2098,67 +2560,137 @@ def tab_chem(lang, age="10-12", api_key=None, model=None):
         lang, age, api_key, model
     )
 
-    a, m, s, p, rx, h = st.tabs([
-        "⚛️ Atom builder", "💧 Molecules", "🧊 States of matter", "🍋 pH scale", "🌋 Virtual Reaction Lab", "🏠 Home experiments"
-    ])
-    with a:
-        st.write(C.CHEM_TEXT["atom"][lang])
-        z = st.slider("Number of protons (Z)", 1, 20, 8)
-        el = C.ELEMENT_BY_Z[z]
-        c1, c2 = st.columns([1, 1])
-        with c1:
-            show_svg(V.atom_svg(z), 360)
-        with c2:
-            use = C.ELEMENT_USE.get(z)
-            st.markdown(f"### {el[2]} ({el[1]})")
-            st.write(f"Protons: **{z}**, Neutrons: **{el[3]}**, Electrons: **{z}**")
-            st.write(f"Electron shells: **{', '.join(map(str, V.electron_shells(z)))}**")
-            if use:
-                st.markdown(f"<div class='fact'>💡 {use[0] if lang == 'en' else use[1]}</div>", unsafe_allow_html=True)
-    with m:
-        st.write(C.CHEM_TEXT["molecule"][lang])
-        key = st.selectbox("Molecule", list(C.MOLECULES), format_func=lambda k: f"{C.MOLECULES[k]['formula']}  {C.MOLECULES[k]['name_en']}")
-        st.plotly_chart(V.molecule_fig(key), width="stretch", key="mol")
-        st.info(C.MOLECULES[key][lang])
-    with s:
-        st.write(C.CHEM_TEXT["states"][lang])
-        state = st.radio("State", list(C.STATES), horizontal=True,
-                         format_func=lambda k: C.STATES[k]["hi_name" if lang == "hi" else "en_name"])
-        c1, c2 = st.columns([1, 1])
-        with c1:
-            show_svg(V.states_svg(state), 340)
-        with c2:
-            st.write(C.STATES[state][lang])
-    with p:
-        st.write(C.CHEM_TEXT["ph"][lang])
-        sub = st.select_slider("Choose a substance", list(C.PH_SUBSTANCES),
-                               format_func=lambda k: C.PH_SUBSTANCES[k][1 if lang == "hi" else 0], value="water")
-        en, hi, val = C.PH_SUBSTANCES[sub]
-        show_svg(V.ph_svg(val, hi if lang == "hi" else en), 520)
-        kind = "acid" if val < 7 else "base" if val > 7 else "neutral"
-        st.write(f"pH **{val:g}** → **{kind}**")
-    with rx:
-        st.markdown("#### 🧪 Safe Virtual Reaction Simulator")
-        st.caption("Mix substances safely on screen and observe the chemical reaction!" if lang == "en" else
-                   "Screen par surakshit tareeke se chemicals milakar reaction dekho!")
-        rx_key = st.selectbox(
-            "Select Reaction Experiment",
-            ["volcano", "indicator", "dissolve"],
-            format_func=lambda k: (
-                "🌋 Baking Soda + Vinegar (CO2 Fizz)" if k == "volcano" else
-                ("🎨 Red Cabbage Juice + Lemon (Anthocyanin pH Shift)" if k == "indicator" else "🧂 Salt Crystal Dissolving in Water (Ions)")
+    tier_id = render_class_tier_header("chem", lang)
+
+    if tier_id == "early":
+        st.markdown("#### 🧪 " + ("Early Chemistry: Fun Mixtures & States (Nursery to Class 2)" if lang == "en" else "Nannha Rasayan Vigyan (Nursery se 2nd)"))
+        e_c_topics = [
+            ("🧊 " + ("Ice, Water & Steam: How Ice Melts" if lang == "en" else "Baraf, Paani aur Bhaap"), "ice_melt"),
+            ("🫧 " + ("Soap Bubble Magic" if lang == "en" else "Sabun Ke Bulbule"), "bubbles"),
+            ("🎨 " + ("Rainbow Color Mixing" if lang == "en" else "Rang Milana (Color Mixing)"), "color_mixing"),
+        ]
+        e_pick = st.selectbox("Choose Activity", range(len(e_c_topics)), format_func=lambda idx: e_c_topics[idx][0], key="chem_early_pick")
+        e_key = e_c_topics[e_pick][1]
+
+        if e_key == "ice_melt":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                stage = st.select_slider("Temperature / Stage", ["ice", "melt", "steam"], value="melt",
+                                         format_func=lambda s: "🧊 Frozen Cold Ice (0°C)" if s=="ice" else ("💧 Melting Water (25°C)" if s=="melt" else "☁️ Hot Steam Cloud (100°C)"), key="ice_stage_slider")
+                show_svg(V.ice_melt_svg(stage, lang), 480)
+            with col2:
+                st.markdown("### 🧊 The Story of Water!")
+                st.markdown("• **Ice Cube:** Water molecules freeze into a hard, slippery crystal solid.<br>• **Warm Sun:** Ice melts into flowing, splashy liquid water!<br>• **Hot Kettle:** Water boils into invisible steam gas that floats in the air!", unsafe_allow_html=True)
+                read_aloud("Ice melts into liquid water, and boils into steam gas.", key="aud_ice_chem", lang=lang)
+                if st.button("⭐ " + ("I Melted the Ice! (+15 XP)" if lang == "en" else "Maine Baraf Pighlayi! (+15 XP)"), key="btn_xp_ice"):
+                    add_xp(15, "Learned how solids melt into liquids and evaporate into gas!", badge_id="chem_wizard", badge_name="Chem Wizard")
+
+        elif e_key == "bubbles":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                show_svg(V.states_svg("gas"), 360)
+            with col2:
+                st.markdown("### 🫧 Stretchy Soap Bubbles")
+                st.markdown("Water has an invisible stretchy skin called surface tension. When you add gentle soap, it stretches like a balloon and traps air inside shimmering rainbow spheres!")
+                if st.button("⭐ " + ("I Discovered Bubble Science! (+15 XP)" if lang == "en" else "Maine Bulbula Science Seekha! (+15 XP)"), key="btn_xp_bub"):
+                    add_xp(15, "Learned surface tension and soap bubbles!")
+
+        else:
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                c_mix = st.radio("Mix Colors", ["🔴 Red + 🟡 Yellow = 🟠 Orange", "🔵 Blue + 🟡 Yellow = 🟢 Green", "🔴 Red + 🔵 Blue = 🟣 Purple"], horizontal=True, key="c_mix_radio")
+                show_svg(V.states_svg("liquid"), 360)
+            with col2:
+                st.markdown(f"### {c_mix}")
+                st.markdown("Primary colors blend their light absorption to make brand new secondary colors! That is how painters and printers create millions of vibrant shades.")
+
+    elif tier_id == "primary":
+        st.markdown("#### 🌋 " + ("Junior Chemistry: Matter & Safe Reactions (Class 3 - 5)" if lang == "en" else "Junior Rasayan Vigyan: Padarth aur Surakshit Reactions (3rd se 5th)"))
+        p_tabs = st.tabs(["🧊 3 States of Matter", "🌋 Kitchen Volcano Lab", "🍋 Safe Kitchen pH", "🏠 Home Experiments"])
+        with p_tabs[0]:
+            state = st.radio("Choose State of Matter", list(C.STATES), horizontal=True,
+                             format_func=lambda k: C.STATES[k]["hi_name" if lang == "hi" else "en_name"], key="chem_p_state")
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                show_svg(V.states_svg(state), 360)
+            with c2:
+                st.write(C.STATES[state][lang])
+        with p_tabs[1]:
+            st.markdown("##### 🌋 Baking Soda + Vinegar Volcano")
+            show_svg(V.reaction_svg("volcano", lang), 480)
+            if st.button("🧪 Mix Baking Soda & Vinegar!", key="btn_p_volcano"):
+                st.success("🎉 FZZZZZ! Sodium bicarbonate + Acetic acid produces Carbon Dioxide gas bubbles!")
+                add_xp(15, "Created a kitchen volcano reaction!")
+        with p_tabs[2]:
+            sub = st.select_slider("Choose Substance", ["lemon", "water", "soap"], value="water",
+                                   format_func=lambda k: C.PH_SUBSTANCES[k][1 if lang=="hi" else 0], key="chem_p_ph")
+            en, hi, val = C.PH_SUBSTANCES[sub]
+            show_svg(V.ph_svg(val, hi if lang=="hi" else en), 500)
+        with p_tabs[3]:
+            for k, act in C.HOME_ACTIVITIES.items():
+                st.markdown(f"<div class='act'><b>{act['title_' + lang]}</b><br>{act[lang]}</div>", unsafe_allow_html=True)
+                st.write("")
+
+    else:
+        st.markdown("#### ⚛️ " + ("Middle School Chemistry & Atomic Structure (Class 6 - 8)" if lang == "en" else "Middle School Rasayan Vigyan (6th se 8th)"))
+        a, m, s, p, rx, h = st.tabs([
+            "⚛️ Atom builder", "💧 Molecules", "🧊 States of matter", "🍋 pH scale", "🌋 Virtual Reaction Lab", "🏠 Home experiments"
+        ])
+        with a:
+            st.write(C.CHEM_TEXT["atom"][lang])
+            z = st.slider("Number of protons (Z)", 1, 20, 8, key="atom_m_z")
+            el = C.ELEMENT_BY_Z[z]
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                show_svg(V.atom_svg(z), 360)
+            with c2:
+                use = C.ELEMENT_USE.get(z)
+                st.markdown(f"### {el[2]} ({el[1]})")
+                st.write(f"Protons: **{z}**, Neutrons: **{el[3]}**, Electrons: **{z}**")
+                st.write(f"Electron shells: **{', '.join(map(str, V.electron_shells(z)))}**")
+                if use:
+                    st.markdown(f"<div class='fact'>💡 {use[0] if lang == 'en' else use[1]}</div>", unsafe_allow_html=True)
+        with m:
+            st.write(C.CHEM_TEXT["molecule"][lang])
+            key = st.selectbox("Molecule", list(C.MOLECULES), format_func=lambda k: f"{C.MOLECULES[k]['formula']}  {C.MOLECULES[k]['name_en']}", key="mol_m_key")
+            st.plotly_chart(V.molecule_fig(key), width="stretch", key="mol")
+            st.info(C.MOLECULES[key][lang])
+        with s:
+            st.write(C.CHEM_TEXT["states"][lang])
+            state = st.radio("State", list(C.STATES), horizontal=True,
+                             format_func=lambda k: C.STATES[k]["hi_name" if lang == "hi" else "en_name"], key="chem_m_state")
+            c1, c2 = st.columns([1, 1])
+            with c1:
+                show_svg(V.states_svg(state), 340)
+            with c2:
+                st.write(C.STATES[state][lang])
+        with p:
+            st.write(C.CHEM_TEXT["ph"][lang])
+            sub = st.select_slider("Choose a substance", list(C.PH_SUBSTANCES),
+                                   format_func=lambda k: C.PH_SUBSTANCES[k][1 if lang == "hi" else 0], value="water", key="chem_m_ph")
+            en, hi, val = C.PH_SUBSTANCES[sub]
+            show_svg(V.ph_svg(val, hi if lang == "hi" else en), 520)
+            kind = "acid" if val < 7 else "base" if val > 7 else "neutral"
+            st.write(f"pH **{val:g}** → **{kind}**")
+        with rx:
+            st.markdown("#### 🧪 Safe Virtual Reaction Simulator")
+            rx_key = st.selectbox(
+                "Select Reaction Experiment",
+                ["volcano", "indicator", "dissolve"],
+                format_func=lambda k: (
+                    "🌋 Baking Soda + Vinegar (CO2 Fizz)" if k == "volcano" else
+                    ("🎨 Red Cabbage Juice + Lemon (Anthocyanin pH Shift)" if k == "indicator" else "🧂 Salt Crystal Dissolving in Water (Ions)")
+                ),
+                key="chem_m_rx_key"
             )
-        )
-        show_svg(V.reaction_svg(rx_key, lang), 480)
-        if st.button("🧪 Mix Ingredients & Observe", key=f"btn_rx_{rx_key}"):
-            add_xp(20, "Virtual chemical reaction simulated!", badge_id="chem_wizard", badge_name="Chem Wizard")
-            st.toast("Reaction Successful! 🌟")
-    with h:
-        for k, act in C.HOME_ACTIVITIES.items():
-            st.markdown(f"<div class='act'><b>{act['title_' + lang]}</b><br>{act[lang]}</div>", unsafe_allow_html=True)
-            st.write("")
-        st.warning("Always do experiments with an adult. Never taste or mix unknown chemicals!" if lang == "en" else
-                   "Experiments hamesha kisi bade ke saath karo. Anjaan chemicals ko kabhi chakho ya milao mat!")
+            show_svg(V.reaction_svg(rx_key, lang), 480)
+            if st.button("🧪 Mix Ingredients & Observe", key=f"btn_rx_{rx_key}"):
+                add_xp(20, "Virtual chemical reaction simulated!", badge_id="chem_wizard", badge_name="Chem Wizard")
+                st.toast("Reaction Successful! 🌟")
+        with h:
+            for k, act in C.HOME_ACTIVITIES.items():
+                st.markdown(f"<div class='act'><b>{act['title_' + lang]}</b><br>{act[lang]}</div>", unsafe_allow_html=True)
+                st.write("")
 
 
 # ----------------------------------------------------------------------------- mathematics tab (Class 1 to 8)
@@ -2172,175 +2704,185 @@ def tab_maths(lang, age="10-12", api_key=None, model=None):
         "Search circle area, pythagoras, cylinder volume, fractions, algebra..." if lang == "en" else "Maths sawaal khojein (area, pythagoras, fraction, algebra)...",
         lang, age, api_key, model
     )
-    st.caption("Interactive Visual Geometry, Pythagoras Theorem, Fraction Pizza, Algebra Balance Scale, and Speed Math Arena!" if lang == "en" else
-               "Visual Geometry, Pythagoras Pramey, Fraction Pizza, Algebra Tarazu Scale aur Speed Math Challenge!")
 
-    m_tabs = st.tabs([
-        "📐 2D Geometry",
-        "🥫 3D Mensuration",
-        "🔺 Pythagoras Theorem",
-        "🍕 Fractions & Percentages",
-        "⚖️ Algebra Balance Scale",
-        "⚡ Speed Math Arena"
-    ] if lang == "en" else [
-        "📐 2D Geometry (Shapes)",
-        "🥫 3D Mensuration (Cylinder)",
-        "🔺 Pythagoras Pramey",
-        "🍕 Fractions & Percentages",
-        "⚖️ Algebra Balance Scale",
-        "⚡ Speed Math Arena"
-    ])
+    tier_id = render_class_tier_header("math", lang)
 
-    # 1. 2D Geometry
-    with m_tabs[0]:
-        st.markdown("#### 📐 " + ("Visual 2D Shapes & Mensuration" if lang == "en" else "Visual 2D Shapes aur Kshetraphal"))
-        shape = st.radio("Choose 2D Shape", ["Circle (Vritt)", "Rectangle (Aayat)", "Triangle (Tribhuj)"], horizontal=True, key="math_2d_shape")
-        if "Circle" in shape:
-            c1, c2 = st.columns([1, 1.2])
-            with c1:
-                r = st.slider("Radius r (cm)", 1, 15, 7, key="geo_circ_r")
-                st.info("💡 " + (f"Diameter = 2 × {r} = {2*r} cm\n\nCircumference = 2πr = {2*math.pi*r:.2f} cm\n\nArea = πr² = {math.pi*r**2:.2f} cm²" if lang == "en" else
-                                 f"Vyas (Diameter) = 2 × {r} = {2*r} cm\n\nParidhi = 2πr = {2*math.pi*r:.2f} cm\n\nKshetraphal = πr² = {math.pi*r**2:.2f} cm²"))
-                read_aloud(f"Circle with radius {r} cm has circumference {2*math.pi*r:.2f} cm and area {math.pi*r**2:.2f} square cm.", key="aud_circ", lang=lang)
-            with c2:
-                show_svg(V.math_geometry_svg("circle", {"r": r}, lang), 440)
-        elif "Rectangle" in shape:
-            c1, c2 = st.columns([1, 1.2])
-            with c1:
-                l = st.slider("Length l (cm)", 2, 20, 8, key="geo_rect_l")
-                w = st.slider("Width w (cm)", 1, 15, 5, key="geo_rect_w")
-                peri = 2 * (l + w)
-                area = l * w
-                diag = math.sqrt(l**2 + w**2)
-                st.info("💡 " + (f"Perimeter = 2({l} + {w}) = {peri} cm\n\nArea = {l} × {w} = {area} cm²\n\nDiagonal = √({l}² + {w}²) = {diag:.2f} cm" if lang == "en" else
-                                 f"Perimeter = 2({l} + {w}) = {peri} cm\n\nArea = {l} × {w} = {area} cm²\n\nDiagonal = {diag:.2f} cm"))
-                read_aloud(f"Rectangle with length {l} and width {w} cm has perimeter {peri} cm and area {area} square cm.", key="aud_rect", lang=lang)
-            with c2:
-                show_svg(V.math_geometry_svg("rectangle", {"l": l, "w": w}, lang), 440)
+    if tier_id == "early":
+        st.markdown("#### 🎈 " + ("Early Math: Counting, Shapes & Candy Addition (Nursery to Class 2)" if lang == "en" else "Nannha Ganit: Ginti, Aakar aur Candy Jod (Nursery se 2nd)"))
+        e_m_topics = [
+            ("🍎 " + ("Counting Fruits & Stars (1 to 10)" if lang == "en" else "Phal aur Taare Ginto (1 se 10)"), "counting"),
+            ("🔷 " + ("Fun Shapes Explorer (Circle, Square, Star)" if lang == "en" else "Shapes Explorer (Gola, Chaukona, Taara)"), "shapes"),
+            ("🍬 " + ("Sweet Candy Addition & Adding Up" if lang == "en" else "Sweet Candy Jod (Addition)"), "candy_addition"),
+        ]
+        e_pick = st.selectbox("Choose Math Activity", range(len(e_m_topics)), format_func=lambda idx: e_m_topics[idx][0], key="math_early_pick")
+        e_key = e_m_topics[e_pick][1]
+
+        if e_key == "counting":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                n_count = st.slider("Count", 1, 10, 5, key="m_early_cnt_slider")
+                show_svg(V.counting_fruits_svg(n_count, lang), 480)
+            with col2:
+                st.markdown(f"### 🍎 Number {n_count}!")
+                st.markdown(f"You have **{n_count}** delicious crunchy red apples in your basket! Let's count them out loud together: 1... 2... {n_count}!")
+                read_aloud(f"Number {n_count}. You counted {n_count} apples!", key=f"aud_cnt_{n_count}", lang=lang)
+                if st.button("⭐ " + ("I Counted Correctly! (+15 XP)" if lang == "en" else "Maine Sahi Gina! (+15 XP)"), key=f"btn_xp_cnt_{n_count}"):
+                    add_xp(15, f"Counted up to {n_count}!", badge_id="math_star", badge_name="Math Star")
+
+        elif e_key == "shapes":
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                sh_pick = st.radio("Pick a Shape", ["Circle 🟡", "Square 🟦", "Triangle 🔺", "Star ⭐"], horizontal=True, key="m_early_shape_rad")
+                sh_code = "circle" if "Circle" in sh_pick else ("square" if "Square" in sh_pick else ("triangle" if "Triangle" in sh_pick else "star"))
+                show_svg(V.basic_shapes_svg(sh_code, lang), 480)
+            with col2:
+                st.markdown(f"### {sh_pick}")
+                if sh_code == "circle":
+                    st.markdown("A Circle is round like a ball, a coin, or the full moon! It has 0 straight corners and rolls smoothly.")
+                elif sh_code == "square":
+                    st.markdown("A Square has 4 equal straight sides and 4 sharp corners, just like a picture frame or a cracker!")
+                elif sh_code == "triangle":
+                    st.markdown("A Triangle has 3 sides and 3 pointy tips, just like a slice of delicious pizza or a party hat!")
+                else:
+                    st.markdown("A Star shines bright in the night sky with 5 glowing golden points!")
+                read_aloud(f"Shape: {sh_pick}", key=f"aud_sh_{sh_code}", lang=lang)
+                if st.button("⭐ " + ("I Learned This Shape! (+15 XP)" if lang == "en" else "Maine Yeh Shape Seekha! (+15 XP)"), key=f"btn_xp_sh_{sh_code}"):
+                    add_xp(15, f"Learned shape {sh_pick}!", badge_id="math_star", badge_name="Math Star")
+
         else:
-            c1, c2 = st.columns([1, 1.2])
-            with c1:
-                b = st.slider("Base b (cm)", 2, 20, 8, key="geo_tri_b")
-                h = st.slider("Height h (cm)", 1, 15, 6, key="geo_tri_h")
-                area = 0.5 * b * h
-                st.info("💡 " + (f"Area = ½ × base × height = ½ × {b} × {h} = {area:g} cm²" if lang == "en" else
-                                 f"Kshetraphal = ½ × {b} × {h} = {area:g} cm²"))
-                read_aloud(f"Triangle with base {b} and height {h} cm has area {area:g} square cm.", key="aud_tri", lang=lang)
-            with c2:
-                show_svg(V.math_geometry_svg("triangle", {"b": b, "h": h}, lang), 440)
+            col1, col2 = st.columns([1.2, 1])
+            with col1:
+                c_a = st.slider("Pink Candies", 1, 5, 2, key="candy_a_slider")
+                c_b = st.slider("Blue Candies", 1, 5, 3, key="candy_b_slider")
+                show_svg(V.candy_addition_svg(c_a, c_b, lang), 480)
+            with col2:
+                total_c = c_a + c_b
+                st.markdown(f"### 🍬 {c_a} + {c_b} = {total_c} Candies!")
+                st.markdown(f"When you put **{c_a} pink candies** together with **{c_b} blue candies**, you have **{total_c} candies in all**!")
+                read_aloud(f"{c_a} plus {c_b} equals {total_c}!", key=f"aud_candy_{total_c}", lang=lang)
+                if st.button("⭐ " + ("I Solved It! (+15 XP)" if lang == "en" else "Maine Hal Kiya! (+15 XP)"), key=f"btn_xp_candy_{total_c}"):
+                    add_xp(15, f"Solved visual addition {c_a} + {c_b} = {total_c}!", badge_id="math_star", badge_name="Math Star")
 
-    # 2. 3D Mensuration
-    with m_tabs[1]:
-        st.markdown("#### 🥫 " + ("Class 8 Mensuration: 3D Cylinder" if lang == "en" else "Class 8 Mensuration: 3D Belan (Cylinder)"))
-        c1, c2 = st.columns([1, 1.2])
-        with c1:
-            cyl_r = st.slider("Radius r (cm)", 1, 10, 4, key="cyl_r_slider")
-            cyl_h = st.slider("Height h (cm)", 2, 20, 8, key="cyl_h_slider")
-            csa = 2 * math.pi * cyl_r * cyl_h
-            tsa = 2 * math.pi * cyl_r * (cyl_r + cyl_h)
-            vol = math.pi * (cyl_r ** 2) * cyl_h
-            liters = vol / 1000.0
-            st.markdown(f"""
-            <div style="background:rgba(16,185,129,0.1);border-left:4px solid #10b981;border-radius:10px;padding:12px;font-size:0.95rem;line-height:1.6;">
-              <b>📐 Formulations (Syllabus Class 8):</b><br>
-              • <b>Curved Surface Area (CSA):</b> 2πrh = <b>{csa:.1f} cm²</b><br>
-              • <b>Total Surface Area (TSA):</b> 2πr(r+h) = <b>{tsa:.1f} cm²</b><br>
-              • <b>Capacity / Volume:</b> πr²h = <b>{vol:.1f} cm³</b> ({liters:.3f} Liters)
-            </div>
-            """, unsafe_allow_html=True)
-            read_aloud(f"Cylinder with radius {cyl_r} cm and height {cyl_h} cm has volume {vol:.1f} cubic cm, which is {liters:.3f} liters.", key="aud_cyl", lang=lang)
-        with c2:
-            show_svg(V.math_geometry_svg("cylinder", {"r": cyl_r, "h": cyl_h}, lang), 440)
-
-    # 3. Pythagoras Theorem
-    with m_tabs[2]:
-        st.markdown("#### 🔺 " + ("Pythagoras Theorem & Triplets (Class 7 & 8)" if lang == "en" else "Pythagoras Pramey & Triplets"))
-        st.caption("In any right-angled triangle, a² + b² = c². Discover triplets like (3, 4, 5) and (5, 12, 13)!" if lang == "en" else
-                   "Right-angled triangle mein a² + b² = c² hota hai. Triplets jaise (3, 4, 5) aur (5, 12, 13) khojein!")
-        py_c1, py_c2 = st.columns([1, 1.2])
-        with py_c1:
-            py_a = st.slider("Side a (Leg 1)", 1, 12, 3, key="py_slider_a")
-            py_b = st.slider("Side b (Leg 2)", 1, 12, 4, key="py_slider_b")
-            c_val = math.sqrt(py_a**2 + py_b**2)
-            is_trip = (abs(c_val - round(c_val)) < 1e-6)
-            if is_trip:
-                st.balloons()
-                st.success(f"🌟 WOW! ({py_a}, {py_b}, {int(round(c_val))}) is a famous Pythagorean Triplet!")
-                add_xp(20, f"Discovered Pythagorean triplet ({py_a}, {py_b}, {int(round(c_val))})!", badge_id="physics_wizard")
-            read_aloud(f"For sides {py_a} and {py_b}, the hypotenuse is {c_val:.2f}.", key="aud_pyth", lang=lang)
-        with py_c2:
-            show_svg(V.pythagoras_svg(py_a, py_b, lang), 440)
-
-    # 4. Fractions & Percentages
-    with m_tabs[3]:
-        st.markdown("#### 🍕 " + ("Visual Fractions, Decimals & Percentages (Class 3 to 7)" if lang == "en" else "Visual Fractions, Decimals & Percentages"))
-        fr_c1, fr_c2 = st.columns([1, 1.2])
-        with fr_c1:
-            den_val = st.slider("Denominator (Total Pizza Slices)", 1, 12, 8, key="fr_den")
-            num_val = st.slider("Numerator (Eaten Slices)", 0, den_val, min(3, den_val), key="fr_num")
-            fr_pct = (num_val / den_val) * 100
-            fr_dec = num_val / den_val
-            st.info(f"🍕 **{num_val} out of {den_val} slices** = **{fr_pct:.1f}%** of the pizza! Decimal = **{fr_dec:.3f}**")
-            read_aloud(f"{num_val} over {den_val} equals {fr_pct:.1f} percent, or {fr_dec:.3f} in decimals.", key="aud_frac", lang=lang)
-        with fr_c2:
-            show_svg(V.fraction_pizza_svg(num_val, den_val, lang), 440)
-
-    # 5. Algebra Balance Scale
-    with m_tabs[4]:
-        st.markdown("#### ⚖️ " + ("Linear Equations & Balancing Scale (Class 6 to 8)" if lang == "en" else "Linear Equations & Tarazu Balance"))
-        st.caption("Learn to solve ax + b = c by keeping both pans of the scale in perfect equilibrium!" if lang == "en" else
-                   "Tarazu ke dono pallo ko barabar rakh kar ax + b = c ko step-by-step solve karein!")
-        alg_c1, alg_c2 = st.columns([1, 1.2])
-        with alg_c1:
-            eq_a = st.slider("Coefficient a", 1, 6, 2, key="alg_a")
-            eq_b = st.slider("Constant b", 1, 20, 5, key="alg_b")
-            eq_c = st.slider("Target c", eq_b + 1, 50, 15, key="alg_c")
-            x_sol = (eq_c - eq_b) / eq_a
-            st.success(f"✨ Equation: **{eq_a}x + {eq_b} = {eq_c}**  ➔  **x = {x_sol:.2f}**")
-            read_aloud(f"For equation {eq_a}x plus {eq_b} equals {eq_c}, subtract {eq_b} and divide by {eq_a} to get x equals {x_sol:.2f}.", key="aud_alg", lang=lang)
-        with alg_c2:
-            show_svg(V.algebra_balance_svg(eq_a, eq_b, eq_c, lang), 440)
-
-    # 6. Speed Math Challenge Arena
-    with m_tabs[5]:
-        st.markdown("#### ⚡ " + ("Speed Math Challenge Arena" if lang == "en" else "Speed Math Challenge Arena"))
-        st.caption("Rapid-fire mental math challenge to sharpen calculation speed!" if lang == "en" else
-                   "Dimag ko tez karne ke liye rapid-fire math quiz!")
-        tier = st.selectbox("Grade Difficulty Tier", [
-            "🥉 Junior (Class 1–4): Addition, Subtraction & Doubles",
-            "🥈 Middle (Class 5–6): Multiplication Tables, Divisions & Squares",
-            "🥇 Senior (Class 7–8): Linear Equations, Percentages & Pythagoras"
-        ], index=1)
-
-        if "Junior" in tier:
+    elif tier_id == "primary":
+        st.markdown("#### 🍕 " + ("Junior Mathematics: Fractions, Shapes & Speed Math (Class 3 - 5)" if lang == "en" else "Junior Ganit: Fractions, Shapes aur Speed Math (3rd se 5th)"))
+        p_math_tabs = st.tabs(["🍕 Fraction Pizza", "📐 Rectangle & Triangle Area", "⚡ Speed Math Arena"])
+        with p_math_tabs[0]:
+            fr_c1, fr_c2 = st.columns([1, 1.2])
+            with fr_c1:
+                den_val = st.slider("Denominator (Total Pizza Slices)", 1, 12, 8, key="fr_p_den")
+                num_val = st.slider("Numerator (Eaten Slices)", 0, den_val, min(3, den_val), key="fr_p_num")
+                fr_pct = (num_val / den_val) * 100
+                st.info(f"🍕 **{num_val} out of {den_val} slices** = **{fr_pct:.1f}%**")
+                read_aloud(f"{num_val} over {den_val} equals {fr_pct:.1f} percent.", key="aud_p_frac", lang=lang)
+            with fr_c2:
+                show_svg(V.fraction_pizza_svg(num_val, den_val, lang), 440)
+        with p_math_tabs[1]:
+            sh = st.radio("Shape", ["Rectangle", "Triangle"], horizontal=True, key="sh_p_rad")
+            if sh == "Rectangle":
+                c1, c2 = st.columns([1, 1.2])
+                with c1:
+                    l = st.slider("Length (cm)", 2, 20, 8, key="sh_p_l")
+                    w = st.slider("Width (cm)", 1, 15, 5, key="sh_p_w")
+                    st.info(f"Perimeter = 2({l} + {w}) = **{2*(l+w)} cm**\n\nArea = {l} × {w} = **{l*w} cm²**")
+                with c2:
+                    show_svg(V.math_geometry_svg("rectangle", {"l": l, "w": w}, lang), 440)
+            else:
+                c1, c2 = st.columns([1, 1.2])
+                with c1:
+                    b = st.slider("Base (cm)", 2, 20, 8, key="sh_p_b")
+                    h = st.slider("Height (cm)", 1, 15, 6, key="sh_p_h")
+                    st.info(f"Area = ½ × base × height = **{0.5*b*h:g} cm²**")
+                with c2:
+                    show_svg(V.math_geometry_svg("triangle", {"b": b, "h": h}, lang), 440)
+        with p_math_tabs[2]:
             q_list = [
                 ("14 + 19 = ?", ["31", "33", "35", "37"], 1, "14 + 19 = 33"),
                 ("50 - 23 = ?", ["27", "28", "25", "37"], 0, "50 - 23 = 27"),
                 ("Double of 16 is:", ["28", "30", "32", "34"], 2, "16 × 2 = 32"),
             ]
-        elif "Middle" in tier:
-            q_list = [
-                ("12 × 13 = ?", ["156", "146", "166", "154"], 0, "12 × 13 = 156"),
-                ("Square of 14 (14²) = ?", ["186", "196", "206", "176"], 1, "14 × 14 = 196"),
-                ("96 ÷ 8 = ?", ["11", "12", "14", "16"], 1, "96 ÷ 8 = 12"),
-            ]
-        else:
+            for s_idx, (s_q, s_opts, s_ans, s_ex) in enumerate(q_list):
+                with st.container(border=True):
+                    st.markdown(f"**Question {s_idx + 1}: {s_q}**")
+                    ch = st.radio("Answer", s_opts, index=None, key=f"sp_p_{s_idx}", label_visibility="collapsed")
+                    if ch is not None and st.button("Check Answer ✅", key=f"btn_p_sp_{s_idx}"):
+                        if s_opts.index(ch) == s_ans:
+                            st.success(f"🎉 Correct! {s_ex}")
+                            add_xp(15, f"Solved Junior Math Question {s_idx + 1}!")
+                        else:
+                            st.error(f"Try again! Explanation: {s_ex}")
+
+    else:
+        st.markdown("#### 📐 " + ("Senior Mathematics, Mensuration & Algebra (Class 6 - 8)" if lang == "en" else "Senior Ganit, Mensuration & Algebra (6th se 8th)"))
+        m_tabs = st.tabs([
+            "🥫 3D Cylinder Mensuration",
+            "🔺 Pythagoras Theorem",
+            "⚖️ Algebra Balance Scale",
+            "🍕 Fractions & Percentages",
+            "⚡ Senior Speed Math Arena"
+        ])
+        with m_tabs[0]:
+            c1, c2 = st.columns([1, 1.2])
+            with c1:
+                cyl_r = st.slider("Radius r (cm)", 1, 10, 4, key="cyl_m_r")
+                cyl_h = st.slider("Height h (cm)", 2, 20, 8, key="cyl_m_h")
+                csa = 2 * math.pi * cyl_r * cyl_h
+                tsa = 2 * math.pi * cyl_r * (cyl_r + cyl_h)
+                vol = math.pi * (cyl_r ** 2) * cyl_h
+                st.markdown(f"""
+                <div style="background:rgba(16,185,129,0.1);border-left:4px solid #10b981;border-radius:10px;padding:12px;font-size:0.95rem;line-height:1.6;">
+                  <b>📐 Formulations:</b><br>
+                  • <b>Curved Surface Area (CSA):</b> 2πrh = <b>{csa:.1f} cm²</b><br>
+                  • <b>Total Surface Area (TSA):</b> 2πr(r+h) = <b>{tsa:.1f} cm²</b><br>
+                  • <b>Capacity / Volume:</b> πr²h = <b>{vol:.1f} cm³</b> ({vol/1000:.3f} L)
+                </div>
+                """, unsafe_allow_html=True)
+            with c2:
+                show_svg(V.math_geometry_svg("cylinder", {"r": cyl_r, "h": cyl_h}, lang), 440)
+        with m_tabs[1]:
+            py_c1, py_c2 = st.columns([1, 1.2])
+            with py_c1:
+                py_a = st.slider("Side a (Leg 1)", 1, 12, 3, key="py_m_a")
+                py_b = st.slider("Side b (Leg 2)", 1, 12, 4, key="py_m_b")
+                c_val = math.sqrt(py_a**2 + py_b**2)
+                if abs(c_val - round(c_val)) < 1e-6:
+                    st.success(f"🌟 WOW! ({py_a}, {py_b}, {int(round(c_val))}) is a famous Pythagorean Triplet!")
+                    add_xp(20, f"Discovered triplet ({py_a}, {py_b}, {int(round(c_val))})!")
+            with py_c2:
+                show_svg(V.pythagoras_svg(py_a, py_b, lang), 440)
+        with m_tabs[2]:
+            alg_c1, alg_c2 = st.columns([1, 1.2])
+            with alg_c1:
+                eq_a = st.slider("Coefficient a", 1, 6, 2, key="alg_m_a")
+                eq_b = st.slider("Constant b", 1, 20, 5, key="alg_m_b")
+                eq_c = st.slider("Target c", eq_b + 1, 50, 15, key="alg_m_c")
+                x_sol = (eq_c - eq_b) / eq_a
+                st.success(f"✨ Equation: **{eq_a}x + {eq_b} = {eq_c}**  ➔  **x = {x_sol:.2f}**")
+            with alg_c2:
+                show_svg(V.algebra_balance_svg(eq_a, eq_b, eq_c, lang), 440)
+        with m_tabs[3]:
+            fr_c1, fr_c2 = st.columns([1, 1.2])
+            with fr_c1:
+                den_val = st.slider("Denominator", 1, 12, 8, key="fr_m_den")
+                num_val = st.slider("Numerator", 0, den_val, min(3, den_val), key="fr_m_num")
+                st.info(f"🍕 **{num_val} / {den_val}** = **{(num_val/den_val)*100:.1f}%**")
+            with fr_c2:
+                show_svg(V.fraction_pizza_svg(num_val, den_val, lang), 440)
+        with m_tabs[4]:
             q_list = [
                 ("Solve for x: 3x - 7 = 14", ["x = 5", "x = 7", "x = 9", "x = 6"], 1, "3x = 21 ➔ x = 7"),
                 ("What is 15% of 200?", ["20", "25", "30", "35"], 2, "(15/100) × 200 = 30"),
                 ("In right triangle with legs 6 and 8, hypotenuse is:", ["9", "10", "12", "14"], 1, "√(6² + 8²) = √100 = 10"),
             ]
-
-        for s_idx, (s_q, s_opts, s_ans, s_ex) in enumerate(q_list):
-            with st.container(border=True):
-                st.markdown(f"**Question {s_idx + 1}: {s_q}**")
-                ch = st.radio("Choose answer", s_opts, index=None, key=f"speed_math_{s_idx}", label_visibility="collapsed")
-                if ch is not None and st.button("Check Answer ✅", key=f"btn_spd_chk_{s_idx}"):
-                    if s_opts.index(ch) == s_ans:
-                        st.success(f"🎉 Correct! {s_ex}")
-                        add_xp(20, f"Solved Speed Math Question {s_idx + 1}!", badge_id="quiz_champion")
-                    else:
-                        st.error(f"Try again! Correct explanation: {s_ex}")
+            for s_idx, (s_q, s_opts, s_ans, s_ex) in enumerate(q_list):
+                with st.container(border=True):
+                    st.markdown(f"**Question {s_idx + 1}: {s_q}**")
+                    ch = st.radio("Answer", s_opts, index=None, key=f"sp_m_{s_idx}", label_visibility="collapsed")
+                    if ch is not None and st.button("Check Answer ✅", key=f"btn_m_sp_{s_idx}"):
+                        if s_opts.index(ch) == s_ans:
+                            st.success(f"🎉 Correct! {s_ex}")
+                            add_xp(20, f"Solved Senior Math Question {s_idx + 1}!")
+                        else:
+                            st.error(f"Try again! Explanation: {s_ex}")
 
 
 # ----------------------------------------------------------------------------- quiz arena
@@ -2404,7 +2946,9 @@ def tab_parent(lang):
         if not blocked.empty:
             st.warning("Blocked categories: " + ", ".join(sorted(set(blocked.topic.astype(str)))) +
                        ". If your child seems upset, please talk to them. Childline India: 1098.")
-        st.download_button("Download progress (CSV)", ev.to_csv(index=False).encode(), "gyaanbuddy_progress.csv", "text/csv")
+        st.download_button("📊 " + ("Download Progress Report (CSV)" if lang == "en" else "Progress Report Download Karein (CSV)"),
+                           ev.to_csv(index=False).encode("utf-8"), "gyaanbuddy_progress.csv", "text/csv; charset=utf-8",
+                           use_container_width=True, key="btn_dl_parent_csv")
 
     st.divider()
 
@@ -2419,7 +2963,9 @@ def tab_parent(lang):
 
     cert_html = generate_certificate_html(student_name, st.session_state["xp"], lang)
     st.components.v1.html(cert_html, height=360)
-    st.download_button("📥 Download Certificate (HTML)", cert_html.encode("utf-8"), f"GyaanBuddy_Certificate_{student_name}.html", "text/html")
+    st.download_button("🏅 " + ("Download Certificate (HTML)" if lang == "en" else "Certificate Download Karein (HTML)"),
+                       cert_html.encode("utf-8"), f"GyaanBuddy_Certificate_{student_name}.html", "text/html; charset=utf-8",
+                       use_container_width=True, key="btn_dl_parent_cert")
 
 
 # ----------------------------------------------------------------------------- main

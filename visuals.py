@@ -2252,16 +2252,522 @@ def nature_foodchain_svg(lang: str = "en") -> str:
 </svg>"""
 
 
+# ----------------------------------------------------------------------------- Multi-Class / Early Stage SVGs
+def cute_animals_svg(animal_key: str = "dog", lang: str = "en") -> str:
+    animals = {
+        "dog": {"name_en": "Dog &amp; Puppy", "name_hi": "Kutta aur Puppy", "sound": "Woof! Woof!", "color": "#f59e0b", "icon": "🐶", "baby_icon": "🐾", "fact_en": "Puppies love to play and wag their tails when happy!", "fact_hi": "Puppy khush hokar apni poonchh hilate hain!"},
+        "cat": {"name_en": "Cat &amp; Kitten", "name_hi": "Billi aur Kitten", "sound": "Meow! Purr...", "color": "#ec4899", "icon": "🐱", "baby_icon": "🐾", "fact_en": "Cats have soft padded paws and can see in dim light!", "fact_hi": "Billi ke panje soft hote hain aur woh raat mein dekh sakti hai!"},
+        "cow": {"name_en": "Cow &amp; Calf", "name_hi": "Gaay aur Bachhda", "sound": "Moo! Mooo!", "color": "#10b981", "icon": "🐮", "baby_icon": "🌾", "fact_en": "Cows eat green grass and give us healthy milk!", "fact_hi": "Gaay hari ghaas khati hai aur humein swasth doodh deti hai!"},
+        "lion": {"name_en": "Lion &amp; Cub", "name_hi": "Sher aur Shavak (Cub)", "sound": "Roaaar!", "color": "#f97316", "icon": "🦁", "baby_icon": "👑", "fact_en": "A lion family is called a pride, and cubs love to play-fight!", "fact_hi": "Sher ke parivaar ko Pride kehte hain!"},
+    }
+    info = animals.get(animal_key, animals["dog"])
+    title = info["name_hi"] if lang == "hi" else info["name_en"]
+    fact = info["fact_hi"] if lang == "hi" else info["fact_en"]
+    
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="an_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#ecfdf5"/>
+    </linearGradient>
+    <filter id="an_sh" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+  <rect width="540" height="320" rx="20" fill="url(#an_bg)"/>
+  
+  <rect x="20" y="16" width="500" height="48" rx="14" fill="#ffffff" filter="url(#an_sh)"/>
+  <text x="270" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#1e1b4b" text-anchor="middle">
+    {title}
+  </text>
+  
+  <g transform="translate(60, 80)">
+    <rect width="180" height="150" rx="18" fill="#ffffff" stroke="{info['color']}" stroke-width="3" filter="url(#an_sh)"/>
+    <circle cx="90" cy="65" r="45" fill="{info['color']}" fill-opacity="0.15"/>
+    <text x="90" y="78" font-size="52" text-anchor="middle">{info['icon']}</text>
+    <text x="90" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#1e293b" text-anchor="middle">Parent Animal</text>
+  </g>
+  
+  <g transform="translate(300, 80)">
+    <rect width="180" height="150" rx="18" fill="#ffffff" stroke="#6366f1" stroke-width="3" filter="url(#an_sh)"/>
+    <circle cx="90" cy="65" r="45" fill="#6366f1" fill-opacity="0.15"/>
+    <text x="90" y="76" font-size="44" text-anchor="middle">{info['icon']}</text>
+    <text x="90" y="132" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#4338ca" text-anchor="middle">Cute Baby {info['baby_icon']}</text>
+  </g>
+  
+  <g transform="translate(210, 110)">
+    <rect width="120" height="36" rx="18" fill="#f43f5e" filter="url(#an_sh)"/>
+    <text x="60" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle">🔊 {info['sound']}</text>
+  </g>
+  
+  <rect x="30" y="248" width="480" height="54" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="270" y="280" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">
+    💡 {fact}
+  </text>
+</svg>"""
+
+
+def seed_plant_svg(stage: int = 3, lang: str = "en") -> str:
+    stage = max(1, min(4, stage))
+    stages_info = [
+        ("1. Seed in Soil", "1. Beej Mitti Mein", "The seed rests in warm soil and drinks water.", "Beej mitti mein aaraam karta hai aur paani peeta hai."),
+        ("2. Tiny Sprout", "2. Chhota Ankuran", "A baby root goes down and a tiny green sprout pops up!", "Chhoti jad neeche jaati hai aur hara ankur nikalta hai!"),
+        ("3. Growing Stem", "3. Bada Hota Tana", "Leaves spread out to catch warm sunshine!", "Pattiyan dhoop lene ke liye phailti hain!"),
+        ("4. Sunflower!", "4. Khila Hua Sunflower!", "Golden flower blossoms and makes new seeds!", "Sundar peela phool khilta hai aur naye beej banata hai!"),
+    ]
+    cur = stages_info[stage - 1]
+    title = cur[1] if lang == "hi" else cur[0]
+    desc = cur[3] if lang == "hi" else cur[2]
+    
+    roots = '<path d="M 270 255 Q 260 280 250 295 M 270 255 Q 280 280 290 295" stroke="#fef3c7" stroke-width="3" fill="none" stroke-linecap="round"/>' if stage >= 2 else ''
+    sprout = '''<path d="M 270 235 Q 270 190 270 160" stroke="#22c55e" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <ellipse cx="250" cy="180" rx="16" ry="8" fill="#16a34a" transform="rotate(-30 250 180)"/>
+  <ellipse cx="290" cy="170" rx="16" ry="8" fill="#16a34a" transform="rotate(30 290 170)"/>''' if stage >= 2 and stage < 4 else ''
+    big_stem = '''<path d="M 270 235 Q 270 160 270 110" stroke="#15803d" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <ellipse cx="230" cy="150" rx="26" ry="12" fill="#16a34a" transform="rotate(-25 230 150)"/>
+  <ellipse cx="310" cy="140" rx="26" ry="12" fill="#16a34a" transform="rotate(25 310 140)"/>''' if stage >= 3 else ''
+    flower = '''<circle cx="270" cy="95" r="32" fill="#f59e0b"/>
+  <circle cx="270" cy="95" r="20" fill="#78350f"/>
+  <text x="270" y="103" font-size="30" text-anchor="middle">🌻</text>''' if stage == 4 else ''
+    
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 330" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sp_sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="sp_soil" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="540" height="210" fill="url(#sp_sky)" rx="18"/>
+  <rect y="210" width="540" height="120" fill="url(#sp_soil)" rx="18"/>
+  
+  <circle cx="460" cy="60" r="34" fill="#fbbf24"/>
+  <circle cx="460" cy="60" r="42" fill="#fde047" fill-opacity="0.3"/>
+  <text x="460" y="66" font-size="24" text-anchor="middle">☀️</text>
+  
+  <line x1="0" y1="210" x2="540" y2="210" stroke="#15803d" stroke-width="6"/>
+  
+  <ellipse cx="270" cy="245" rx="14" ry="10" fill="#92400e" stroke="#451a03" stroke-width="2"/>
+  <text x="270" y="249" font-size="12" text-anchor="middle">🌰</text>
+  
+  {roots}
+  {sprout}
+  {big_stem}
+  {flower}
+  
+  <rect x="25" y="15" width="340" height="60" rx="14" fill="#ffffff" fill-opacity="0.95" stroke="#cbd5e1"/>
+  <text x="40" y="40" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#15803d">{title}</text>
+  <text x="40" y="60" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#334155">{desc}</text>
+</svg>"""
+
+
+def water_cycle_svg(lang: str = "en") -> str:
+    title = "Jal Chakra (The Water Cycle)" if lang == "hi" else "The Complete Water Cycle"
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 310" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wc_sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#bae6fd"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+    <linearGradient id="wc_sea" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="220" fill="url(#wc_sky)" rx="16"/>
+  <rect y="220" width="540" height="90" fill="url(#wc_sea)" rx="16"/>
+  
+  <circle cx="460" cy="50" r="30" fill="#f59e0b"/>
+  <text x="460" y="58" font-size="24" text-anchor="middle">☀️</text>
+  
+  <rect x="25" y="15" width="320" height="42" rx="10" fill="#ffffff" opacity="0.95"/>
+  <text x="185" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#0369a1" text-anchor="middle">{title}</text>
+  
+  <g transform="translate(110, 70)">
+    <rect width="140" height="46" rx="23" fill="#ffffff" opacity="0.95"/>
+    <text x="70" y="32" font-size="26" text-anchor="middle">☁️</text>
+  </g>
+  <text x="180" y="170" font-size="24">🌧️</text>
+  <text x="180" y="200" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0369a1">Precipitation (Rain)</text>
+  
+  <text x="370" y="170" font-size="24">♨️ ⬆️</text>
+  <text x="340" y="200" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#ea580c">Evaporation (Sun Heat)</text>
+  
+  <rect x="30" y="255" width="480" height="42" rx="10" fill="#ffffff" opacity="0.95"/>
+  <text x="270" y="280" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">Sun Heats Sea ➔ Water Evaporates ➔ Clouds Condense ➔ Rain Falls Back!</text>
+</svg>"""
+
+
+def counting_fruits_svg(n: int = 5, lang: str = "en") -> str:
+    n = max(1, min(10, n))
+    words_en = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN"]
+    words_hi = ["EK", "DO", "TEEN", "CHAAR", "PAANCH", "CHHEH", "SAAT", "AATH", "NAU", "DAS"]
+    w = words_hi[n - 1] if lang == "hi" else words_en[n - 1]
+    
+    items_svg = []
+    cols = 5
+    for i in range(n):
+        row = i // cols
+        col = i % cols
+        cx = 90 + col * 85
+        cy = 135 + row * 80
+        items_svg.append(f"""
+        <g transform="translate({cx}, {cy})">
+          <circle cx="0" cy="0" r="32" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+          <text x="0" y="12" font-size="34" text-anchor="middle">🍎</text>
+          <circle cx="20" cy="-20" r="11" fill="#ef4444"/>
+          <text x="20" y="-16" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle">{i+1}</text>
+        </g>
+        """)
+    items_str = "".join(items_svg)
+    
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 310" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cnt_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff1f2"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="310" rx="20" fill="url(#cnt_bg)"/>
+  
+  <rect x="20" y="16" width="500" height="64" rx="16" fill="#ffffff" stroke="#f43f5e" stroke-width="2"/>
+  <text x="50" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="44" font-weight="900" fill="#e11d48">{n}</text>
+  <text x="110" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#1e1b4b">
+    {w} {'APPLES' if lang == 'en' else 'SEB'} 🍎
+  </text>
+  <text x="110" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b">
+    {'Tap the slider below to count together!' if lang == 'en' else 'Slider ko hilakar ek-ek karke gino!'}
+  </text>
+  
+  {items_str}
+</svg>"""
+
+
+def basic_shapes_svg(shape_key: str = "circle", lang: str = "en") -> str:
+    shapes = {
+        "circle": {"name_en": "Circle (Round)", "name_hi": "Vritt (Gol)", "sides": "0 straight sides (Curved)", "sides_hi": "0 sidhi side (Gol)", "ex": "Clock, Coin, Wheel", "ex_hi": "Ghadi, Sikka, Pahiya", "color": "#ef4444", "svg": '<circle cx="270" cy="145" r="50" fill="#ef4444" stroke="#b91c1c" stroke-width="4"/><circle cx="255" cy="135" r="5" fill="#ffffff"/><circle cx="285" cy="135" r="5" fill="#ffffff"/><path d="M 255 155 Q 270 170 285 155" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>'},
+        "square": {"name_en": "Square (4 Equal Sides)", "name_hi": "Varg / Square (4 Barabar Bhuja)", "sides": "4 equal sides &amp; 4 corners", "sides_hi": "4 barabar sides aur 4 kone", "ex": "Sandwich, Chess board, Dice", "ex_hi": "Bread, Chess board, Ludo Dice", "color": "#3b82f6", "svg": '<rect x="220" y="95" width="100" height="100" rx="8" fill="#3b82f6" stroke="#1d4ed8" stroke-width="4"/><circle cx="250" cy="130" r="5" fill="#ffffff"/><circle cx="290" cy="130" r="5" fill="#ffffff"/><path d="M 255 155 Q 270 170 285 155" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/>'},
+        "triangle": {"name_en": "Triangle (3 Sides)", "name_hi": "Tribhuj / Triangle (3 Sides)", "sides": "3 sides &amp; 3 corners", "sides_hi": "3 sides aur 3 kone", "ex": "Pizza slice, Nacho, Hanger", "ex_hi": "Pizza slice, Samosa, Hanger", "color": "#10b981", "svg": '<polygon points="270,90 215,190 325,190" fill="#10b981" stroke="#047857" stroke-width="4"/><circle cx="255" cy="145" r="4" fill="#ffffff"/><circle cx="285" cy="145" r="4" fill="#ffffff"/><path d="M 260 162 Q 270 172 280 162" stroke="#ffffff" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+        "star": {"name_en": "Star (5 Points)", "name_hi": "Taara / Star (5 Kone)", "sides": "5 pointed arms", "sides_hi": "5 chamakdar kone", "ex": "Stars in night sky, Badge", "ex_hi": "Raat ka tara, School badge", "color": "#f59e0b", "svg": '<polygon points="270,90 283,126 322,126 291,148 303,184 270,162 237,184 249,148 218,126 257,126" fill="#f59e0b" stroke="#d97706" stroke-width="3"/>'},
+    }
+    cur = shapes.get(shape_key, shapes["circle"])
+    title = cur["name_hi"] if lang == "hi" else cur["name_en"]
+    sides = cur["sides_hi"] if lang == "hi" else cur["sides"]
+    ex = cur["ex_hi"] if lang == "hi" else cur["ex"]
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 290" width="100%" height="100%">
+  <rect width="540" height="290" rx="20" fill="#f8fafc"/>
+  <rect x="20" y="15" width="500" height="48" rx="14" fill="#ffffff" stroke="{cur['color']}" stroke-width="2"/>
+  <text x="270" y="46" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#1e1b4b" text-anchor="middle">{title}</text>
+  {cur['svg']}
+  <rect x="40" y="215" width="460" height="58" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="270" y="238" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="{cur['color']}" text-anchor="middle">Properties: {sides}</text>
+  <text x="270" y="258" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">Real World Examples: {ex}</text>
+</svg>"""
+
+
+def candy_addition_svg(a: int = 2, b: int = 3, lang: str = "en") -> str:
+    tot = a + b
+    candy_a = "🍬" * min(a, 4)
+    candy_b = "🍭" * min(b, 4)
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 280" width="100%" height="100%">
+  <rect width="540" height="280" rx="20" fill="#fef2f2"/>
+  <rect x="25" y="15" width="490" height="46" rx="12" fill="#ffffff" stroke="#f43f5e" stroke-width="1.5"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#e11d48" text-anchor="middle">Visual Candy Addition: {a} + {b} = {tot}!</text>
+  
+  <g transform="translate(60, 95)">
+    <rect width="120" height="95" rx="14" fill="#ffffff" stroke="#fb7185" stroke-width="2"/>
+    <text x="60" y="52" font-size="30" text-anchor="middle">{candy_a}</text>
+    <text x="60" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#be123c" text-anchor="middle">{a} Candies</text>
+  </g>
+  
+  <text x="220" y="155" font-family="'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="900" fill="#e11d48" text-anchor="middle">+</text>
+  
+  <g transform="translate(255, 95)">
+    <rect width="120" height="95" rx="14" fill="#ffffff" stroke="#fb7185" stroke-width="2"/>
+    <text x="60" y="52" font-size="30" text-anchor="middle">{candy_b}</text>
+    <text x="60" y="80" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#be123c" text-anchor="middle">{b} Candies</text>
+  </g>
+  
+  <text x="415" y="155" font-family="'Segoe UI', Roboto, sans-serif" font-size="40" font-weight="900" fill="#e11d48" text-anchor="middle">=</text>
+  
+  <g transform="translate(440, 95)">
+    <circle cx="40" cy="48" r="38" fill="#e11d48"/>
+    <text x="40" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="900" fill="#ffffff" text-anchor="middle">{tot}</text>
+  </g>
+  
+  <rect x="40" y="225" width="460" height="36" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="270" y="248" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">Count them all together: {a} plus {b} makes {tot} sweets in all!</text>
+</svg>"""
+
+
+def push_pull_svg(mode: str = "push", lang: str = "en") -> str:
+    is_push = (mode.lower() == "push")
+    title = ("PUSH (Dhakka Dena) • Moves Away!" if lang == "en" else "PUSH (Dhakka) • Aage Badhana!") if is_push else ("PULL (Kheenchna) • Moves Closer!" if lang == "en" else "PULL (Kheenchna) • Apni Taraf Lana!")
+    desc = ("A push moves an object away from you, like kicking a ball or rolling a toy car!" if lang == "en" else "Dhakka dene se cheez door jaati hai, jaise gend ko kick marna ya toy car chalana!") if is_push else ("A pull brings an object towards you, like pulling a wagon handle or pulling a rope!" if lang == "en" else "Kheenchna cheez ko apni taraf lata hai, jaise wagon ko kheenchna!")
+    
+    scene = '''<!-- Pushing Car -->
+  <g transform="translate(180, 130)">
+    <rect x="70" y="30" width="160" height="50" rx="16" fill="#ef4444"/>
+    <polygon points="110,30 150,10 190,30" fill="#dc2626"/>
+    <circle cx="100" cy="80" r="18" fill="#1e293b"/>
+    <circle cx="100" cy="80" r="8" fill="#94a3b8"/>
+    <circle cx="200" cy="80" r="18" fill="#1e293b"/>
+    <circle cx="200" cy="80" r="8" fill="#94a3b8"/>
+    <text x="20" y="55" font-size="44">👐</text>
+    <path d="M 120 15 L 210 15 M 195 5 L 215 15 L 195 25" stroke="#2563eb" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <text x="165" y="-2" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#2563eb" text-anchor="middle">PUSH FORCE ➔</text>
+  </g>''' if is_push else '''<!-- Pulling Wagon -->
+  <g transform="translate(140, 130)">
+    <rect x="110" y="30" width="150" height="50" rx="10" fill="#eab308" stroke="#ca8a04" stroke-width="2"/>
+    <circle cx="140" cy="80" r="18" fill="#1e293b"/>
+    <circle cx="140" cy="80" r="8" fill="#94a3b8"/>
+    <circle cx="230" cy="80" r="18" fill="#1e293b"/>
+    <circle cx="230" cy="80" r="8" fill="#94a3b8"/>
+    <line x1="110" y1="50" x2="40" y2="25" stroke="#78350f" stroke-width="5" stroke-linecap="round"/>
+    <text x="-5" y="35" font-size="44">✊</text>
+    <path d="M 170 15 L 80 15 M 95 5 L 75 15 L 95 25" stroke="#16a34a" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <text x="125" y="-2" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#16a34a" text-anchor="middle">⬅️ PULL FORCE</text>
+  </g>'''
+    
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pp_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="300" rx="20" fill="url(#pp_bg)"/>
+  
+  <rect x="25" y="16" width="490" height="60" rx="14" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="#1d4ed8" text-anchor="middle">{title}</text>
+  <text x="270" y="64" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#475569" text-anchor="middle">{desc}</text>
+  
+  <line x1="30" y1="230" x2="510" y2="230" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+  
+  {scene}
+  
+  <rect x="120" y="250" width="300" height="34" rx="17" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="270" y="272" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#0f172a" text-anchor="middle">
+    {'All movement begins with a Push or a Pull!' if lang == 'en' else 'Har gati Push ya Pull se shuru hoti hai!'}
+  </text>
+</svg>"""
+
+
+def circuit_bulb_svg(switch_on: bool = True, lang: str = "en") -> str:
+    status = ("BULB IS ON! 💡 (Closed Circuit)" if lang == "en" else "BULB JAL RAHA HAI! 💡") if switch_on else ("BULB IS OFF (Open Circuit)" if lang == "en" else "BULB BAND HAI (Open Circuit)")
+    color = "#fef08a" if switch_on else "#e2e8f0"
+    glow = '<circle cx="390" cy="120" r="50" fill="#fbbf24" fill-opacity="0.3"/><circle cx="390" cy="120" r="70" fill="#fef08a" fill-opacity="0.15"/>' if switch_on else ''
+    
+    switch_part = '''<line x1="0" y1="10" x2="60" y2="10" stroke="#22c55e" stroke-width="5" stroke-linecap="round"/>
+    <text x="30" y="-8" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#22c55e" text-anchor="middle">SWITCH: ON</text>''' if switch_on else '''<line x1="0" y1="10" x2="45" y2="-15" stroke="#ef4444" stroke-width="5" stroke-linecap="round"/>
+    <text x="30" y="-18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#ef4444" text-anchor="middle">SWITCH: OFF</text>'''
+    
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 310" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ckt_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="310" rx="20" fill="url(#ckt_bg)"/>
+  
+  <rect x="25" y="16" width="490" height="46" rx="12" fill="#ffffff" fill-opacity="0.1"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle">
+    {status}
+  </text>
+  
+  <path d="M 170 120 L 170 80 L 390 80 L 390 95" stroke="#38bdf8" stroke-width="4" fill="none"/>
+  <path d="M 390 145 L 390 220 L 290 220" stroke="#38bdf8" stroke-width="4" fill="none"/>
+  <path d="M 230 220 L 100 220 L 100 120" stroke="#38bdf8" stroke-width="4" fill="none"/>
+  
+  <g transform="translate(80, 100)">
+    <rect width="90" height="40" rx="6" fill="#3b82f6" stroke="#ffffff" stroke-width="2"/>
+    <rect x="90" y="12" width="8" height="16" rx="2" fill="#fbbf24"/>
+    <text x="45" y="25" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">1.5V 🔋</text>
+    <text x="18" y="25" font-weight="900" fill="#ffffff">-</text>
+    <text x="75" y="25" font-weight="900" fill="#ffffff">+</text>
+  </g>
+  
+  <g transform="translate(230, 210)">
+    <circle cx="0" cy="10" r="6" fill="#ffffff"/>
+    <circle cx="60" cy="10" r="6" fill="#ffffff"/>
+    {switch_part}
+  </g>
+  
+  <g transform="translate(390, 120)">
+    {glow}
+    <circle cx="0" cy="0" r="26" fill="{color}" stroke="#fbbf24" stroke-width="3"/>
+    <rect x="-10" y="26" width="20" height="14" rx="3" fill="#94a3b8"/>
+    <text x="0" y="8" font-size="24" text-anchor="middle">💡</text>
+  </g>
+  
+  <rect x="50" y="265" width="440" height="32" rx="10" fill="#ffffff" fill-opacity="0.1"/>
+  <text x="270" y="286" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#cbd5e1" text-anchor="middle">
+    {'Electricity flows in a circle! Closing the switch lets current reach the bulb.' if lang == 'en' else 'Bijli ek circle mein behti hai! Switch band karne se bulb jalta hai.'}
+  </text>
+</svg>"""
+
+
+def ice_melt_svg(stage: str = "melt", lang: str = "en") -> str:
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ice_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#e0f2fe"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="300" rx="20" fill="url(#ice_bg)"/>
+  
+  <rect x="25" y="16" width="490" height="46" rx="12" fill="#ffffff" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#0369a1" text-anchor="middle">
+    {'Water in 3 Shapes: Ice ➔ Water ➔ Steam!' if lang == 'en' else 'Paani ke 3 Roop: Barf ➔ Paani ➔ Bhaap!'}
+  </text>
+  
+  <g transform="translate(60, 90)">
+    <rect width="110" height="130" rx="16" fill="#ffffff" stroke="#38bdf8" stroke-width="2"/>
+    <text x="55" y="65" font-size="44" text-anchor="middle">🧊</text>
+    <text x="55" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#0284c7" text-anchor="middle">1. SOLID ICE</text>
+    <text x="55" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Cold &amp; Hard</text>
+  </g>
+  
+  <text x="195" y="165" font-size="22" fill="#0284c7" text-anchor="middle">➔</text>
+  
+  <g transform="translate(215, 90)">
+    <rect width="110" height="130" rx="16" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+    <text x="55" y="65" font-size="44" text-anchor="middle">💧</text>
+    <text x="55" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#0369a1" text-anchor="middle">2. LIQUID</text>
+    <text x="55" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Flows in Glass</text>
+  </g>
+  
+  <text x="350" y="165" font-size="22" fill="#0284c7" text-anchor="middle">➔</text>
+  
+  <g transform="translate(370, 90)">
+    <rect width="110" height="130" rx="16" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+    <text x="55" y="65" font-size="44" text-anchor="middle">♨️</text>
+    <text x="55" y="98" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#d97706" text-anchor="middle">3. STEAM GAS</text>
+    <text x="55" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Flies in Air</text>
+  </g>
+  
+  <rect x="30" y="245" width="480" height="40" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="270" y="270" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">
+    {'Heat turns cold ice into liquid water, and boiling turns water into steam!' if lang == 'en' else 'Garmi se barf paani banti hai, aur ubaalne par bhaap ban jaati hai!'}
+  </text>
+</svg>"""
+
+
+def five_senses_body_svg(sense_key: str = "all", lang: str = "en") -> str:
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 310" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sen_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf4ff"/>
+      <stop offset="100%" stop-color="#fae8ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="310" rx="20" fill="url(#sen_bg)"/>
+  
+  <rect x="25" y="16" width="490" height="46" rx="12" fill="#ffffff" stroke="#c084fc" stroke-width="2"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#7e22ce" text-anchor="middle">
+    {'My 5 Wonder Senses • Hamari 5 Indriyan' if lang == 'hi' else 'My 5 Wonder Senses (Eyes, Ears, Nose, Mouth, Hands)'}
+  </text>
+  
+  <g transform="translate(20, 85)">
+    <rect width="90" height="140" rx="14" fill="#ffffff" stroke="#3b82f6" stroke-width="2"/>
+    <text x="45" y="55" font-size="34" text-anchor="middle">👀</text>
+    <text x="45" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#1d4ed8" text-anchor="middle">EYES</text>
+    <text x="45" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">See colors</text>
+  </g>
+  
+  <g transform="translate(122, 85)">
+    <rect width="90" height="140" rx="14" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+    <text x="45" y="55" font-size="34" text-anchor="middle">👂</text>
+    <text x="45" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="middle">EARS</text>
+    <text x="45" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Hear songs</text>
+  </g>
+  
+  <g transform="translate(225, 85)">
+    <rect width="90" height="140" rx="14" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+    <text x="45" y="55" font-size="34" text-anchor="middle">👃</text>
+    <text x="45" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#b45309" text-anchor="middle">NOSE</text>
+    <text x="45" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Smell roses</text>
+  </g>
+  
+  <g transform="translate(328, 85)">
+    <rect width="90" height="140" rx="14" fill="#ffffff" stroke="#ec4899" stroke-width="2"/>
+    <text x="45" y="55" font-size="34" text-anchor="middle">👅</text>
+    <text x="45" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#be185d" text-anchor="middle">TONGUE</text>
+    <text x="45" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Taste sweets</text>
+  </g>
+  
+  <g transform="translate(430, 85)">
+    <rect width="90" height="140" rx="14" fill="#ffffff" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="45" y="55" font-size="34" text-anchor="middle">✋</text>
+    <text x="45" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#6d28d9" text-anchor="middle">HANDS</text>
+    <text x="45" y="110" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">Touch puppy</text>
+  </g>
+  
+  <rect x="25" y="245" width="490" height="45" rx="12" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="270" y="272" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#1e293b" text-anchor="middle">
+    {'Our 5 senses send signals through nerves to the brain so we explore our world!' if lang == 'en' else 'Hamari 5 indriyan dimaag ko signal bhejti hain jisse hum duniya ko jaante hain!'}
+  </text>
+</svg>"""
+
+
+def clean_teeth_svg(lang: str = "en") -> str:
+    title = "Sparkly Clean Teeth &amp; Healthy Smile" if lang == "en" else "Chamakte Daant aur Healthy Smile"
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 290" width="100%" height="100%">
+  <defs>
+    <linearGradient id="t_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0fdfa"/>
+      <stop offset="100%" stop-color="#ccfbf1"/>
+    </linearGradient>
+  </defs>
+  <rect width="540" height="290" rx="20" fill="url(#t_bg)"/>
+  <rect x="25" y="15" width="490" height="46" rx="12" fill="#ffffff" stroke="#14b8a6" stroke-width="2"/>
+  <text x="270" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#0f766e" text-anchor="middle">{title}</text>
+  
+  <g transform="translate(140, 75)">
+    <path d="M 50 20 C 20 20 20 60 20 90 C 20 120 40 140 50 140 C 60 140 70 120 80 120 C 90 120 100 140 110 140 C 120 140 140 120 140 90 C 140 60 140 20 110 20 C 95 20 88 30 80 30 C 72 30 65 20 50 20 Z" fill="#ffffff" stroke="#0d9488" stroke-width="4"/>
+    <circle cx="60" cy="65" r="6" fill="#0f766e"/>
+    <circle cx="100" cy="65" r="6" fill="#0f766e"/>
+    <path d="M 65 85 Q 80 105 95 85" stroke="#f43f5e" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <text x="145" y="45" font-size="28">✨</text>
+    <text x="15" y="35" font-size="24">✨</text>
+  </g>
+  
+  <g transform="translate(320, 105)">
+    <rect width="130" height="45" rx="10" fill="#3b82f6"/>
+    <text x="65" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#ffffff" text-anchor="middle">🪥 Brush 2x Day</text>
+  </g>
+  
+  <rect x="30" y="235" width="480" height="40" rx="10" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="270" y="260" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#334155" text-anchor="middle">
+    Brush morning and night for 2 minutes to keep your teeth sparkling strong!
+  </text>
+</svg>"""
+
+
 # ============================================================================= DISPATCH (used by the chat)
 def render_spec(spec: str, lang: str = "en"):
     """Turn a visual spec string into ("svg", str) or ("plotly", Figure). Returns None if unknown."""
     parts = spec.split(":")
     try:
         if parts[0] == "body":
+            if len(parts) > 1 and parts[1] == "senses":
+                return "svg", five_senses_body_svg("all", lang)
+            if len(parts) > 1 and parts[1] == "teeth":
+                return "svg", clean_teeth_svg(lang)
             if len(parts) > 2 and parts[1] == "kidneys" and parts[2] == "detail":
                 return "svg", kidney_detail_svg(lang)
             return "svg", body_svg(parts[1], lang)
         if parts[0] == "physics":
+            if parts[1] in ("push_pull", "push", "pull"):
+                return "svg", push_pull_svg(parts[2] if len(parts) > 2 else "push", lang)
+            if parts[1] in ("circuit_bulb", "bulb"):
+                return "svg", circuit_bulb_svg(True, lang)
             if parts[1] == "ohm":
                 return "svg", circuit_svg(6, 3)
             if parts[1] == "force":
@@ -2275,6 +2781,8 @@ def render_spec(spec: str, lang: str = "en"):
             return "plotly", {"projectile": projectile_fig, "pendulum": pendulum_fig,
                               "refraction": refraction_fig}[parts[1]]()
         if parts[0] == "chem":
+            if parts[1] in ("ice", "water_steam"):
+                return "svg", ice_melt_svg("melt", lang)
             if parts[1] == "metals":
                 return "svg", metals_nonmetals_svg(lang)
             if parts[1] == "atom":
@@ -2287,6 +2795,12 @@ def render_spec(spec: str, lang: str = "en"):
                 en, hi, ph = C.PH_SUBSTANCES[parts[2]]
                 return "svg", ph_svg(ph, hi if lang == "hi" else en)
         if parts[0] == "nature":
+            if parts[1] in ("cute", "animals", "animal"):
+                return "svg", cute_animals_svg(parts[2] if len(parts) > 2 else "dog", lang)
+            if parts[1] in ("seed", "sprout"):
+                return "svg", seed_plant_svg(int(parts[2]) if len(parts) > 2 else 3, lang)
+            if parts[1] in ("watercycle", "water_cycle"):
+                return "svg", water_cycle_svg(lang)
             if parts[1] in ("tree", "plant"):
                 return "svg", tree_plant_svg(lang)
             if parts[1] == "photosynthesis":
@@ -2300,6 +2814,12 @@ def render_spec(spec: str, lang: str = "en"):
         if parts[0] == "vital":
             return "svg", vital_signs_svg(95, lang)
         if parts[0] == "math":
+            if parts[1] in ("count", "counting"):
+                return "svg", counting_fruits_svg(int(parts[2]) if len(parts) > 2 else 5, lang)
+            if parts[1] in ("shapes", "shape"):
+                return "svg", basic_shapes_svg(parts[2] if len(parts) > 2 else "circle", lang)
+            if parts[1] in ("addition", "candy"):
+                return "svg", candy_addition_svg(int(parts[2]) if len(parts) > 2 else 2, int(parts[3]) if len(parts) > 3 else 3, lang)
             if parts[1] == "circle":
                 return "svg", math_geometry_svg("circle", {"r": 7}, lang)
             if parts[1] == "rectangle":
