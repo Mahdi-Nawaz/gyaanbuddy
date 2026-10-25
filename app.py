@@ -1190,8 +1190,14 @@ def sidebar():
     age = class_to_age.get(chosen_class, "10-12")
 
     st.sidebar.divider()
+    env_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+    if not env_api_key:
+        try:
+            env_api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        except Exception:
+            env_api_key = ""
     api_key = st.sidebar.text_input("Anthropic API key (optional, for parents)", type="password",
-                                    value=os.getenv("ANTHROPIC_API_KEY", ""),
+                                    value=env_api_key,
                                     help="Without a key GyaanBuddy answers from its built-in lessons.")
     model = st.sidebar.text_input("Model", value=tutor_engine.DEFAULT_MODEL)
     st.sidebar.success("AI mode on" if api_key else "Built-in lessons mode")
@@ -1412,46 +1418,167 @@ def tab_snap_solve(lang, age, api_key, model):
     if solve_btn:
         q_to_solve = user_prob.strip()
         if not q_to_solve and not active_img:
-            st.warning("Please take a photo or select a question to solve!" if lang == "en" else "Kripya photo lein ya koi sawaal chunein!")
-        elif not q_to_solve and active_img and not api_key:
-            st.info("💡 Please type what question is in your photo or click a preset above, and GyaanBuddy will solve it with formulas and diagrams!" if lang == "en" else
-                    "💡 Kripya batayein photo mein kya sawaal hai ya upar se topic chunein!")
+            st.warning("⚠️ " + ("Please take a photo with the camera, upload an image, or pick a question preset above!" if lang == "en" else "⚠️ Kripya photo lein ya upar se sawaal chunein!"))
         else:
-            if api_key and active_img:
-                import anthropic
-                client = anthropic.Anthropic(api_key=api_key)
-                img_bytes = active_img.getvalue()
-                b64_data = base64.b64encode(img_bytes).decode("utf-8")
-                mime = getattr(active_img, "type", "image/jpeg") or "image/jpeg"
-                sys_prompt = f"You are GyaanBuddy, a friendly tutor for school students up to Class 8 in India. Language: {'English' if lang == 'en' else 'Hinglish'}. Carefully read the question in the image and solve it step-by-step with simple explanations, formulas, and encouraging emojis."
+            effective_api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+            if not effective_api_key:
                 try:
-                    resp = client.messages.create(
-                        model=model or "claude-3-5-sonnet-20241022",
-                        max_tokens=600,
-                        system=sys_prompt,
-                        messages=[{
-                            "role": "user",
-                            "content": [
-                                {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
-                                {"type": "text", "text": q_to_solve or "Please solve this question step-by-step for a school student."}
-                            ]
-                        }]
-                    )
-                    sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
-                    st.session_state["messages"].append({"role": "user", "text": f"📸 [Photo Question]: {q_to_solve or 'School Problem in Image'}"})
-                    st.session_state["messages"].append({"role": "assistant", "text": sol_text, "q": q_to_solve})
-                    add_xp(20, "Solved photo question!", badge_id="curious_spark")
-                    st.rerun()
-                except Exception as e:
-                    st.info(f"AI Vision Helper falling back to offline tutor: {e}")
+                    effective_api_key = st.secrets.get("ANTHROPIC_API_KEY")
+                except Exception:
+                    effective_api_key = None
 
-            if not q_to_solve:
-                q_to_solve = "What is force and Newton's law?"
-            r = tutor_engine.answer(q_to_solve, lang, age)
-            st.session_state["messages"].append({"role": "user", "text": f"📸 [Question]: {q_to_solve}"})
-            st.session_state["messages"].append({"role": "assistant", "text": r.text, "visual": r.visual, "q": q_to_solve})
-            add_xp(20, "Solved question!", badge_id="curious_spark")
-            st.rerun()
+            with st.spinner("🤖 Scanning question and calculating solution... 🔍" if lang == "en" else "🤖 Sawaal scan ho raha hai aur hal kiya ja raha hai... 🔍"):
+                sol_text = ""
+                visual_spec = None
+                was_ai = False
+
+                # 1. AI Vision if key is available
+                if active_img and effective_api_key:
+                    try:
+                        import anthropic
+                        client = anthropic.Anthropic(api_key=effective_api_key)
+                        active_img.seek(0)
+                        img_bytes = active_img.getvalue()
+                        b64_data = base64.b64encode(img_bytes).decode("utf-8")
+                        mime = getattr(active_img, "type", "image/jpeg") or "image/jpeg"
+                        sys_prompt = (
+                            f"You are GyaanBuddy, a friendly, encouraging AI tutor for school students (Nursery to Class 8) in India. "
+                            f"Language: {'English' if lang == 'en' else 'Hinglish'}. "
+                            f"Carefully examine the student's photo. Extract and read the math problem, science question, diagram, or textbook exercise. "
+                            f"Provide a complete, step-by-step solution formatted with simple child-friendly language, clear steps (Step 1, Step 2, ...), "
+                            f"formulas, final answer highlighted, and encouraging emojis."
+                        )
+                        v_prompt = q_to_solve or "Please solve the question or exercise shown in this photo step-by-step for a school student."
+                        resp = client.messages.create(
+                            model=model or "claude-3-5-sonnet-20241022",
+                            max_tokens=650,
+                            system=sys_prompt,
+                            messages=[{
+                                "role": "user",
+                                "content": [
+                                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
+                                    {"type": "text", "text": v_prompt}
+                                ]
+                            }]
+                        )
+                        sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
+                        was_ai = True
+                    except Exception:
+                        sol_text = ""
+
+                # 2. Try OCR if Vision was not used or failed and no question typed
+                if not sol_text and active_img and not q_to_solve:
+                    try:
+                        import pytesseract
+                        from PIL import Image
+                        active_img.seek(0)
+                        ocr_p = Image.open(active_img)
+                        rot = st.session_state.get("snap_rotation", 0)
+                        if rot != 0:
+                            ocr_p = ocr_p.rotate(rot, expand=True)
+                        ocr_out = pytesseract.image_to_string(ocr_p)
+                        cleaned_ocr = " ".join(ocr_out.split()).strip()
+                        if len(cleaned_ocr) >= 3:
+                            q_to_solve = cleaned_ocr
+                    except Exception:
+                        pass
+
+                # 3. If still no specific question text, infer from subject or use core problem
+                if not sol_text:
+                    if not q_to_solve:
+                        subject_defaults = {
+                            "math": "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse",
+                            "physics": "What is force and Newton's law?",
+                            "body": "How does the heart pump blood?",
+                            "chem": "What is an atom of oxygen?",
+                            "all": "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse",
+                        }
+                        q_to_solve = subject_defaults.get(active_subj, "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse")
+
+                    r = tutor_engine.answer(q_to_solve, lang, age)
+                    sol_text = r.text
+                    visual_spec = r.visual
+
+                # 4. Attach relevant visual diagram if not yet set
+                if not visual_spec and sol_text:
+                    comb = (q_to_solve + " " + sol_text).lower()
+                    if any(w in comb for w in ["pythagor", "hypotenuse", "right triangle", "triangle"]):
+                        visual_spec = "math:pythagoras"
+                    elif any(w in comb for w in ["circle", "radius", "circumference"]):
+                        visual_spec = "math:circle"
+                    elif any(w in comb for w in ["cylinder", "volume"]):
+                        visual_spec = "math:cylinder"
+                    elif any(w in comb for w in ["fraction", "pizza"]):
+                        visual_spec = "math:fractions"
+                    elif any(w in comb for w in ["linear equation", "solve for x", "2x +", "algebra"]):
+                        visual_spec = "math:algebra"
+                    elif any(w in comb for w in ["heart", "pump blood", "circulatory"]):
+                        visual_spec = "body:heart"
+                    elif any(w in comb for w in ["lung", "breathe", "oxygen", "respiratory"]):
+                        visual_spec = "body:lungs"
+                    elif any(w in comb for w in ["brain", "cerebrum", "thinking"]):
+                        visual_spec = "body:brain"
+                    elif any(w in comb for w in ["kidney", "nephron", "filter blood"]):
+                        visual_spec = "body:kidneys:detail"
+                    elif any(w in comb for w in ["atom", "electron", "proton"]):
+                        visual_spec = "chem:atom:8"
+                    elif any(w in comb for w in ["water molecule", "h2o"]):
+                        visual_spec = "chem:mol:H2O"
+                    elif any(w in comb for w in ["force", "newton", "motion"]):
+                        visual_spec = "physics:force"
+                    elif any(w in comb for w in ["gravity", "free fall", "weight"]):
+                        visual_spec = "physics:gravity"
+                    elif any(w in comb for w in ["pendulum", "oscillation"]):
+                        visual_spec = "physics:pendulum"
+
+                # Store solution in state
+                st.session_state["snap_last_solution"] = {
+                    "q": q_to_solve or ("Photo Question" if lang == "en" else "Photo ka Sawaal"),
+                    "text": sol_text,
+                    "visual": visual_spec,
+                    "is_vision": was_ai,
+                }
+                # Also save to messages history
+                st.session_state["messages"].append({
+                    "role": "user",
+                    "text": f"📸 [Photo Question]: {q_to_solve or 'Question in photo'}"
+                })
+                st.session_state["messages"].append({
+                    "role": "assistant",
+                    "text": sol_text,
+                    "visual": visual_spec,
+                    "q": q_to_solve
+                })
+                add_xp(20, "Solved photo question!", badge_id="curious_spark")
+                st.toast("🎉 Question Solved! +20 XP awarded", icon="🚀")
+
+    # Render Solution Card directly in the Snap & Solve Tab
+    last_sol = st.session_state.get("snap_last_solution")
+    if last_sol:
+        st.markdown("---")
+        mode_badge = "🤖 " + ("AI Vision Solved" if last_sol.get("is_vision") else "Interactive Step-by-Step Solution")
+        st.markdown(f"### 🎯 {mode_badge}")
+        with st.container(border=True):
+            st.markdown(f"**❓ " + ("Question:" if lang == "en" else "Sawaal:") + f"** {last_sol['q']}")
+            st.markdown(last_sol["text"])
+            read_aloud(last_sol["text"], key="snap_sol_audio_play", lang=lang)
+
+            if last_sol.get("visual"):
+                st.markdown("##### 🖼️ " + ("Interactive Model / Diagram:" if lang == "en" else "Interactive Diagram:"))
+                show_visual(last_sol["visual"], lang, "snap_solution_visual")
+
+            st.divider()
+            c_s1, c_s2 = st.columns([1, 1])
+            with c_s1:
+                if st.button("💬 " + ("Ask follow-up in Buddy Chat" if lang == "en" else "Buddy se Chat mein aur poochhein"), key="btn_snap_chat_fwd", width="stretch"):
+                    st.session_state["pending"] = f"Explain more about: {last_sol['q']}"
+                    st.rerun()
+            with c_s2:
+                if st.button("🔄 " + ("Solve Another Question" if lang == "en" else "Dusra Sawaal Hal Karein"), key="btn_snap_clear_sol", width="stretch"):
+                    st.session_state["snap_last_solution"] = None
+                    st.session_state["snap_problem_text"] = ""
+                    st.session_state["snap_problem_input"] = ""
+                    st.rerun()
 
 
 # ----------------------------------------------------------------------------- body tab

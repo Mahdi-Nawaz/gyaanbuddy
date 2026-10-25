@@ -110,3 +110,21 @@ def test_apptest_maths_and_camera():
     # Check file_uploader present in Ask Buddy snap & solve
     uploaders = [u for u in at.file_uploader]
     assert len(uploaders) >= 1
+
+    # Check Solve button is present
+    solve_btns = [b for b in at.button if "Solve" in b.label or "Hal" in b.label]
+    assert len(solve_btns) >= 1
+
+
+def test_snap_solve_offline_fallback():
+    # Test that default subject questions properly resolve to solutions with visuals
+    subj_defaults = {
+        "math": "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse",
+        "physics": "What is force and Newton's law?",
+        "body": "How does the heart pump blood?",
+        "chem": "What is an atom of oxygen?",
+    }
+    for subj, q in subj_defaults.items():
+        ans = T.answer(q, "en", "10-12")
+        assert ans.text is not None and len(ans.text) > 10
+        assert ans.visual is not None

@@ -6,3 +6,4 @@ anthropic>=0.40
 pytest>=8.0
 gTTS>=2.5
 SpeechRecognition>=3.17.0
+pytesseract>=0.3.10
