@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import base64
+import html
 import math
+from pathlib import Path
 import random
 
 import numpy as np
@@ -22,413 +24,213 @@ def svg_to_html(svg: str, max_width: int = 420) -> str:
 
 
 # ============================================================================= HUMAN BODY
+_BODY_IMG_B64: str | None = None
+
+
+def _get_body_img_b64() -> str:
+    """Retrieve base64-encoded string of the high-res child anatomical illustration."""
+    global _BODY_IMG_B64
+    if _BODY_IMG_B64 is None:
+        candidates = [
+            Path(__file__).parent / "assets" / "human_body_anatomy.jpg",
+            Path("assets/human_body_anatomy.jpg"),
+            Path(__file__).parent.parent / "assets" / "human_body_anatomy.jpg",
+            Path("gyaanbuddy/assets/human_body_anatomy.jpg"),
+        ]
+        for p in candidates:
+            if p.exists():
+                try:
+                    with open(p, "rb") as f:
+                        _BODY_IMG_B64 = base64.b64encode(f.read()).decode("ascii")
+                    break
+                except Exception:
+                    pass
+        if _BODY_IMG_B64 is None:
+            _BODY_IMG_B64 = ""
+    return _BODY_IMG_B64
+
+
 def _organs() -> dict[str, dict]:
     return {
         "brain": dict(
             color="#ec407a",
-            anchor=(180, 50),
-            sub_en="Cerebrum • Cerebellum • Brainstem",
-            sub_hi="Sochna • Santulan • Nerves",
-            svg="""
-            <g id="organ-brain">
-              <path d="M152 52 C152 28 164 22 180 22 C196 22 208 28 208 52 C208 66 202 72 180 72 C158 72 152 66 152 52 Z"
-                    fill="url(#brain-grad)" stroke="#880e4f" stroke-width="2.5"/>
-              <path d="M158 42 Q168 34 178 42 M156 52 Q166 44 176 52 M160 62 Q170 54 176 60"
-                    fill="none" stroke="#ad1457" stroke-width="2" stroke-linecap="round"/>
-              <path d="M182 42 Q192 34 202 42 M184 52 Q194 44 204 52 M182 60 Q188 54 198 60"
-                    fill="none" stroke="#ad1457" stroke-width="2" stroke-linecap="round"/>
-              <line x1="180" y1="24" x2="180" y2="70" stroke="#880e4f" stroke-width="2" stroke-linecap="round"/>
-              <path d="M192 64 C204 64 210 72 204 80 C198 84 190 82 188 74 Z" fill="#ad1457" stroke="#880e4f" stroke-width="1.8"/>
-              <line x1="192" y1="70" x2="202" y2="72" stroke="#f8bbd0" stroke-width="1.2"/>
-              <line x1="192" y1="75" x2="200" y2="77" stroke="#f8bbd0" stroke-width="1.2"/>
-              <path d="M176 72 L176 92 M184 72 L184 92" stroke="#c2185b" stroke-width="2.5" fill="none"/>
-              <circle cx="166" cy="38" r="1.8" fill="#ffffff" opacity="0.8"/>
-              <circle cx="194" cy="38" r="1.8" fill="#ffffff" opacity="0.8"/>
-            </g>"""),
+            anchor=(512, 160),
+            sub_en="Cerebrum • Cerebellum • Brainstem • Control Room",
+            sub_hi="Sochna • Santulan • Yaaddasht • Control Room",
+            sys_en="Nervous System",
+            sys_hi="Nervous System",
+            name_en="Brain",
+            name_hi="Dimaag (Brain)",
+            svg='<ellipse cx="512" cy="160" rx="70" ry="60" fill="rgba(236,64,122,0.28)" stroke="#ec407a" stroke-width="5"/>',
+        ),
         "lungs": dict(
             color="#0288d1",
-            anchor=(236, 175),
-            sub_en="Windpipe (Trachea) • Bronchi • Lobes • Diaphragm",
-            sub_hi="Saans nali • Fefde • Diaphragm",
-            svg="""
-            <g id="organ-lungs">
-              <!-- Trachea (windpipe) with cartilage rings -->
-              <rect x="174" y="96" width="12" height="44" rx="3" fill="#e0f7fa" stroke="#0277bd" stroke-width="2"/>
-              <line x1="174" y1="104" x2="186" y2="104" stroke="#0277bd" stroke-width="1.5"/>
-              <line x1="174" y1="111" x2="186" y2="111" stroke="#0277bd" stroke-width="1.5"/>
-              <line x1="174" y1="118" x2="186" y2="118" stroke="#0277bd" stroke-width="1.5"/>
-              <line x1="174" y1="125" x2="186" y2="125" stroke="#0277bd" stroke-width="1.5"/>
-              <line x1="174" y1="132" x2="186" y2="132" stroke="#0277bd" stroke-width="1.5"/>
-              <!-- Primary Bronchi -->
-              <path d="M176 140 Q168 152 156 164" fill="none" stroke="#0277bd" stroke-width="4.5" stroke-linecap="round"/>
-              <path d="M184 140 Q192 152 204 164" fill="none" stroke="#0277bd" stroke-width="4.5" stroke-linecap="round"/>
-              <!-- Right Lung (3 lobes) -->
-              <path d="M170 138 C166 126 150 126 140 136 C128 150 122 176 122 200 C122 218 132 228 148 228 C162 228 170 218 172 204 C174 188 174 154 170 138 Z"
-                    fill="url(#lung-grad)" stroke="#01579b" stroke-width="2.5"/>
-              <path d="M124 182 Q146 186 168 180" fill="none" stroke="#01579b" stroke-width="1.5" stroke-dasharray="3 2"/>
-              <path d="M130 206 Q150 208 170 200" fill="none" stroke="#01579b" stroke-width="1.5" stroke-dasharray="3 2"/>
-              <!-- Left Lung (2 lobes + Cardiac Notch for heart) -->
-              <path d="M190 138 C194 126 210 126 220 136 C232 150 238 176 238 200 C238 218 228 228 212 228 C198 228 190 218 188 206 C182 192 186 154 190 138 Z"
-                    fill="url(#lung-grad)" stroke="#01579b" stroke-width="2.5"/>
-              <path d="M190 188 Q210 190 236 184" fill="none" stroke="#01579b" stroke-width="1.5" stroke-dasharray="3 2"/>
-              <!-- Bronchial tree branches -->
-              <path d="M156 164 Q146 174 138 190 M156 164 Q162 176 160 194 M146 174 Q140 182 136 198"
-                    fill="none" stroke="#e1f5fe" stroke-width="2" stroke-linecap="round"/>
-              <path d="M204 164 Q214 174 222 190 M204 164 Q198 176 200 194 M214 174 Q220 182 224 198"
-                    fill="none" stroke="#e1f5fe" stroke-width="2" stroke-linecap="round"/>
-              <!-- Alveoli dots -->
-              <circle cx="136" cy="198" r="2.5" fill="#e1f5fe"/>
-              <circle cx="138" cy="190" r="2.5" fill="#e1f5fe"/>
-              <circle cx="160" cy="194" r="2.5" fill="#e1f5fe"/>
-              <circle cx="224" cy="198" r="2.5" fill="#e1f5fe"/>
-              <circle cx="222" cy="190" r="2.5" fill="#e1f5fe"/>
-              <circle cx="200" cy="194" r="2.5" fill="#e1f5fe"/>
-              <!-- Diaphragm muscle base -->
-              <path d="M118 232 Q180 218 242 232" fill="none" stroke="#e91e63" stroke-width="3" stroke-linecap="round"/>
-            </g>"""),
+            anchor=(565, 515),
+            sub_en="Trachea • Bronchi • Alveoli • Oxygen In &amp; CO2 Out",
+            sub_hi="Saans Nali • Fefde • Oxygen In &amp; CO2 Out",
+            sys_en="Respiratory System",
+            sys_hi="Respiratory System",
+            name_en="Lungs",
+            name_hi="Fefde (Lungs)",
+            svg='<g><ellipse cx="435" cy="515" rx="55" ry="70" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="4"/><ellipse cx="565" cy="515" rx="55" ry="70" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="4"/></g>',
+        ),
         "heart": dict(
-            color="#e53935",
-            anchor=(204, 186),
-            sub_en="Aorta • Ventricles • Atria • Coronary arteries",
-            sub_hi="Aorta • Khoon pump • Dhadkan",
-            svg="""
-            <g id="organ-heart">
-              <!-- Superior Vena Cava (Blue - deoxygenated blood) -->
-              <rect x="166" y="146" width="10" height="28" rx="3" fill="#1565c0" stroke="#0d47a1" stroke-width="1.5"/>
-              <!-- Aortic Arch (Bright Red - oxygenated blood to body) with 3 branches -->
-              <path d="M178 168 C178 148 186 142 198 142 C208 142 212 150 212 164"
-                    fill="none" stroke="#d32f2f" stroke-width="10" stroke-linecap="round"/>
-              <line x1="188" y1="143" x2="186" y2="134" stroke="#d32f2f" stroke-width="3.5" stroke-linecap="round"/>
-              <line x1="196" y1="142" x2="196" y2="132" stroke="#d32f2f" stroke-width="3.5" stroke-linecap="round"/>
-              <line x1="204" y1="144" x2="206" y2="134" stroke="#d32f2f" stroke-width="3.5" stroke-linecap="round"/>
-              <!-- Pulmonary Artery Trunk (Blue) -->
-              <path d="M182 166 Q194 162 208 166" fill="none" stroke="#1976d2" stroke-width="8" stroke-linecap="round"/>
-              <!-- Heart Muscular Chambers (Ventricles & Atria) -->
-              <path d="M168 174 C160 178 162 192 170 196 C170 208 184 218 198 216 C210 214 214 200 214 188 C214 178 206 172 196 172 C186 172 174 172 168 174 Z"
-                    fill="url(#heart-grad)" stroke="#b71c1c" stroke-width="2.5"/>
-              <!-- Interventricular septum shadow -->
-              <path d="M188 176 Q190 196 198 214" fill="none" stroke="#880e4f" stroke-width="1.8"/>
-              <!-- Coronary arteries (red) & veins (blue) -->
-              <path d="M184 182 Q192 190 196 204" fill="none" stroke="#ff8a80" stroke-width="1.8" stroke-linecap="round"/>
-              <path d="M192 188 Q198 192 204 198" fill="none" stroke="#ff8a80" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M178 184 Q182 194 186 206" fill="none" stroke="#90caf9" stroke-width="1.5" stroke-linecap="round"/>
-            </g>"""),
-        "stomach": dict(
-            color="#ff9800",
-            anchor=(212, 250),
-            sub_en="Esophagus • Fundus • Gastric folds • Pylorus",
-            sub_hi="Food pipe • Acid • Khana pachana",
-            svg="""
-            <g id="organ-stomach">
-              <!-- Esophagus (food pipe) descending from throat -->
-              <path d="M178 108 L178 160 Q178 200 184 230" fill="none" stroke="#ffcc80" stroke-width="6" stroke-linecap="round"/>
-              <!-- J-shaped stomach with curved fundus, greater curvature and pylorus -->
-              <path d="M184 232 C184 222 204 220 212 230 C220 242 220 262 208 272 C194 282 176 278 168 266 C162 254 168 248 178 248 C186 248 194 254 200 252 C204 250 206 242 198 238 C192 234 186 236 184 232 Z"
-                    fill="url(#stomach-grad)" stroke="#e65100" stroke-width="2.5"/>
-              <!-- Internal gastric rugae folds -->
-              <path d="M194 244 Q204 250 202 260 M186 254 Q194 262 198 270 M176 260 Q182 266 190 270"
-                    fill="none" stroke="#bf360c" stroke-width="1.8" stroke-linecap="round"/>
-              <!-- Duodenum connection (small intestine start) -->
-              <path d="M168 266 Q162 272 168 278" fill="none" stroke="#ffe082" stroke-width="6" stroke-linecap="round"/>
-            </g>"""),
-        "liver": dict(
-            color="#8d4f22",
-            anchor=(148, 240),
-            sub_en="Right &amp; Left Lobes • Gallbladder (Bile)",
-            sub_hi="Bada organ • Blood saaf karna • Gallbladder",
-            svg="""
-            <g id="organ-liver">
-              <!-- Wedge-shaped liver spanning upper abdomen -->
-              <path d="M136 246 C136 232 152 226 174 226 C194 226 202 232 198 238 C192 244 176 250 168 258 C158 262 144 262 138 256 C136 252 136 248 136 246 Z"
-                    fill="url(#liver-grad)" stroke="#4e342e" stroke-width="2.5"/>
-              <!-- Falciform ligament division line -->
-              <path d="M166 228 Q164 242 160 254" fill="none" stroke="#d7ccc8" stroke-width="1.8"/>
-              <!-- Emerald green Gallbladder tucked underneath -->
-              <path d="M152 258 C150 266 160 270 162 262 C164 256 158 254 152 258 Z"
-                    fill="#43a047" stroke="#1b5e20" stroke-width="1.8"/>
-              <path d="M158 262 Q164 268 168 270" fill="none" stroke="#2e7d32" stroke-width="1.5"/>
-            </g>"""),
-        "kidneys": dict(
             color="#dc2626",
-            anchor=(236, 290),
-            sub_en="Renal cortex • Medullary pyramids • Ureters to bladder",
-            sub_hi="Gurde • Blood filter • 10 lakh nephrons • Bladder",
-            svg="""
-            <g id="organ-kidneys">
-              <!-- Abdominal Aorta & Inferior Vena Cava (Major central vessels) -->
-              <line x1="177" y1="262" x2="177" y2="330" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
-              <line x1="184" y1="262" x2="184" y2="330" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-              <!-- Left Renal Artery & Vein -->
-              <path d="M177 286 Q194 284 208 288" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
-              <path d="M208 293 Q196 292 184 292" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
-              <!-- Right Renal Artery & Vein -->
-              <path d="M177 294 Q162 292 150 296" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
-              <path d="M150 301 Q166 298 184 298" fill="none" stroke="#3b82f6" stroke-width="3.5" stroke-linecap="round"/>
-              <!-- Left Kidney (anatomical left, viewer's right, higher) -->
-              <path d="M212 268 C226 266 237 276 236 292 C235 308 225 313 214 309 C206 304 204 294 207 288 C204 282 206 272 212 268 Z"
-                    fill="url(#kidney-grad)" stroke="#450a0a" stroke-width="2.5"/>
-              <path d="M226 275 Q232 284 231 296" stroke="#fca5a5" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
-              <!-- Right Kidney (anatomical right, viewer's left, slightly lower for liver) -->
-              <path d="M148 276 C134 274 123 284 124 300 C125 316 135 321 146 317 C154 312 156 302 153 296 C156 290 154 280 148 276 Z"
-                    fill="url(#kidney-grad)" stroke="#450a0a" stroke-width="2.5"/>
-              <path d="M134 283 Q128 292 129 304" stroke="#fca5a5" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
-              <!-- Adrenal Glands (Suprarenal Caps contoured on upper pole) -->
-              <path d="M208 268 C214 260 226 260 231 268 C224 266 216 266 208 268 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.2"/>
-              <path d="M152 276 C146 268 134 268 129 276 C136 274 144 274 152 276 Z" fill="#f59e0b" stroke="#b45309" stroke-width="1.2"/>
-              <!-- Ureters (draining to bladder) -->
-              <path d="M150 314 Q158 335 174 350" fill="none" stroke="#fde047" stroke-width="2.2" stroke-linecap="round"/>
-              <path d="M210 307 Q202 335 186 350" fill="none" stroke="#fde047" stroke-width="2.2" stroke-linecap="round"/>
-              <!-- Urinary Bladder in pelvis -->
-              <ellipse cx="180" cy="354" rx="10" ry="7" fill="#fef08a" stroke="#ca8a04" stroke-width="1.5"/>
-            </g>"""),
+            anchor=(520, 545),
+            sub_en="Pumps blood 100,000 times/day • 4 Chambers • Aorta",
+            sub_hi="4 Chambers • Khoon Pump Karta Hai • 1 Lakh Dhadkan",
+            sys_en="Circulatory System",
+            sys_hi="Circulatory System",
+            name_en="Heart",
+            name_hi="Dil (Heart)",
+            svg='<ellipse cx="520" cy="545" rx="42" ry="46" fill="rgba(220,38,38,0.30)" stroke="#dc2626" stroke-width="5"/>',
+        ),
+        "stomach": dict(
+            color="#ea580c",
+            anchor=(545, 615),
+            sub_en="Digestive acid &amp; enzymes • Churns and breaks down food",
+            sub_hi="Digestive Juices • Acid Se Khana Chhota Karna",
+            sys_en="Digestive System",
+            sys_hi="Digestive System",
+            name_en="Stomach",
+            name_hi="Pet / Stomach",
+            svg='<ellipse cx="545" cy="615" rx="50" ry="38" fill="rgba(234,88,12,0.30)" stroke="#ea580c" stroke-width="4.5"/>',
+        ),
+        "liver": dict(
+            color="#92400e",
+            anchor=(440, 560),
+            sub_en="Largest internal organ • Cleans blood &amp; stores energy",
+            sub_hi="Sabse Bada Organ • Khoon Saaf Karna • Bile Banana",
+            sys_en="Digestive &amp; Detox",
+            sys_hi="Digestive &amp; Detox",
+            name_en="Liver",
+            name_hi="Jigar (Liver)",
+            svg='<ellipse cx="440" cy="560" rx="52" ry="45" fill="rgba(146,64,14,0.30)" stroke="#92400e" stroke-width="4.5"/>',
+        ),
+        "kidneys": dict(
+            color="#b91c1c",
+            anchor=(385, 665),
+            sub_en="2 Bean-shaped filters • 1M Nephrons each • Cleans blood",
+            sub_hi="2 Gurde • Khoon Filter Karna • Urine Banana",
+            sys_en="Urinary System",
+            sys_hi="Urinary System",
+            name_en="Kidneys",
+            name_hi="Gurde (Kidneys)",
+            svg='<g><ellipse cx="385" cy="665" rx="30" ry="38" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="4"/><ellipse cx="635" cy="665" rx="30" ry="38" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="4"/></g>',
+        ),
         "intestines": dict(
-            color="#ffb300",
-            anchor=(180, 320),
-            sub_en="Small Intestine (nutrients) • Large Colon (water)",
-            sub_hi="Chhoti aant (poshan) • Badi aant (paani)",
-            svg="""
-            <g id="organ-intestines">
-              <!-- Large Intestine (Colon) outer frame with haustral pouches -->
-              <path d="M142 344 L142 296 Q142 290 150 290 L210 290 Q218 290 218 296 L218 344 Q218 350 210 350 L196 350 L196 364"
-                    fill="none" stroke="url(#colon-grad)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- Large intestine segmented contour -->
-              <path d="M142 344 L142 296 Q142 290 150 290 L210 290 Q218 290 218 296 L218 344 Q218 350 210 350 L196 350 L196 364"
-                    fill="none" stroke="#e65100" stroke-width="1.8" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- Cecum & Appendix -->
-              <circle cx="142" cy="346" r="7" fill="#ffb74d" stroke="#e65100" stroke-width="1.5"/>
-              <path d="M140 352 Q136 360 142 362" fill="none" stroke="#e65100" stroke-width="2" stroke-linecap="round"/>
-              <!-- Small Intestine (intricate coiled inner loops) -->
-              <path d="M156 302 H204 Q210 302 210 308 Q210 314 204 314 H156 Q150 314 150 320 Q150 326 156 326 H204 Q210 326 210 332 Q210 338 204 338 H156"
-                    fill="none" stroke="#ffd54f" stroke-width="9" stroke-linecap="round"/>
-              <path d="M156 302 H204 Q210 302 210 308 Q210 314 204 314 H156 Q150 314 150 320 Q150 326 156 326 H204 Q210 326 210 332 Q210 338 204 338 H156"
-                    fill="none" stroke="#f57f17" stroke-width="2" stroke-linecap="round"/>
-            </g>"""),
+            color="#d97706",
+            anchor=(512, 770),
+            sub_en="Small intestine absorbs nutrients • Large intestine absorbs water",
+            sub_hi="Chhoti Aant Poshan Leti Hai • Badi Aant Paani Leti Hai",
+            sys_en="Digestive System",
+            sys_hi="Digestive System",
+            name_en="Intestines",
+            name_hi="Aant (Intestines)",
+            svg='<rect x="420" y="690" width="184" height="150" rx="28" fill="rgba(217,119,6,0.25)" stroke="#d97706" stroke-width="4.5"/>',
+        ),
         "bones": dict(
-            color="#78909c",
-            anchor=(180, 165),
-            sub_en="Skull • Rib cage • Spine • Pelvis • Limbs",
-            sub_hi="Khopdi • Ribs • Reedh ki haddi • Kankal",
-            svg="""
-            <g id="organ-bones">
-              <!-- Skull (cranium, eye sockets, jaw) -->
-              <path d="M158 52 C158 30 202 30 202 52 C202 64 196 68 180 68 C164 68 158 64 158 52 Z"
-                    fill="#f5f5f0" stroke="#78909c" stroke-width="2"/>
-              <circle cx="170" cy="50" r="4" fill="#37474f"/>
-              <circle cx="190" cy="50" r="4" fill="#37474f"/>
-              <polygon points="180,54 178,59 182,59" fill="#37474f"/>
-              <rect x="174" y="62" width="12" height="6" rx="2" fill="#eceff1" stroke="#78909c" stroke-width="1.5"/>
-              <!-- Cervical vertebrae (neck) -->
-              <line x1="180" y1="74" x2="180" y2="108" stroke="#90a4ae" stroke-width="6" stroke-linecap="round"/>
-              <!-- Clavicles (collarbones) -->
-              <path d="M142 116 Q161 122 180 118 Q199 122 218 116" fill="none" stroke="#78909c" stroke-width="3" stroke-linecap="round"/>
-              <!-- Sternum (breastbone) in center -->
-              <rect x="177" y="132" width="6" height="54" rx="3" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/>
-              <!-- Rib cage (6 pairs of contoured ribs) -->
-              <path d="M180 138 Q148 142 140 162 M180 138 Q212 142 220 162" fill="none" stroke="#78909c" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M180 150 Q144 154 136 176 M180 150 Q216 154 224 176" fill="none" stroke="#78909c" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M180 162 Q144 168 136 190 M180 162 Q216 168 224 190" fill="none" stroke="#78909c" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M180 174 Q146 182 138 204 M180 174 Q214 182 222 204" fill="none" stroke="#78909c" stroke-width="2.5" stroke-linecap="round"/>
-              <path d="M180 186 Q150 194 142 216 M180 186 Q210 194 218 216" fill="none" stroke="#78909c" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- Spine (Vertebral column down to pelvis) -->
-              <line x1="180" y1="190" x2="180" y2="310" stroke="#90a4ae" stroke-width="7" stroke-dasharray="6 3" stroke-linecap="round"/>
-              <!-- Pelvis (Hip bones & Sacrum) -->
-              <path d="M148 316 C144 336 158 350 180 348 C202 350 216 336 212 316 C198 310 162 310 148 316 Z"
-                    fill="#eceff1" stroke="#78909c" stroke-width="2.5"/>
-              <ellipse cx="164" cy="334" rx="8" ry="12" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
-              <ellipse cx="196" cy="334" rx="8" ry="12" fill="#cfd8dc" stroke="#78909c" stroke-width="1.5"/>
-              <!-- Arm bones (Humerus, radius, ulna) -->
-              <line x1="138" y1="126" x2="114" y2="230" stroke="#78909c" stroke-width="5" stroke-linecap="round"/>
-              <line x1="114" y1="230" x2="104" y2="330" stroke="#90a4ae" stroke-width="4" stroke-linecap="round"/>
-              <line x1="222" y1="126" x2="246" y2="230" stroke="#78909c" stroke-width="5" stroke-linecap="round"/>
-              <line x1="246" y1="230" x2="256" y2="330" stroke="#90a4ae" stroke-width="4" stroke-linecap="round"/>
-              <!-- Leg bones (Femur, patella, tibia, fibula) -->
-              <line x1="162" y1="346" x2="148" y2="440" stroke="#78909c" stroke-width="6.5" stroke-linecap="round"/>
-              <circle cx="148" cy="444" r="5" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/>
-              <line x1="148" y1="448" x2="144" y2="530" stroke="#90a4ae" stroke-width="5.5" stroke-linecap="round"/>
-              <line x1="198" y1="346" x2="212" y2="440" stroke="#78909c" stroke-width="6.5" stroke-linecap="round"/>
-              <circle cx="212" cy="444" r="5" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/>
-              <line x1="212" y1="448" x2="216" y2="530" stroke="#90a4ae" stroke-width="5.5" stroke-linecap="round"/>
-            </g>"""),
+            color="#475569",
+            anchor=(670, 500),
+            sub_en="206 Bones • Ribcage protects heart &amp; lungs • Strong framework",
+            sub_hi="206 Haddiyan • Ribcage Dil &amp; Fefdon Ko Protect Karta Hai",
+            sys_en="Skeletal System",
+            sys_hi="Skeletal System",
+            name_en="Bones (Skeleton)",
+            name_hi="Haddiyan (Bones)",
+            svg='<g><ellipse cx="512" cy="510" rx="145" ry="90" fill="none" stroke="#475569" stroke-width="5" stroke-dasharray="8 4"/><line x1="330" y1="440" x2="694" y2="440" stroke="#475569" stroke-width="4"/><line x1="310" y1="520" x2="280" y2="700" stroke="#475569" stroke-width="5"/><line x1="714" y1="520" x2="744" y2="700" stroke="#475569" stroke-width="5"/></g>',
+        ),
     }
 
 
-def _body_outline() -> str:
-    """Medical-grade anatomical human body silhouette with authentic proportions and cranial contour."""
-    return """
-    <!-- Medical-grade anatomical human body silhouette -->
-    <g id="body-silhouette">
-      <!-- Outer cranial vault (anatomical cranium profile, no cartoon face) -->
-      <path d="M180 28 
-               C198 28 212 40 212 62 
-               C212 80 204 94 196 104 
-               C192 110 190 118 190 126
-               L170 126
-               C170 118 168 110 164 104
-               C156 94 148 80 148 62
-               C148 40 162 28 180 28 Z"
-            fill="url(#body-skin)" opacity="0.45" stroke="#94a3b8" stroke-width="2"/>
-      <!-- Clavicular Arch & Neck Contour -->
-      <path d="M138 134 Q158 140 180 136 Q202 140 222 134" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
-      <!-- Torso Athletic Muscular Profile (Pectorals, Waist, Pelvic Girdle) -->
-      <path d="M138 134 
-               C122 155 120 195 126 230 
-               C132 265 134 290 128 320 
-               C122 345 120 365 132 375 
-               C146 385 160 385 180 372 
-               C200 385 214 385 228 375 
-               C240 365 238 345 232 320 
-               C226 290 228 265 234 230 
-               C240 195 238 155 222 134 Z" 
-            fill="url(#body-skin)" opacity="0.60" stroke="#64748b" stroke-width="2"/>
-      <!-- Anatomical Arms (translucent medical contour) -->
-      <path d="M124 140 C110 170 102 220 98 270 C94 310 90 350 86 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.5"/>
-      <path d="M236 140 C250 170 258 220 262 270 C266 310 270 350 274 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.5"/>
-      <!-- Anatomical Legs (translucent medical contour) -->
-      <path d="M144 375 C140 420 138 475 136 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.45"/>
-      <path d="M216 375 C220 420 222 475 224 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.45"/>
-    </g>"""
-
-
 def body_svg(highlight: str | None = None, lang: str = "en") -> str:
-    """Rich, understandable anatomical body diagram with clear highlights and sub-labels."""
+    """Authentic, high-resolution child anatomical illustration with glowing organ highlights and callout badges."""
     organs = _organs()
-    names = {b["key"]: (b["hi_name"] if lang == "hi" else b["en_name"]) for b in C.BODY_PARTS}
-    systems = {b["key"]: b["system"] for b in C.BODY_PARTS}
+    img_b64 = _get_body_img_b64()
 
-    # Cardiovascular Great Vessels (Abdominal Aorta & Inferior Vena Cava) context
-    vessels_op = "0.85" if highlight is None or highlight in ("heart", "kidneys") else "0.45"
-    vessels = f"""
-    <!-- Cardiovascular Great Vessels (Aorta & Inferior Vena Cava) -->
-    <g id="body-vessels" opacity="{vessels_op}">
-      <line x1="177" y1="168" x2="177" y2="330" stroke="#dc2626" stroke-width="5" stroke-linecap="round"/>
-      <path d="M177 330 Q168 348 154 365 M177 330 Q186 348 200 365" fill="none" stroke="#dc2626" stroke-width="3.5" stroke-linecap="round"/>
-      <line x1="184" y1="160" x2="184" y2="330" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
-      <path d="M184 330 Q174 348 160 365 M184 330 Q192 348 206 365" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
-    </g>"""
-
-    # Trachea (Cartilaginous airway down to lungs)
-    trachea_op = "0.8" if highlight is None or highlight == "lungs" else "0.45"
-    trachea = f"""
-    <!-- Trachea (Airway with cartilage rings) -->
-    <g id="body-trachea" opacity="{trachea_op}">
-      <rect x="175" y="100" width="10" height="38" rx="2" fill="#bae6fd" stroke="#0284c7" stroke-width="1.8"/>
-      <line x1="175" y1="107" x2="185" y2="107" stroke="#0284c7" stroke-width="1.5"/>
-      <line x1="175" y1="114" x2="185" y2="114" stroke="#0284c7" stroke-width="1.5"/>
-      <line x1="175" y1="121" x2="185" y2="121" stroke="#0284c7" stroke-width="1.5"/>
-      <line x1="175" y1="128" x2="185" y2="128" stroke="#0284c7" stroke-width="1.5"/>
-    </g>"""
-
-    parts = [_body_outline(), vessels, trachea]
-    order = ["bones", "brain", "lungs", "heart", "stomach", "liver", "kidneys", "intestines"]
-
-    for key in order:
-        o = organs[key]
-        if highlight is None:
-            op, extra = (0.35 if key == "bones" else 1.0), ""
-        elif key == highlight:
-            op, extra = 1.0, ' filter="url(#glow)"'
-        else:
-            op, extra = 0.45, ""
-        parts.append(f'<g opacity="{op}"{extra}>{o["svg"]}</g>')
-
+    parts = []
     labels = []
-    if highlight is not None:
-        # Single highlighted organ: show rich callout badge on the right
-        o = organs[highlight]
-        ax, ay = o["anchor"]
-        sub = o["sub_hi"] if lang == "hi" else o["sub_en"]
-        col = o["color"]
-        name = names[highlight]
-        sys_name = systems[highlight]
-        # Connecting callout polyline to information box
-        by = max(80, min(ay, 460))
-        labels.append(f"""
-        <!-- Highlight Callout Card -->
-        <polyline points="{ax},{ay} 265,{ay} 275,{by}" fill="none" stroke="{col}" stroke-width="2.5" stroke-dasharray="4 2"/>
-        <circle cx="{ax}" cy="{ay}" r="4.5" fill="{col}" stroke="#ffffff" stroke-width="2"/>
-        <g transform="translate(275, {by - 42})">
-          <rect width="195" height="84" rx="12" fill="#ffffff" stroke="{col}" stroke-width="2"
-                filter="url(#card-shadow)"/>
-          <rect x="0" y="0" width="8" height="84" rx="4" fill="{col}"/>
-          <text x="16" y="22" font-family="'Trebuchet MS', Arial, sans-serif" font-size="11" font-weight="700"
-                fill="{col}" letter-spacing="0.5">{sys_name.upper()}</text>
-          <text x="16" y="44" font-family="'Trebuchet MS', Arial, sans-serif" font-size="16" font-weight="700"
-                fill="#263238">{name}</text>
-          <text x="16" y="66" font-family="Arial, sans-serif" font-size="10.5" fill="#546e7a">{sub}</text>
-        </g>""")
+
+    if img_b64:
+        parts.append(f'<image href="data:image/jpeg;base64,{img_b64}" x="0" y="0" width="1024" height="1024" preserveAspectRatio="xMidYMid meet"/>')
     else:
-        # Show all organs view: neatly branch labels to left and right margins so no lines overlap
-        left_keys = ["brain", "liver", "kidneys", "bones"]
-        right_keys = ["lungs", "heart", "stomach", "intestines"]
+        parts.append('<rect width="1024" height="1024" rx="24" fill="#0f172a"/><text x="512" y="512" text-anchor="middle" fill="#94a3b8" font-size="24">Human Anatomy Model</text>')
+
+    if highlight and highlight in organs:
+        o = organs[highlight]
+        col = o["color"]
+        ax, ay = o["anchor"]
+        name = o["name_hi"] if lang == "hi" else o["name_en"]
+        sys_name = o["sys_hi"] if lang == "hi" else o["sys_en"]
+        sub = o["sub_hi"] if lang == "hi" else o["sub_en"]
+
+        parts.append(f'<g filter="url(#glow)">{o["svg"]}</g>')
+        parts.append(f'<circle cx="{ax}" cy="{ay}" r="8" fill="{col}" stroke="#ffffff" stroke-width="3"/>')
+
+        is_right = ax < 512
+        card_x = 640 if is_right else 40
+        card_y = max(80, min(ay - 60, 840))
+        elbow_x = card_x + (0 if is_right else 340)
+
+        labels.append(f"""
+        <!-- Connecting Leader Line -->
+        <polyline points="{ax},{ay} {elbow_x + (-20 if is_right else 20)},{ay} {elbow_x},{card_y + 60}" fill="none" stroke="{col}" stroke-width="4" stroke-dasharray="6 3"/>
+        <g transform="translate({card_x}, {card_y})">
+          <rect width="340" height="130" rx="16" fill="#ffffff" stroke="{col}" stroke-width="3.5" filter="url(#card-shadow)"/>
+          <rect x="0" y="0" width="12" height="130" rx="6" fill="{col}"/>
+          <text x="24" y="32" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="14" font-weight="800" fill="{col}" letter-spacing="1">{html.escape(sys_name.upper())}</text>
+          <text x="24" y="66" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="24" font-weight="900" fill="#0f172a">{html.escape(name)}</text>
+          <text x="24" y="96" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="13" font-weight="500" fill="#334155">{html.escape(sub[:45])}</text>
+          <text x="24" y="116" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="12" font-weight="500" fill="#64748b">{html.escape(sub[45:90])}</text>
+        </g>
+        """)
+    else:
+        left_keys = ["brain", "liver", "kidneys"]
+        right_keys = ["lungs", "heart", "stomach", "intestines", "bones"]
 
         for i, k in enumerate(left_keys):
             o = organs[k]
             ax, ay = o["anchor"]
-            ly = 70 + i * 115
             col = o["color"]
-            name = names[k].split("(")[0].strip()
+            name = o["name_hi"].split("(")[0].strip() if lang == "hi" else o["name_en"].split("(")[0].strip()
+            ly = 180 + i * 220
             labels.append(f"""
-            <polyline points="{ax},{ay} 85,{ay} 75,{ly}" fill="none" stroke="{col}" stroke-width="2"/>
-            <circle cx="{ax}" cy="{ay}" r="3.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>
-            <rect x="10" y="{ly - 14}" width="70" height="26" rx="13" fill="#ffffff" stroke="{col}" stroke-width="1.8"/>
-            <text x="45" y="{ly + 4}" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif"
-                  font-size="11" font-weight="700" fill="#263238">{name}</text>""")
+            <polyline points="{ax},{ay} 220,{ay} 190,{ly}" fill="none" stroke="{col}" stroke-width="3"/>
+            <circle cx="{ax}" cy="{ay}" r="6" fill="{col}" stroke="#ffffff" stroke-width="2.5"/>
+            <g transform="translate(20, {ly - 22})">
+              <rect width="165" height="44" rx="22" fill="#ffffff" stroke="{col}" stroke-width="2.5" filter="url(#card-shadow)"/>
+              <text x="82" y="27" text-anchor="middle" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">{html.escape(name)}</text>
+            </g>
+            """)
 
         for i, k in enumerate(right_keys):
             o = organs[k]
             ax, ay = o["anchor"]
-            ly = 110 + i * 110
             col = o["color"]
-            name = names[k].split("(")[0].strip()
+            name = o["name_hi"].split("(")[0].strip() if lang == "hi" else o["name_en"].split("(")[0].strip()
+            ly = 150 + i * 160
             labels.append(f"""
-            <polyline points="{ax},{ay} 275,{ay} 285,{ly}" fill="none" stroke="{col}" stroke-width="2"/>
-            <circle cx="{ax}" cy="{ay}" r="3.5" fill="{col}" stroke="#fff" stroke-width="1.5"/>
-            <rect x="280" y="{ly - 14}" width="80" height="26" rx="13" fill="#ffffff" stroke="{col}" stroke-width="1.8"/>
-            <text x="320" y="{ly + 4}" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif"
-                  font-size="11" font-weight="700" fill="#263238">{name}</text>""")
+            <polyline points="{ax},{ay} 800,{ay} 830,{ly}" fill="none" stroke="{col}" stroke-width="3"/>
+            <circle cx="{ax}" cy="{ay}" r="6" fill="{col}" stroke="#ffffff" stroke-width="2.5"/>
+            <g transform="translate(835, {ly - 22})">
+              <rect width="165" height="44" rx="22" fill="#ffffff" stroke="{col}" stroke-width="2.5" filter="url(#card-shadow)"/>
+              <text x="82" y="27" text-anchor="middle" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">{html.escape(name)}</text>
+            </g>
+            """)
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 570" width="480" height="570">
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <!-- Glow filter for selected organ -->
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="5" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
-    <!-- Soft shadow for cards -->
     <filter id="card-shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
     </filter>
-    <!-- Body & Organ Gradients -->
-    <linearGradient id="body-skin" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fff0e6"/><stop offset="100%" stop-color="#f5d6be"/>
-    </linearGradient>
-    <linearGradient id="brain-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#f48fb1"/><stop offset="100%" stop-color="#c2185b"/>
-    </linearGradient>
-    <linearGradient id="lung-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#81d4fa"/><stop offset="100%" stop-color="#0288d1"/>
-    </linearGradient>
-    <linearGradient id="heart-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ef5350"/><stop offset="100%" stop-color="#b71c1c"/>
-    </linearGradient>
-    <linearGradient id="stomach-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffa726"/><stop offset="100%" stop-color="#e65100"/>
-    </linearGradient>
-    <linearGradient id="liver-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#a1662f"/><stop offset="100%" stop-color="#5d3a14"/>
-    </linearGradient>
-    <linearGradient id="kidney-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ef4444"/>
-      <stop offset="50%" stop-color="#b91c1c"/>
-      <stop offset="100%" stop-color="#581c1c"/>
-    </linearGradient>
-    <linearGradient id="colon-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffb74d"/><stop offset="100%" stop-color="#f57c00"/>
-    </linearGradient>
   </defs>
-  <!-- Background Card -->
-  <rect width="480" height="570" rx="18" fill="#f8fbfe"/>
-  <rect x="8" y="8" width="464" height="554" rx="14" fill="none" stroke="#e1eef8" stroke-width="1.5"/>
   {''.join(parts)}
   {''.join(labels)}
 </svg>"""

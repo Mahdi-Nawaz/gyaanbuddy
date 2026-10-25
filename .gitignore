@@ -49,6 +49,9 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
+# Scratch temporary scripts
+scratch/
+
 # IDE & Editor caches
 .idea/
 .vscode/

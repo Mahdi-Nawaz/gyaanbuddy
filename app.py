@@ -37,8 +37,8 @@ THEMES = {
         "hero_shadow": "0 12px 30px rgba(79, 70, 229, 0.25)",
         "hero_border": "none",
         "accent": "#4f46e5",
-        "tab_text": "#475569",
-        "tab_active_text": "#4f46e5",
+        "tab_text": "#1e293b",
+        "tab_active_text": "#ffffff",
         "card_bg": "#ffffff",
         "card_border": "1px solid #cbd5e1",
         "card_shadow": "0 8px 24px rgba(0, 0, 0, 0.06)",
@@ -186,6 +186,21 @@ def apply_theme(theme_name: str):
         color: {t['sidebar_text']} !important;
     }}
 
+    /* Ensure sidebar text inputs are crisp white with dark text regardless of dark mode */
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] [data-baseweb="input"],
+    [data-testid="stSidebar"] [data-baseweb="base-input"] {{
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 10px !important;
+        -webkit-text-fill-color: #0f172a !important;
+    }}
+    [data-testid="stSidebar"] input::placeholder {{
+        color: #64748b !important;
+        -webkit-text-fill-color: #64748b !important;
+    }}
+
     /* Hide Streamlit default clutter and badges that overlap mobile footer */
     #MainMenu {{visibility: hidden !important; display: none !important;}}
     footer {{visibility: hidden !important; display: none !important;}}
@@ -235,20 +250,146 @@ def apply_theme(theme_name: str):
         align-items: center;
         gap: 6px;
     }}
+
+    /* Pill-style Navigation Tabs - 100% visible in all modes */
+    .stTabs [data-baseweb="tab-list"] {{
+        background: rgba(255, 255, 255, 0.92) !important;
+        padding: 6px 10px !important;
+        border-radius: 18px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+        margin-bottom: 12px !important;
+    }}
     .stTabs [data-baseweb="tab"] {{
-        font-family: 'Outfit', sans-serif;
-        font-size: 1.05rem;
-        font-weight: 600;
-        padding: 10px 18px;
-        border-radius: 12px 12px 0 0;
-        transition: all 0.2s ease;
-        color: {t['tab_text']} !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 0.98rem !important;
+        font-weight: 700 !important;
+        padding: 8px 16px !important;
+        border-radius: 12px !important;
+        transition: all 0.2s ease !important;
+        color: #1e293b !important; /* High-contrast dark text */
+        background: transparent !important;
+        border: none !important;
+    }}
+    .stTabs [data-baseweb="tab"]:hover {{
+        color: #4f46e5 !important;
+        background: rgba(79, 70, 229, 0.1) !important;
     }}
     .stTabs [aria-selected="true"] {{
-        color: {t['tab_active_text']} !important;
-        border-bottom: 3.5px solid {t['accent']} !important;
+        color: #ffffff !important;
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+        border-radius: 12px !important;
         font-weight: 800 !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35) !important;
     }}
+    .stTabs [data-baseweb="tab-highlight"] {{
+        display: none !important;
+    }}
+
+    /* All Main Inputs (Search bar, problem text, text inputs) - Override dark mode */
+    input, textarea, 
+    [data-baseweb="input"], [data-baseweb="base-input"],
+    [data-testid="stTextInput"] input,
+    [data-testid="stNumberInput"] input {{
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 14px !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        -webkit-text-fill-color: #0f172a !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+    }}
+    input::placeholder, textarea::placeholder {{
+        color: #64748b !important;
+        -webkit-text-fill-color: #64748b !important;
+        opacity: 1 !important;
+    }}
+    [data-baseweb="input"]:focus-within {{
+        border-color: #4f46e5 !important;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2) !important;
+    }}
+
+    /* All Buttons (Search, Clear, Mystery, Spoken chips, Options) - High-contrast & crisp */
+    .stButton>button, 
+    button[data-testid="baseButton-secondary"] {{
+        background: #ffffff !important;
+        color: #1e293b !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 14px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        padding: 8px 16px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }}
+    .stButton>button:hover,
+    button[data-testid="baseButton-secondary"]:hover {{
+        background: #f8fafc !important;
+        color: #4f46e5 !important;
+        border-color: #6366f1 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.2) !important;
+    }}
+    .stButton>button:active {{
+        transform: translateY(0) !important;
+    }}
+
+    /* Primary Action Buttons (Solve, Check Answer) */
+    button[kind="primary"],
+    button[data-testid="baseButton-primary"] {{
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 14px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3) !important;
+    }}
+    button[kind="primary"]:hover,
+    button[data-testid="baseButton-primary"]:hover {{
+        background: linear-gradient(135deg, #4338ca 0%, #0891b2 100%) !important;
+        color: #ffffff !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 22px rgba(79, 70, 229, 0.42) !important;
+    }}
+
+    /* Audio Recorder Widget - High contrast white card */
+    [data-testid="stAudioInput"] {{
+        background: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 16px !important;
+        padding: 10px 14px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    }}
+    [data-testid="stAudioInput"] * {{
+        color: #0f172a !important;
+    }}
+
+    /* Radio buttons and slider labels */
+    [data-testid="stRadio"] label, [data-testid="stRadio"] span, [data-testid="stRadio"] p {{
+        color: #1e293b !important;
+        font-weight: 600 !important;
+    }}
+    [data-testid="stSlider"] div, [data-testid="stSlider"] label {{
+        color: #1e293b !important;
+        font-weight: 600 !important;
+    }}
+    div[data-baseweb="select"] > div {{
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+    }}
+    div[data-baseweb="select"] span {{
+        color: #0f172a !important;
+        font-weight: 600 !important;
+    }}
+
+    /* Chat Messages */
     [data-testid="stChatMessage"] {{
         background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
@@ -262,15 +403,21 @@ def apply_theme(theme_name: str):
         line-height: 1.65 !important;
         font-size: 1rem !important;
     }}
-    .stButton>button {{
-        border-radius: 12px !important;
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 600 !important;
-        transition: all 0.2s ease !important;
+
+    /* Chat Input Bar */
+    [data-testid="stChatInput"] {{
+        border-radius: 24px !important;
+        border: 1.5px solid #cbd5e1 !important;
+        background: #ffffff !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
     }}
-    .stButton>button:hover {{
-        transform: translateY(-2px) !important;
+    [data-testid="stChatInput"] textarea {{
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        font-size: 1rem !important;
     }}
+
     .search-card {{
         background: {t['card_bg']};
         border: {t['card_border']};
@@ -550,108 +697,24 @@ def transcribe_audio(audio_file, lang: str = "en") -> str:
 
 
 def render_whatsapp_voice_bar(lang: str):
-    """WhatsApp-style interactive voice and message bar for young students who can't write."""
-    placeholder_text = "Type a message or tap 🎙️ to speak…" if lang == "en" else "Message likhein ya 🎙️ daba kar bolein…"
-    status_prompt = "Tap 🎙️ to speak your question" if lang == "en" else "Sawaal bolne ke liye 🎙️ dabayein"
-    speech_lang = "hi-IN" if lang == "hi" else "en-IN"
-
-    wa_html = f"""
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin:10px 0 16px 0;">
-      <div style="background:#1f2c34;border-radius:28px;padding:6px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(0,0,0,0.22);max-width:720px;border:1px solid rgba(255,255,255,0.08);">
-        <span style="font-size:20px;color:#8696a0;cursor:pointer;padding:4px;user-select:none;" title="Attach photo or question">📎</span>
-        <span style="font-size:20px;color:#8696a0;cursor:pointer;padding:4px;user-select:none;" title="Kid emojis">😃</span>
-        <input id="wa_text" type="text" placeholder="{placeholder_text}" style="flex:1;background:transparent;border:none;outline:none;color:#e9edef;font-size:15px;padding:6px 4px;font-family:inherit;" />
-        <button id="wa_mic_btn" onclick="toggleWaSpeech()" style="background:#00a884;border:none;border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#ffffff;font-size:18px;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(0,168,132,0.4);" title="Speak your question">
-          🎙️
-        </button>
+    """Voice status banner for young students who can't write, directing them to the microphone recorder."""
+    title = "🎙️ Voice Question Mode (Nursery to Class 8)" if lang == "en" else "🎙️ Awaaz Se Poochhein (Nursery se 8th Class)"
+    desc = "Can't write? Use the microphone recorder below to speak, or tap a quick question chip!" if lang == "en" else "Likhna mushkil hai? Neeche diye mic se bol kar poochhein ya buttons dabayein!"
+    badge = "Tap Mic Below" if lang == "en" else "Neeche Mic Dabayein"
+    st.markdown(f"""
+    <div style="background: linear-gradient(135deg, rgba(0, 168, 132, 0.12), rgba(14, 165, 233, 0.12)); border: 1.5px solid rgba(0, 168, 132, 0.35); border-radius: 16px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between; margin: 6px 0 14px 0;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 26px; background: #00a884; color: white; border-radius: 50%; width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,168,132,0.35);">🎙️</span>
+        <div>
+          <div style="font-weight: 700; font-size: 1.02rem; color: #0f172a;">{title}</div>
+          <div style="font-size: 0.88rem; color: #475569;">{desc}</div>
+        </div>
       </div>
-      <div id="wa_status" style="margin-top:6px;font-size:12px;color:#00a884;font-weight:600;padding-left:14px;min-height:18px;">
-        {status_prompt}
+      <div style="font-size: 0.82rem; font-weight: 700; color: #00a884; background: rgba(0,168,132,0.15); padding: 5px 12px; border-radius: 20px; white-space: nowrap;">
+        ⚡ {badge}
       </div>
     </div>
-    <style>
-      @keyframes waPulse {{
-        0% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); transform: scale(1); }}
-        70% {{ box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.08); }}
-        100% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }}
-      }}
-    </style>
-    <script>
-      let isWaListening = false;
-      let waRecognition = null;
-      const waInput = document.getElementById("wa_text");
-      const waMicBtn = document.getElementById("wa_mic_btn");
-      const waStatus = document.getElementById("wa_status");
-
-      function initWaSpeech() {{
-        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRec) {{
-          waStatus.textContent = "🎙️ Browser live speech unsupported. Use the voice recorder below!";
-          return null;
-        }}
-        const rec = new SpeechRec();
-        rec.continuous = false;
-        rec.interimResults = true;
-        rec.lang = "{speech_lang}";
-
-        rec.onstart = function() {{
-          isWaListening = true;
-          waMicBtn.style.background = "#ef4444";
-          waMicBtn.style.animation = "waPulse 1.4s infinite";
-          waStatus.textContent = "🔴 Listening... Speak your question now!";
-        }};
-
-        rec.onresult = function(event) {{
-          let transcript = "";
-          for (let i = event.resultIndex; i < event.results.length; ++i) {{
-            transcript += event.results[i][0].transcript;
-          }}
-          waInput.value = transcript;
-          waStatus.textContent = "🗣️ Heard: \\"" + transcript + "\\"";
-        }};
-
-        rec.onend = function() {{
-          isWaListening = false;
-          waMicBtn.style.background = "#00a884";
-          waMicBtn.style.animation = "none";
-          if (waInput.value.trim().length > 0) {{
-            waStatus.textContent = "✅ Spoken question ready! Asking Buddy...";
-            // Copy to clipboard or trigger prompt
-            navigator.clipboard.writeText(waInput.value.trim()).catch(() => {{}});
-          }} else {{
-            waStatus.textContent = "{status_prompt}";
-          }}
-        }};
-
-        rec.onerror = function(e) {{
-          isWaListening = false;
-          waMicBtn.style.background = "#00a884";
-          waMicBtn.style.animation = "none";
-          waStatus.textContent = "Speech recognition: " + (e.error || "Please try speaking closer to mic");
-        }};
-        return rec;
-      }}
-
-      function toggleWaSpeech() {{
-        if (!waRecognition) {{
-          waRecognition = initWaSpeech();
-        }}
-        if (!waRecognition) return;
-
-        if (isWaListening) {{
-          waRecognition.stop();
-        }} else {{
-          waInput.value = "";
-          try {{
-            waRecognition.start();
-          }} catch(e) {{
-            waRecognition.stop();
-          }}
-        }}
-      }}
-    </script>
-    """
-    components.html(wa_html, height=72)
+    """, unsafe_allow_html=True)
 
 
 # ----------------------------------------------------------------------------- gamification engine
@@ -1984,9 +2047,6 @@ def main():
       </div>
     </div>
     """, unsafe_allow_html=True)
-
-    # Prominent Topic Search Hub
-    render_search_hub(lang)
 
     tabs = st.tabs(TXT[lang]["tabs"])
     with tabs[0]:
