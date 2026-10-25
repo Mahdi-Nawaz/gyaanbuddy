@@ -50,6 +50,32 @@ def _get_body_img_b64() -> str:
     return _BODY_IMG_B64
 
 
+_BRAIN_IMG_B64: str | None = None
+
+
+def _get_brain_img_b64() -> str:
+    """Retrieve base64-encoded string of the high-definition medical human brain illustration."""
+    global _BRAIN_IMG_B64
+    if _BRAIN_IMG_B64 is None:
+        candidates = [
+            Path(__file__).parent / "assets" / "human_brain_medical.jpg",
+            Path("assets/human_brain_medical.jpg"),
+            Path(__file__).parent.parent / "assets" / "human_brain_medical.jpg",
+            Path("gyaanbuddy/assets/human_brain_medical.jpg"),
+        ]
+        for p in candidates:
+            if p.exists():
+                try:
+                    with open(p, "rb") as f:
+                        _BRAIN_IMG_B64 = base64.b64encode(f.read()).decode("ascii")
+                    break
+                except Exception:
+                    pass
+        if _BRAIN_IMG_B64 is None:
+            _BRAIN_IMG_B64 = ""
+    return _BRAIN_IMG_B64
+
+
 def _organs() -> dict[str, dict]:
     return {
         "brain": dict(
@@ -248,42 +274,53 @@ def brain_detail_svg(lang: str = "en") -> str:
     labels = {
         "frontal": ("Frontal Lobe (Decision &amp; Thinking)", "Controls planning, problem-solving, emotions &amp; speech") if not is_hi else ("Frontal Lobe (Sochna &amp; Faisla)", "Planning, problems solve karna aur bolna"),
         "parietal": ("Parietal Lobe (Sensory &amp; Touch)", "Processes touch, taste, pain &amp; spatial orientation") if not is_hi else ("Parietal Lobe (Chhoone Ka Ehsaas)", "Touch, swaad aur disha ka gyaan"),
-        "occipital": ("Occipital Lobe (Vision &amp; Sight)", "Processes everything your eyes see &amp; colors") if not is_hi else ("Occipital Lobe (Dekhna &amp; Nazar)", "Aankhon se dikhne wali cheezein aur rang"),
         "temporal": ("Temporal Lobe (Memory &amp; Hearing)", "Stores memories, processes sounds &amp; language") if not is_hi else ("Temporal Lobe (Yaad &amp; Sunna)", "Yaadein store karna aur baatein sunna"),
+        "occipital": ("Occipital Lobe (Vision &amp; Sight)", "Processes everything your eyes see &amp; colors") if not is_hi else ("Occipital Lobe (Dekhna &amp; Nazar)", "Aankhon se dikhne wali cheezein aur rang"),
         "cerebellum": ("Cerebellum (Balance &amp; Coordination)", "Smooth muscle control, posture &amp; agility") if not is_hi else ("Cerebellum (Santulan &amp; Balance)", "Sharir ka santulan aur chalne-doudne ka control"),
         "brainstem": ("Brainstem (Heartbeat &amp; Breathing)", "Controls automatic vital functions without thinking") if not is_hi else ("Brainstem (Dhadkan &amp; Saans)", "Bina soche dil ki dhadkan aur saans chalana"),
     }
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 520" width="680" height="520">
+    brain_b64 = _get_brain_img_b64()
+    if brain_b64:
+        center_illustration = f'''
+        <g id="med-brain-img" transform="translate(25, 75)">
+          <rect width="360" height="420" rx="16" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+          <image href="data:image/jpeg;base64,{brain_b64}" x="5" y="10" width="350" height="400" preserveAspectRatio="xMidYMid meet"/>
+        </g>
+        <!-- Connecting guide lines from image to cards -->
+        <polyline points="290,140 375,104" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="290" cy="140" r="5" fill="#0284c7" stroke="#ffffff" stroke-width="2"/>
+        <polyline points="250,230 375,174" fill="none" stroke="#ca8a04" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="250" cy="230" r="5" fill="#ca8a04" stroke="#ffffff" stroke-width="2"/>
+        <polyline points="280,310 375,244" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="280" cy="310" r="5" fill="#ea580c" stroke="#ffffff" stroke-width="2"/>
+        <polyline points="120,250 375,314" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="120" cy="250" r="5" fill="#16a34a" stroke="#ffffff" stroke-width="2"/>
+        <polyline points="150,380 375,384" fill="none" stroke="#be185d" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="150" cy="380" r="5" fill="#be185d" stroke="#ffffff" stroke-width="2"/>
+        <polyline points="200,450 375,454" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="4 3"/>
+        <circle cx="200" cy="450" r="5" fill="#475569" stroke="#ffffff" stroke-width="2"/>
+        '''
+    else:
+        center_illustration = '''
+        <g transform="translate(45, 90)">
+          <ellipse cx="170" cy="180" rx="140" ry="110" fill="#f8fafc" stroke="#94a3b8" stroke-width="3"/>
+          <path d="M70 180 C80 120 130 90 200 90 C260 90 290 130 280 180 C270 240 220 270 150 260 Z" fill="#e0f2fe" stroke="#0284c7" stroke-width="3"/>
+        </g>
+        '''
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 710 520" width="710" height="520">
   <defs>
     <filter id="b-shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.12"/>
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.10"/>
     </filter>
     <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#f8fafc"/>
     </linearGradient>
-    <linearGradient id="frontal-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0284c7"/>
-    </linearGradient>
-    <linearGradient id="parietal-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#ca8a04"/>
-    </linearGradient>
-    <linearGradient id="occipital-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#16a34a"/>
-    </linearGradient>
-    <linearGradient id="temporal-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#ea580c"/>
-    </linearGradient>
-    <linearGradient id="cerebellum-detail-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#be185d"/>
-    </linearGradient>
-    <linearGradient id="stem-detail-grad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#64748b"/>
-    </linearGradient>
   </defs>
 
   <!-- Background Card -->
-  <rect width="680" height="520" rx="20" fill="url(#bg-grad)" stroke="#e2e8f0" stroke-width="2"/>
+  <rect width="710" height="520" rx="20" fill="url(#bg-grad)" stroke="#e2e8f0" stroke-width="2"/>
 
   <!-- Title Header -->
   <g transform="translate(30, 32)">
@@ -291,95 +328,52 @@ def brain_detail_svg(lang: str = "en") -> str:
     <text x="0" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b">{sub_title}</text>
   </g>
 
-  <!-- Central Brain Sagittal Lateral Illustration -->
-  <g transform="translate(60, 60)">
-    <!-- Brain Silhouette Glow Shadow -->
-    <path d="M120 220 C70 200 40 140 70 80 C100 20 200 10 260 40 C310 65 330 110 320 160 C310 200 270 230 220 230 L210 310 C210 325 180 325 180 310 L180 250 C150 250 130 240 120 220 Z"
-          fill="#f1f5f9" opacity="0.8"/>
-
-    <!-- 1. Frontal Lobe (Blue) -->
-    <path d="M160 30 C110 30 65 75 60 130 C55 185 85 210 130 215 C150 215 165 200 170 170 C175 130 185 80 160 30 Z"
-          fill="url(#frontal-grad)" stroke="#0369a1" stroke-width="2.5"/>
-    <!-- Frontal gyri -->
-    <path d="M80 110 Q110 95 135 115 M75 145 Q105 130 135 150 M85 175 Q115 160 145 180" fill="none" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round"/>
-
-    <!-- 2. Parietal Lobe (Yellow) -->
-    <path d="M162 30 C205 32 250 50 265 95 C250 120 210 135 180 135 C175 95 175 60 162 30 Z"
-          fill="url(#parietal-grad)" stroke="#a16207" stroke-width="2.5"/>
-    <!-- Parietal gyri -->
-    <path d="M185 65 Q215 55 240 75 M190 100 Q215 90 235 110" fill="none" stroke="#fef9c3" stroke-width="2" stroke-linecap="round"/>
-
-    <!-- 3. Occipital Lobe (Green - Vision) -->
-    <path d="M265 95 C295 115 315 150 300 190 C270 195 245 180 235 150 C245 130 255 110 265 95 Z"
-          fill="url(#occipital-grad)" stroke="#15803d" stroke-width="2.5"/>
-    <!-- Occipital gyri -->
-    <path d="M265 135 Q285 145 295 165 M250 165 Q270 170 280 185" fill="none" stroke="#dcfce7" stroke-width="2" stroke-linecap="round"/>
-
-    <!-- 4. Temporal Lobe (Orange - Hearing & Memory) -->
-    <path d="M140 165 C180 155 230 150 240 185 C245 215 210 230 160 225 C135 220 130 190 140 165 Z"
-          fill="url(#temporal-grad)" stroke="#c2410c" stroke-width="2.5"/>
-    <!-- Temporal gyri -->
-    <path d="M155 185 Q185 180 215 190 M150 205 Q180 200 205 210" fill="none" stroke="#ffedd5" stroke-width="2" stroke-linecap="round"/>
-
-    <!-- 5. Cerebellum (Pink - Balance) -->
-    <g id="detail-cerebellum">
-      <ellipse cx="250" cy="235" rx="42" ry="30" fill="url(#cerebellum-detail-grad)" stroke="#9d174d" stroke-width="2.5"/>
-      <path d="M218 225 Q250 215 282 225" fill="none" stroke="#fff1f2" stroke-width="2"/>
-      <path d="M214 235 Q250 225 286 235" fill="none" stroke="#fff1f2" stroke-width="2"/>
-      <path d="M218 245 Q250 235 282 245" fill="none" stroke="#fff1f2" stroke-width="2"/>
-      <path d="M228 255 Q250 248 272 255" fill="none" stroke="#fff1f2" stroke-width="2"/>
-    </g>
-
-    <!-- 6. Brainstem (Spinal Connector & Vitals) -->
-    <path d="M185 215 L208 215 L204 310 C204 316 198 320 192 320 C186 320 180 316 180 310 Z"
-          fill="url(#stem-detail-grad)" stroke="#334155" stroke-width="2.5"/>
-    <path d="M180 230 C172 240 172 255 180 265" fill="none" stroke="#334155" stroke-width="2.5"/>
-  </g>
+  {center_illustration}
 
   <!-- Interactive Callout Legend Cards (Right Column) -->
   <!-- 1. Frontal -->
-  <g transform="translate(400, 75)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 75)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#0284c7"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#0284c7">{labels['frontal'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['frontal'][1]}</text>
   </g>
 
   <!-- 2. Parietal -->
-  <g transform="translate(400, 145)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#ca8a04" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 145)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#ca8a04" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#ca8a04"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ca8a04">{labels['parietal'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['parietal'][1]}</text>
   </g>
 
   <!-- 3. Temporal -->
-  <g transform="translate(400, 215)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 215)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#ea580c"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ea580c">{labels['temporal'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['temporal'][1]}</text>
   </g>
 
   <!-- 4. Occipital -->
-  <g transform="translate(400, 285)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 285)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#16a34a"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#16a34a">{labels['occipital'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['occipital'][1]}</text>
   </g>
 
   <!-- 5. Cerebellum -->
-  <g transform="translate(400, 355)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#be185d" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 355)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#be185d" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#be185d"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#be185d">{labels['cerebellum'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['cerebellum'][1]}</text>
   </g>
 
   <!-- 6. Brainstem -->
-  <g transform="translate(400, 425)">
-    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#475569" stroke-width="2" filter="url(#b-shadow)"/>
+  <g transform="translate(390, 425)">
+    <rect width="295" height="58" rx="10" fill="#ffffff" stroke="#475569" stroke-width="2" filter="url(#b-shadow)"/>
     <rect x="0" y="0" width="8" height="58" rx="4" fill="#475569"/>
     <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#334155">{labels['brainstem'][0]}</text>
     <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['brainstem'][1]}</text>
@@ -1799,6 +1793,94 @@ def friction_svg(lang: str = "en") -> str:
 </svg>"""
 
 
+def metals_nonmetals_svg(lang: str = "en") -> str:
+    """Class 8 Chemistry: Clean comparative visual of Metals vs Non-Metals in Daily Life."""
+    m_title = "🥇 Metals &amp; 🧪 Non-Metals in Daily Life" if lang == "en" else "🥇 Dhaatu aur 🧪 Adhaatu (Daily Life)"
+    m_sub = ("NCERT Class 8 Science • Essential Materials That Shape Our World"
+             if lang == "en" else "NCERT Class 8 Vigyan • Rozmarra ke Jeevan mein Dhaatu aur Adhaatu")
+    m_head = "🥇 METALS (Dhaatu)"
+    nm_head = "🧪 NON-METALS (Adhaatu)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mn-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#eef2ff"/>
+    </linearGradient>
+    <linearGradient id="metal-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fef9c3"/>
+    </linearGradient>
+    <linearGradient id="nonmetal-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#ecfdf5"/>
+    </linearGradient>
+    <filter id="mn-sh" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="720" height="500" rx="20" fill="url(#mn-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Title Header -->
+  <g transform="translate(30, 36)">
+    <text x="0" y="0" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#1e1b4b">{m_title}</text>
+    <text x="0" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#6366f1">{m_sub}</text>
+  </g>
+
+  <!-- Left: Metals Card -->
+  <g transform="translate(30, 75)">
+    <rect width="315" height="330" rx="16" fill="url(#metal-grad)" stroke="#eab308" stroke-width="2" filter="url(#mn-sh)"/>
+    <rect x="0" y="0" width="315" height="44" rx="16" fill="#eab308"/>
+    <text x="16" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" fill="#ffffff">{m_head}</text>
+
+    <!-- Key Properties -->
+    <text x="16" y="72" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#854d0e">Key Properties (Khaas Gun):</text>
+    <text x="20" y="94" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🔨 Malleable: Beaten into thin sheets (Chadar)</text>
+    <text x="20" y="114" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🧵 Ductile: Drawn into thin electrical wires</text>
+    <text x="20" y="134" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">⚡ Conductors: Carry heat &amp; electricity well</text>
+    <text x="20" y="154" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🔔 Sonorous: Ringing sound when struck</text>
+
+    <!-- Daily Life Uses -->
+    <text x="16" y="186" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#854d0e">Daily Life Uses (Roj ka Upyog):</text>
+    <text x="20" y="208" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🏗️ Iron (Fe): Bridges, railways, buildings</text>
+    <text x="20" y="228" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🔌 Copper (Cu): Electrical wiring &amp; motors</text>
+    <text x="20" y="248" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">✈️ Aluminium (Al): Airplanes &amp; cooking pots</text>
+    <text x="20" y="268" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">💍 Gold &amp; Silver: Jewelry (shiny, no rust)</text>
+    <text x="20" y="288" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🌡️ Mercury (Hg): Liquid metal in thermometer</text>
+  </g>
+
+  <!-- Right: Non-Metals Card -->
+  <g transform="translate(375, 75)">
+    <rect width="315" height="330" rx="16" fill="url(#nonmetal-grad)" stroke="#10b981" stroke-width="2" filter="url(#mn-sh)"/>
+    <rect x="0" y="0" width="315" height="44" rx="16" fill="#10b981"/>
+    <text x="16" y="28" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" fill="#ffffff">{nm_head}</text>
+
+    <!-- Key Properties -->
+    <text x="16" y="72" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#065f46">Key Properties (Khaas Gun):</text>
+    <text x="20" y="94" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">💥 Brittle: Break easily when struck</text>
+    <text x="20" y="114" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🚫 Non-Ductile: Cannot be drawn into wires</text>
+    <text x="20" y="134" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🔌 Insulators: Poor conductors of electricity</text>
+    <text x="20" y="154" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🔕 Non-Sonorous: Dull thud when struck</text>
+
+    <!-- Daily Life Uses -->
+    <text x="16" y="186" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#065f46">Daily Life Uses (Roj ka Upyog):</text>
+    <text x="20" y="208" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🫁 Oxygen (O₂): Respiration &amp; breathing</text>
+    <text x="20" y="228" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🌱 Nitrogen &amp; Phosphorus: Plant fertilizers</text>
+    <text x="20" y="248" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">💧 Chlorine (Cl): Purifies drinking water</text>
+    <text x="20" y="268" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">🩹 Iodine (I): Antiseptic tincture on wounds</text>
+    <text x="20" y="288" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155">✏️ Carbon (C): Food, cells &amp; pencil graphite</text>
+  </g>
+
+  <!-- Bottom Takeaway Banner -->
+  <g transform="translate(30, 420)">
+    <rect width="660" height="55" rx="12" fill="#ffffff" stroke="#6366f1" stroke-width="1.5" filter="url(#mn-sh)"/>
+    <text x="20" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#4338ca">💡 Quick Summary for Exams:</text>
+    <text x="20" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#475569">Metals give us structure, electric power, and machines. Non-metals give us breath, plant food, water purification, and health!</text>
+  </g>
+</svg>"""
+
+
 # ============================================================================= DISPATCH (used by the chat)
 def render_spec(spec: str, lang: str = "en"):
     """Turn a visual spec string into ("svg", str) or ("plotly", Figure). Returns None if unknown."""
@@ -1822,6 +1904,8 @@ def render_spec(spec: str, lang: str = "en"):
             return "plotly", {"projectile": projectile_fig, "pendulum": pendulum_fig,
                               "refraction": refraction_fig}[parts[1]]()
         if parts[0] == "chem":
+            if parts[1] == "metals":
+                return "svg", metals_nonmetals_svg(lang)
             if parts[1] == "atom":
                 return "svg", atom_svg(int(parts[2]))
             if parts[1] == "mol":

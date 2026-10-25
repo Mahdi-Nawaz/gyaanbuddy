@@ -52,6 +52,12 @@ desktop.ini
 # Scratch temporary scripts
 scratch/
 
+# Local student logs & datasets
+data/*.jsonl
+data/student_profile.json
+gyaanbuddy/data/*.jsonl
+gyaanbuddy/data/student_profile.json
+
 # IDE & Editor caches
 .idea/
 .vscode/

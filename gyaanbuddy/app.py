@@ -877,6 +877,20 @@ def build_search_index() -> list[dict]:
             "spec": f"chem:ph:{k}",
             "keywords": [en_sub, hi_sub, "ph", "acid", "base", "alkaline", str(ph_val), "scale"]
         })
+    # Chemistry - Metals & Non-Metals in Daily Life (Class 8 Science)
+    index.append({
+        "category_en": "🥇 Chemistry: Materials",
+        "category_hi": "🥇 Chemistry: Padarth",
+        "icon": "🥇",
+        "title_en": "Metals & Non-Metals in Daily Life",
+        "title_hi": "Metals aur Non-Metals (Dhaatu aur Adhaatu)",
+        "desc_en": "Importance of metals (iron, copper, aluminium, gold) and non-metals (oxygen, carbon, nitrogen, chlorine, iodine) in everyday life.",
+        "desc_hi": "Rozmarra ke jeevan mein dhaatu (loha, taamba) aur adhaatu (oxygen, nitrogen, iodine) ka upyog.",
+        "spec": "chem:metals",
+        "keywords": ["metals", "metal", "nonmetals", "nonmetal", "non-metals", "non-metal", "dhaatu", "dhatu", "adhaatu",
+                     "importance of metals and non-metals in daily life", "daily life", "iron", "copper", "gold", "aluminium",
+                     "oxygen", "nitrogen", "chlorine", "iodine", "malleable", "ductile", "conductor"]
+    })
     # 7. Virtual Lab Reactions
     reactions = [
         ("reaction:baking_soda", "🌋 Volcano Eruption (Baking Soda + Vinegar)", "🌋 Jwalamukhi (Baking Soda + Sirka)",
@@ -990,147 +1004,282 @@ def search_topics(q: str, limit: int = 8) -> list[dict]:
     return [item for _, item in scored[:limit]]
 
 
-def render_search_hub(lang: str):
-    """Unified Topic Search Hub with fast indexing, interactive diagram viewer and voiceover."""
-    st.markdown("### 🔍 " + ("Explore & Search Topics" if lang == "en" else "Vigyan Topics Khojein"))
-    st.caption("Search across 68+ interactive topics: Human Body, Physics Labs, Chemical Elements, Reactions, and Quizzes!" if lang == "en" else
-               "68+ interactive topics khojein: Insaani Sharir, Physics Labs, Elements, Reactions aur Quizzes!")
-
-    # Search bar row with Search and Clear buttons
-    col_input, col_search, col_clear = st.columns([5.5, 1.2, 1.2])
-    with col_input:
-        current_q = st.session_state.get("search_query", "")
-        query_val = st.text_input(
-            "Topic Search Input",
-            value=current_q,
-            placeholder="🔍 " + ("Type any topic: Heart, Lungs, Gravity, Pendulum, Circuit, Oxygen, Water, Acid, Volcano..." if lang == "en" else "Topic likhein: Dil, Fefde, Pendulum, Circuit, Oxygen, Paani, Acid, Volcano..."),
-            key="topic_search_input",
-            label_visibility="collapsed"
-        )
-    with col_search:
-        if st.button("🔍 " + ("Search" if lang == "en" else "Khojein"), key="btn_do_search", width="stretch"):
-            st.session_state["search_query"] = query_val
-            st.rerun()
-    with col_clear:
-        if st.button("✖️ " + ("Clear" if lang == "en" else "Saaf"), key="btn_clear_search", width="stretch"):
-            st.session_state["search_query"] = ""
-            st.rerun()
-
-    # Active Query Results
-    active_q = (st.session_state.get("search_query") or query_val).strip()
-    if active_q:
-        results = search_topics(active_q, limit=8)
-        if results:
-            st.markdown(f"#### 🎯 " + (f"Found {len(results)} topics for **'{active_q}'**:" if lang == "en" else f"**'{active_q}'** ke liye {len(results)} topics mile:"))
-            for r_idx, item in enumerate(results):
-                title = item["title_hi"] if lang == "hi" else item["title_en"]
-                cat = item["category_hi"] if lang == "hi" else item["category_en"]
-                desc = item["desc_hi"] if lang == "hi" else item["desc_en"]
-
-                with st.container():
-                    st.markdown(f"""
-                    <div class="search-card">
-                      <span class="search-badge">{cat}</span>
-                      <h3 style="margin:4px 0 8px 0;font-size:1.25rem;">{item['icon']} {title}</h3>
-                      <p style="margin:0 0 10px 0;font-size:0.95rem;line-height:1.5;">{desc}</p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    btn_c1, btn_c2, _ = st.columns([1.5, 1.5, 2])
-                    with btn_c1:
-                        read_aloud(desc, key=f"srch_aud_{r_idx}", lang=lang)
-                    with btn_c2:
-                        ask_q = f"Tell me more about {item['title_en']}" if lang == "en" else f"{item['title_hi']} ke baare mein aur batao"
-                        if st.button("💬 " + ("Ask Buddy" if lang == "en" else "Buddy se poochhein"), key=f"srch_ask_{r_idx}", width="stretch"):
-                            st.session_state["pending"] = ask_q
-                            st.toast("Redirecting to Buddy Chat...", icon="💬")
-                            st.rerun()
-
-                    # Interactive Diagram Inline Preview
-                    spec = item.get("spec")
-                    if spec and spec != "quiz":
-                        with st.expander("🖼️ " + ("View Interactive Diagram / Model" if lang == "en" else "Interactive Model / Diagram Dekhein")):
-                            show_visual(spec, lang, key=f"srch_vis_{r_idx}")
-                            add_xp(5, f"Explored {title} diagram in search", "curious_spark")
-                st.divider()
-        else:
-            st.info("💡 " + (f"No direct matches found for '{active_q}'. Try searching for: 'heart', 'lungs', 'circuit', 'acid', 'atom', 'water' or ask Buddy in the chat below!"
-                             if lang == "en" else f"'{active_q}' ke liye koi topic nahi mila. 'dil', 'fefde', 'circuit', 'acid', 'atom', 'paani' dhoondhein ya neeche Buddy se poochhein!"))
-            if st.button("💬 " + (f"Ask Buddy: \"{active_q}\"" if lang == "en" else f"Buddy se poochhein: \"{active_q}\""), key="srch_ask_fallback"):
-                st.session_state["pending"] = active_q
-                st.rerun()
-        st.write("")
-
-
-def render_subject_search(subject_key: str, subject_title: str, placeholder: str, chips: list[tuple[str, str]], lang: str):
-    """Dedicated, subject-specific search bar with fast topic chips and immediate inline previews."""
-    ss_query_key = f"srch_query_{subject_key}"
-    st.markdown(f"""
-    <div style="background: rgba(99, 102, 241, 0.07); border: 1px solid rgba(99, 102, 241, 0.22); border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
-      <span style="font-size: 0.95rem; font-weight: 700; color: #4338ca;">
-        🔍 {('Search ' + subject_title if lang == 'en' else subject_title + ' Mein Khojein')}
-      </span>
-      <span style="font-size: 0.8rem; opacity: 0.75;">
-        {('Class 1–8 Curriculum Focus' if lang == 'en' else 'Class 1–8 Syllabus Focus')}
-      </span>
-    </div>
+def render_unified_top_bar(lang: str, age: str, api_key: str | None, model: str):
+    """Unified 1School-style Top Action Bar: Search Bar + Camera Snap & Solve + Voice Mic + Quick Topic Pills."""
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(240,249,255,0.95) 100%);
+                border: 2px solid #c7d2fe; border-radius: 20px; padding: 14px 18px; margin-bottom: 20px;
+                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.08);">
     """, unsafe_allow_html=True)
 
-    col_in, col_btn, col_clr = st.columns([5.5, 1.2, 1.2])
+    col_in, col_btn, col_cam, col_mic, col_clr = st.columns([5.0, 1.2, 1.3, 1.3, 0.9])
     with col_in:
-        curr_val = st.session_state.get(ss_query_key, "")
+        curr_val = st.session_state.get("global_search_q", "")
         in_val = st.text_input(
-            f"Input Search {subject_title}",
+            "Global Search Bar",
             value=curr_val,
-            placeholder="🔍 " + placeholder,
-            key=f"in_{ss_query_key}",
+            placeholder="🔍 " + ("Search any topic: Newton's 2nd law, Heart, Brain, Pythagoras, Oxygen, Gravity..." if lang == "en" else
+                                 "Sawaal ya topic khojein: Newton ka niyam, Dil, Dimaag, Pythagoras, Oxygen..."),
+            key="global_search_input",
             label_visibility="collapsed"
         )
     with col_btn:
-        if st.button("🔍 " + ("Search" if lang == "en" else "Khojein"), key=f"btn_go_{subject_key}", width="stretch"):
-            st.session_state[ss_query_key] = in_val
+        if st.button("🔍 " + ("Search" if lang == "en" else "Khojein"), key="btn_global_search", width="stretch", type="primary"):
+            st.session_state["global_search_q"] = in_val
+            st.session_state["show_top_cam"] = False
+            st.session_state["show_top_voice"] = False
+            st.rerun()
+    with col_cam:
+        cam_active = st.session_state.get("show_top_cam", False)
+        if st.button("📷 " + ("Camera" if lang == "en" else "Camera"), key="btn_toggle_top_cam", width="stretch", type="primary" if cam_active else "secondary"):
+            st.session_state["show_top_cam"] = not cam_active
+            st.session_state["show_top_voice"] = False
+            st.rerun()
+    with col_mic:
+        voice_active = st.session_state.get("show_top_voice", False)
+        if st.button("🎙️ " + ("Voice" if lang == "en" else "Awaaz"), key="btn_toggle_top_voice", width="stretch", type="primary" if voice_active else "secondary"):
+            st.session_state["show_top_voice"] = not voice_active
+            st.session_state["show_top_cam"] = False
             st.rerun()
     with col_clr:
-        if st.button("✖️ " + ("Clear" if lang == "en" else "Saaf"), key=f"btn_clr_{subject_key}", width="stretch"):
-            st.session_state[ss_query_key] = ""
+        if st.button("✖️", key="btn_global_clear", width="stretch", help="Clear Search & Tools"):
+            st.session_state["global_search_q"] = ""
+            st.session_state["show_top_cam"] = False
+            st.session_state["show_top_voice"] = False
             st.rerun()
 
-    # Topic Shortcut Chips
-    if chips:
-        c_cols = st.columns(len(chips))
-        for c_idx, (c_label, c_term) in enumerate(chips):
-            if c_cols[c_idx].button(c_label, key=f"chip_{subject_key}_{c_idx}", width="stretch"):
-                st.session_state[ss_query_key] = c_term
-                st.rerun()
+    # Quick 1School-style Topic Pills
+    quick_chips = [
+        ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
+        ("⚡ Newton's 2nd Law", "explain newtons 2nd law"),
+        ("🫀 Heart & Blood", "How does the heart pump blood?"),
+        ("🧠 Brain & Lobes", "What are the parts and functions of the brain?"),
+        ("📐 Pythagoras", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
+        ("⚛️ Oxygen Atom", "What is an atom of oxygen?"),
+    ] if lang == "en" else [
+        ("🥇 Dhaatu aur Adhaatu", "Importance of metals and non-metals in daily life"),
+        ("⚡ Newton ka Niyam", "Newton ka niyam samjhao"),
+        ("🫀 Dil aur Rakt", "Dil kya kaam karta hai?"),
+        ("🧠 Dimaag ke Hisse", "Dimaag ke khaas hisse kya hain?"),
+        ("📐 Pythagoras", "Pythagoras pramey kya hai"),
+        ("⚛️ Oxygen Parmanu", "Oxygen parmanu kya hai"),
+    ]
+    q_cols = st.columns(len(quick_chips))
+    for qc_idx, (qc_label, qc_query) in enumerate(quick_chips):
+        if q_cols[qc_idx].button(qc_label, key=f"top_qc_{qc_idx}", width="stretch"):
+            st.session_state["global_search_q"] = qc_query
+            st.session_state["show_top_cam"] = False
+            st.session_state["show_top_voice"] = False
+            st.rerun()
 
-    active_q = (st.session_state.get(ss_query_key) or in_val).strip()
-    if active_q:
-        results = search_topics(active_q, limit=6)
-        subj_results = [
-            r for r in results
-            if subject_key in r.get("spec", "")
-            or subject_key in r.get("category_en", "").lower()
-            or any(subject_key in kw.lower() for kw in r.get("keywords", []))
-        ]
-        display_results = subj_results if subj_results else results[:2]
-        if display_results:
-            st.markdown(f"##### 🎯 " + (f"Matches for '{active_q}' in {subject_title}:" if lang == "en" else f"{subject_title} mein '{active_q}' ke matches:"))
-            for r_idx, r_item in enumerate(display_results):
-                title = r_item["title_hi"] if lang == "hi" else r_item["title_en"]
-                desc = r_item["desc_hi"] if lang == "hi" else r_item["desc_en"]
-                st.markdown(f"""
-                <div class="search-card" style="padding:10px 14px; margin-bottom:8px;">
-                  <b>{r_item['icon']} {title}</b>
-                  <p style="margin:2px 0 6px 0; font-size:0.9rem; line-height:1.4;">{desc}</p>
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # 📷 Inline Camera & Screenshot Solver Drawer if toggled
+    if st.session_state.get("show_top_cam", False):
+        with st.container(border=True):
+            st.markdown("##### 📷 " + ("Snap, Upload or Paste Screenshot Question" if lang == "en" else "Photo Lein, Upload Karein ya Screenshot Paste Karein"))
+            c_c1, c_c2 = st.columns([1.1, 1.1])
+            with c_c1:
+                top_cam = st.camera_input("Take photo with camera", key="top_cam_widget")
+            with c_c2:
+                top_file = st.file_uploader(
+                    "📁 " + ("Or upload screenshot / question photo" if lang == "en" else "Ya screenshot photo upload karein"),
+                    type=["png", "jpg", "jpeg", "webp"],
+                    key="top_file_widget"
+                )
+                st.markdown("""
+                <div style="background:#f1f5f9;border:1.5px dashed #6366f1;border-radius:12px;padding:10px 14px;margin-top:6px;text-align:center;">
+                  <span style="font-size:0.95rem;font-weight:700;color:#4338ca;">📋 How to Paste a Screenshot:</span><br>
+                  <span style="font-size:0.85rem;color:#475569;">
+                    Press <b>Win + Shift + S</b> to take a screenshot, save as an image to upload above, OR paste/type question text below!
+                  </span>
                 </div>
                 """, unsafe_allow_html=True)
-                sp = r_item.get("spec")
-                if sp and sp != "quiz":
-                    with st.expander("🖼️ " + ("Preview Model / Diagram" if lang == "en" else "Diagram Dekhein")):
-                        show_visual(sp, lang, key=f"subj_res_{subject_key}_{r_idx}")
+
+            active_pic = top_cam or top_file
+
+            st.markdown("###### ✍️ " + ("Question Text in Screenshot / Photo:" if lang == "en" else "Photo / Screenshot ka Sawaal:"))
+            cam_hint = st.text_input(
+                "Question Text",
+                value=st.session_state.get("top_cam_hint_text", ""),
+                placeholder="e.g. Importance of metals and non-metals in daily life, Pythagoras theorem, Newton's 2nd law..." if lang == "en" else "jaise: Importance of metals and non-metals in daily life, Pythagoras, Newton ka niyam...",
+                key="top_cam_hint_input",
+                label_visibility="collapsed"
+            )
+
+            # Quick Topic Presets
+            cam_presets = [
+                ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
+                ("⚡ Newton's 2nd Law", "explain newtons 2nd law"),
+                ("📐 Pythagoras Triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
+                ("🫀 Heart & Blood Pumping", "How does the heart pump blood through the circulatory system?"),
+                ("🧠 Brain & Lobes", "What are the parts and functions of the human brain?"),
+                ("⚛️ Oxygen Atom", "What is an atom of oxygen?"),
+            ] if lang == "en" else [
+                ("🥇 Dhaatu aur Adhaatu", "Importance of metals and non-metals in daily life"),
+                ("⚡ Newton ka Niyam", "Newton ka niyam samjhao"),
+                ("📐 Pythagoras Pramey", "Pythagoras pramey kya hai"),
+                ("🫀 Dil aur Rakt", "Dil kya kaam karta hai?"),
+                ("🧠 Dimaag ke Hisse", "Dimaag ke khaas hisse kya hain?"),
+                ("⚛️ Oxygen Parmanu", "Oxygen parmanu kya hai"),
+            ]
+            cp_cols = st.columns(len(cam_presets))
+            for cp_i, (cp_lbl, cp_q) in enumerate(cam_presets):
+                if cp_cols[cp_i].button(cp_lbl, key=f"top_cam_p_{cp_i}", width="stretch"):
+                    st.session_state["top_cam_hint_text"] = cp_q
+                    st.rerun()
+
+            btn_cam_search = st.button(
+                "🔍 " + ("Search & Solve Question from Photo / Screenshot" if lang == "en" else "Photo / Screenshot se Sawaal Khojein aur Hal Karein"),
+                key="btn_search_solve_top_cam",
+                type="primary",
+                width="stretch"
+            )
+            if btn_cam_search:
+                q_solve = cam_hint.strip() or st.session_state.get("top_cam_hint_text", "").strip()
+                effective_api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+                if not effective_api_key:
+                    try:
+                        effective_api_key = st.secrets.get("ANTHROPIC_API_KEY")
+                    except Exception:
+                        effective_api_key = None
+
+                was_ai = False
+                sol_text = ""
+                vis_spec = None
+
+                # 1. AI Vision if photo is present and API key is set
+                if active_pic and effective_api_key:
+                    try:
+                        import anthropic
+                        client = anthropic.Anthropic(api_key=effective_api_key)
+                        active_pic.seek(0)
+                        img_bytes = active_pic.getvalue()
+                        b64_data = base64.b64encode(img_bytes).decode("utf-8")
+                        mime = getattr(active_pic, "type", "image/jpeg") or "image/jpeg"
+                        sys_prompt = (
+                            "You are GyaanBuddy, a friendly tutor for school students in India. "
+                            "Examine the photo/screenshot. Extract the question and provide clear step-by-step solution with final answer highlighted."
+                        )
+                        v_p = q_solve or "Please solve the question shown in this screenshot step-by-step."
+                        resp = client.messages.create(
+                            model=model or "claude-3-5-sonnet-20241022",
+                            max_tokens=650,
+                            system=sys_prompt,
+                            messages=[{
+                                "role": "user",
+                                "content": [
+                                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
+                                    {"type": "text", "text": v_p}
+                                ]
+                            }]
+                        )
+                        sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
+                        was_ai = True
+                    except Exception:
+                        sol_text = ""
+
+                # 2. Smart curriculum tutor engine
+                if not sol_text:
+                    if not q_solve:
+                        q_solve = "Importance of metals and non-metals in daily life"
+                    ans = tutor_engine.answer(q_solve, lang, age)
+                    sol_text = ans.text
+                    vis_spec = ans.visual
+
+                final_q = q_solve or ("Screenshot Question" if lang == "en" else "Screenshot ka Sawaal")
+                st.session_state["top_cam_sol"] = {
+                    "q": final_q,
+                    "text": sol_text,
+                    "visual": vis_spec,
+                    "is_vision": was_ai
+                }
+                st.session_state["messages"].append({
+                    "role": "user",
+                    "text": f"📸 [Screenshot Question]: {final_q}"
+                })
+                st.session_state["messages"].append({
+                    "role": "assistant",
+                    "text": sol_text,
+                    "visual": vis_spec,
+                    "q": final_q
+                })
+                add_xp(20, "Solved photo question!", badge_id="curious_spark")
+                st.toast("🎉 Question Solved!", icon="🚀")
+
+            # 🎯 Render Solution Card directly inside drawer
+            if st.session_state.get("top_cam_sol"):
+                c_sol = st.session_state["top_cam_sol"]
+                st.markdown("---")
+                badge_m = "🤖 AI Vision Solved" if c_sol.get("is_vision") else "🌟 Curriculum Step-by-Step Solution"
+                st.markdown(f"#### 🎯 {badge_m}")
+                with st.container(border=True):
+                    st.markdown(f"**❓ " + ("Question:" if lang == "en" else "Sawaal:") + f"** {c_sol['q']}")
+                    st.markdown(c_sol["text"])
+                    read_aloud(c_sol["text"], key="top_cam_sol_aud", lang=lang)
+
+                    if c_sol.get("visual"):
+                        st.markdown("##### 🖼️ " + ("Interactive Model / Diagram:" if lang == "en" else "Interactive Diagram:"))
+                        show_visual(c_sol["visual"], lang, "top_cam_sol_vis")
+
+                    st.divider()
+                    s_c1, s_c2 = st.columns([1, 1])
+                    with s_c1:
+                        if st.button("💬 " + ("Ask Follow-up in Buddy Chat" if lang == "en" else "Buddy se Chat mein poochhein"), key="top_cam_fwd_chat", width="stretch"):
+                            st.session_state["pending"] = f"Explain more about: {c_sol['q']}"
+                            st.rerun()
+                    with s_c2:
+                        if st.button("🔄 " + ("Solve Another Question" if lang == "en" else "Dusra Sawaal Hal Karein"), key="top_cam_clear_sol", width="stretch"):
+                            st.session_state["top_cam_sol"] = None
+                            st.session_state["top_cam_hint_text"] = ""
+                            st.rerun()
+
+    # 🎙️ Inline Voice Drawer if toggled
+    if st.session_state.get("show_top_voice", False):
+        with st.container(border=True):
+            st.markdown("##### 🎙️ " + ("Speak to Buddy (Voice Question)" if lang == "en" else "Buddy se Bol Kar Poochhein"))
+            render_whatsapp_voice_bar(lang)
+            v_in = st.audio_input("Record voice question", key="top_voice_widget")
+            if v_in:
+                with st.spinner("🎧 Transcribing audio..."):
+                    spoken = transcribe_audio(v_in, lang)
+                if spoken:
+                    st.success(f"🗣️ " + (f"Heard: \"{spoken}\"" if lang == "en" else f"Suna: \"{spoken}\""))
+                    st.session_state["pending"] = spoken
+                    st.rerun()
+
+    # 🔍 Active Global Search Results
+    active_q = (st.session_state.get("global_search_q") or in_val).strip()
+    if active_q:
+        results = search_topics(active_q, limit=6)
+        if results:
+            st.markdown(f"#### 🎯 " + (f"Results for **'{active_q}'**:" if lang == "en" else f"**'{active_q}'** ke matches:"))
+            for r_i, r_item in enumerate(results):
+                t_title = r_item["title_hi"] if lang == "hi" else r_item["title_en"]
+                t_cat = r_item["category_hi"] if lang == "hi" else r_item["category_en"]
+                t_desc = r_item["desc_hi"] if lang == "hi" else r_item["desc_en"]
+                with st.container(border=True):
+                    st.markdown(f"""
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                      <h4 style="margin:0;font-size:1.15rem;">{r_item['icon']} {t_title}</h4>
+                      <span class="search-badge">{t_cat}</span>
+                    </div>
+                    <p style="margin:0 0 10px 0;font-size:0.95rem;line-height:1.5;">{t_desc}</p>
+                    """, unsafe_allow_html=True)
+                    b_c1, b_c2, b_c3 = st.columns([1.5, 2, 2.5])
+                    with b_c1:
+                        read_aloud(t_desc, key=f"g_srch_aud_{r_i}", lang=lang)
+                    with b_c2:
+                        if st.button("💬 " + ("Ask Buddy" if lang == "en" else "Buddy se poochhein"), key=f"g_srch_ask_{r_i}", width="stretch"):
+                            st.session_state["pending"] = f"Tell me more about: {r_item['title_en']}"
+                            st.rerun()
+                    sp = r_item.get("spec")
+                    if sp and sp != "quiz":
+                        with st.expander("🖼️ " + ("View Interactive Model" if lang == "en" else "Diagram Dekhein")):
+                            show_visual(sp, lang, f"g_srch_vis_{r_i}")
             st.divider()
         else:
-            st.info(f"💡 No direct topic found for '{active_q}' in {subject_title}. Try one of the topic chips above!")
+            st.info(f"💡 No direct topic found for '{active_q}'. You can ask Buddy directly in chat!")
 
 
 def init_state():
@@ -1151,6 +1300,15 @@ def init_state():
     ss.setdefault("snap_rotation", 0)
     ss.setdefault("snap_subject", "all")
     ss.setdefault("search_query", "")
+    ss.setdefault("global_search_q", "")
+    ss.setdefault("show_top_cam", False)
+    ss.setdefault("show_top_voice", False)
+    ss.setdefault("body_active_key", "brain")
+    ss.setdefault("phys_active_key", "force")
+    ss.setdefault("chem_active_key", "atom")
+    ss.setdefault("math_active_key", "pythagoras")
+    ss.setdefault("top_cam_sol", None)
+    ss.setdefault("top_cam_hint_text", "")
 
 
 # ----------------------------------------------------------------------------- sidebar
@@ -1188,6 +1346,37 @@ def sidebar():
         "8": "13-15",
     }
     age = class_to_age.get(chosen_class, "10-12")
+
+    # 🎓 Persistent Student Learning Profile & Training Dataset Memory
+    try:
+        import student_memory
+        prof = student_memory.load_student_profile()
+        with st.sidebar.expander("🎓 " + ("Student Profile & AI Training Memory" if lang == "en" else "Student Profile & Training Memory"), expanded=False):
+            st.markdown(f"**Level:** `{prof.get('assessed_level')}`")
+            st.markdown(f"**Total Chats Logged:** `{prof.get('total_chats', 0)}`")
+            mastered = prof.get("topics_mastered", [])
+            if mastered:
+                st.markdown(f"🌟 **Mastered:** {', '.join(mastered[-3:])}")
+            practicing = prof.get("topics_practicing", [])
+            if practicing:
+                st.markdown(f"📈 **Practicing:** {', '.join(practicing[-3:])}")
+
+            ds_bytes = student_memory.get_training_dataset_bytes()
+            if ds_bytes:
+                st.download_button(
+                    "📥 " + ("Download Training Data (.jsonl)" if lang == "en" else "Training Data Download Karein"),
+                    data=ds_bytes,
+                    file_name="gyaanbuddy_student_training.jsonl",
+                    mime="application/jsonlines",
+                    key="btn_dl_train_ds",
+                    help="Export logged student conversations formatted for fine-tuning LLMs."
+                )
+            if st.button("🔄 " + ("Reset Profile Memory" if lang == "en" else "Profile Reset Karein"), key="btn_reset_student_prof"):
+                student_memory.reset_student_profile()
+                st.toast("Student profile memory reset!")
+                st.rerun()
+    except Exception:
+        pass
 
     st.sidebar.divider()
     env_api_key = os.getenv("ANTHROPIC_API_KEY", "")
@@ -1379,6 +1568,7 @@ def tab_snap_solve(lang, age, api_key, model):
             ("🦴 How many bones in the body?", "How many bones are in the human skeleton?"),
         ],
         "chem": [
+            ("🥇 Importance of metals & non-metals", "Importance of metals and non-metals in daily life"),
             ("⚛️ Oxygen atom: protons & electrons", "What is an atom of oxygen?"),
             ("💧 Water molecule (H2O) structure", "What is water H2O made of?"),
             ("🍋 What is pH of lemon juice?", "What is the pH of lemon juice?"),
@@ -1388,6 +1578,7 @@ def tab_snap_solve(lang, age, api_key, model):
     }
     if active_subj == "all":
         cur_presets = [
+            ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
             ("⚡ What is force?", "What is force and Newton's law?"),
             ("🌌 Why is the sky blue?", "Why is the sky blue?"),
             ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
@@ -1409,12 +1600,13 @@ def tab_snap_solve(lang, age, api_key, model):
     user_prob = st.text_input(
         "Question text",
         value=st.session_state.get("snap_problem_text", ""),
-        placeholder="Type question or select a preset above..." if lang == "en" else "Sawaal likhein ya upar se preset chunein...",
+        placeholder="Type question or paste text here (e.g., Importance of metals and non-metals in daily life)..." if lang == "en" else "Sawaal likhein ya upar se preset chunein...",
         key="snap_problem_input",
         label_visibility="collapsed"
     )
+    st.caption("📋 " + ("Tip: Use Win + Shift + S to screenshot from PDF or textbook, save as image to upload above, or paste question text!" if lang == "en" else "Tip: Win + Shift + S se screenshot lein, photo upload karein ya text paste karein!"))
 
-    solve_btn = st.button("🚀 " + ("Solve This Question" if lang == "en" else "Yeh Sawaal Hal Karein"), key="btn_do_snap_solve", type="primary")
+    solve_btn = st.button("🔍 " + ("Search & Solve Question from Photo / Screenshot" if lang == "en" else "Photo / Screenshot se Sawaal Khojein aur Hal Karein"), key="btn_do_snap_solve", type="primary")
     if solve_btn:
         q_to_solve = user_prob.strip()
         if not q_to_solve and not active_img:
@@ -2160,6 +2352,9 @@ def main():
       </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # 1School-style Unified Top Bar: Global Search Hub + Camera & Screenshot Snap/Paste + Voice Mic
+    render_unified_top_bar(lang, age, api_key, model)
 
     tabs = st.tabs(TXT[lang]["tabs"])
     with tabs[0]:

@@ -113,7 +113,7 @@ PHYSICS = {
                     "a dimmer bulb. Never touch mains sockets or wires!",
         activity_hi="Safe tareeka: torch aur 1.5 V ki battery se dekho ki kamzor battery se bulb dim jalta hai. "
                     "Ghar ke plug-socket ya wires ko kabhi mat chhuo!",
-        keywords=["ohm", "ohms", "circuit", "current", "voltage", "resistance", "bijli", "electricity",
+        keywords=["ohm", "ohms", "ohms law", "ohm's law", "ohm law", "circuit", "current", "voltage", "resistance", "bijli", "electricity",
                   "electric", "battery", "bulb"]),
     "refraction": dict(
         title_en="Refraction (bending of light)", title_hi="Refraction (roshni ka mudna)",
@@ -126,16 +126,25 @@ PHYSICS = {
         activity_hi="Ek saaf glass paani mein pencil rakho aur side se dekho. Woh tuti hui kyun dikhti hai?",
         keywords=["refraction", "light", "roshni", "bend", "mudna", "snell", "lens", "reflection", "prism"]),
     "force": dict(
-        title_en="Force & Motion (Push or Pull)", title_hi="Force aur Gati (Dhakka ya Kheenchna)",
-        en="A force is simply a push or a pull! It can make objects speed up, slow down, stop, or turn. "
-           "Sir Isaac Newton showed that Force = Mass × Acceleration (F = m × a). Its unit is the Newton (N).",
-        hi="Force (bal) kisi cheez ko dhakka dena (push) ya kheenchna (pull) hota hai! Yeh kisi cheez ko chala sakti hai, "
-           "rok sakti hai ya disha badal sakti hai. Newton ka niyam: Force = Mass × Acceleration (F = m × a). Unit: Newton (N).",
+        title_en="Force & Newton's Laws of Motion (F = m × a)", title_hi="Force aur Newton ke Niyam (F = m × a)",
+        en="A force is simply a push or a pull! Sir Isaac Newton gave 3 Laws of Motion:\n\n"
+           "1. 1st Law (Inertia): An object stays at rest or moves at a constant speed unless a force acts on it.\n"
+           "2. 2nd Law (F = m × a): Force = Mass × Acceleration. A heavier object needs more force to speed up!\n"
+           "3. 3rd Law (Action & Reaction): For every action, there is an equal and opposite reaction.\n\n"
+           "📐 Formula: Force = Mass × Acceleration (F = m × a). Unit: Newton (N).",
+        hi="Force (bal) kisi cheez ko dhakka dena (push) ya kheenchna (pull) hota hai! Newton ke 3 Niyam:\n\n"
+           "1. 1st Law (Inertia): Har cheez apni jagah rehti hai jab tak uspar force na lage.\n"
+           "2. 2nd Law (F = m × a): Force = Mass × Acceleration. Bhaari cheez ko chalane ke liye zyada force chahiye!\n"
+           "3. 3rd Law (Action & Reaction): Har action ka ek barabar aur ulta reaction hota hai.\n\n"
+           "📐 Formula: F = m × a. Unit: Newton (N).",
         formula="F = m × a",
-        activity_en="Push a toy car on a smooth floor and then on a rough carpet. Where does it stop sooner?",
-        activity_hi="Ek khilona gaadi ko pehle chikne farsh par aur phir darri (carpet) par dhakelo. Kahan jaldi rukti hai?",
-        keywords=["force", "bal", "push", "pull", "motion", "gati", "newton", "acceleration", "mass", "f=ma",
-                  "dhakka", "kheenchna", "speed", "friction", "laws of motion"]),
+        activity_en="Push a light ball and a heavy book with the same push. The light ball accelerates much faster because of Newton's 2nd Law (F = m × a)!",
+        activity_hi="Ek halki ball aur ek bhaari kitaab ko dhakka do. Halki ball tez bhaagti hai kyunki F = m × a!",
+        keywords=["force", "bal", "push", "pull", "motion", "gati", "newton", "newtons", "newtons law", "newtons laws",
+                  "newton's", "newtons 2nd law", "newton 2nd law", "second law", "2nd law", "newtons second law",
+                  "newtons 1st law", "first law", "1st law", "inertia", "newtons 3rd law", "third law", "3rd law",
+                  "action and reaction", "acceleration", "mass", "f=ma", "f = ma", "dhakka", "kheenchna", "speed",
+                  "friction", "laws of motion"]),
     "sky": dict(
         title_en="Why is the sky blue? (Rayleigh scattering)", title_hi="Aasman neela kyun hai? (Rayleigh scattering)",
         en="Sunlight looks white, but it holds all rainbow colors! Blue light travels in short, small waves and "
@@ -285,6 +294,36 @@ CHEM_TEXT = {
         hi="pH scale 0 se 14 tak hota hai. 7 se neeche acid (jaise nimbu), 7 neutral (saaf paani) aur 7 se upar "
            "base (jaise sabun) hota hai.",
         keywords=["ph", "acid", "base", "acidic", "alkaline", "neutral", "nimbu", "lemon", "indicator"]),
+    "metals": dict(
+        title_en="Metals & Non-Metals in Daily Life", title_hi="Metals aur Non-Metals (Dhaatu aur Adhaatu)",
+        en="Metals and Non-Metals are essential materials in our daily life!\n\n"
+           "🥇 **Importance of Metals:**\n"
+           "• **Iron (Fe):** High strength for building bridges, trains, houses, and tools.\n"
+           "• **Copper (Cu) & Aluminium (Al):** Outstanding conductors of electricity & heat, used in electrical wiring and cooking pots.\n"
+           "• **Gold (Au) & Silver (Ag):** Highly lustrous and corrosion-resistant, used for jewelry and premium electronics.\n\n"
+           "🧪 **Importance of Non-Metals:**\n"
+           "• **Oxygen (O₂):** Vital for breathing (respiration) of humans, animals, and plants.\n"
+           "• **Nitrogen (N) & Phosphorus (P):** Essential in fertilizers for rich crop yields.\n"
+           "• **Carbon (C):** Present in all living beings, food, diamonds, and pencil graphite.\n"
+           "• **Chlorine (Cl):** Water purifier that destroys germs to make water safe to drink.\n"
+           "• **Iodine (I):** Used as an antiseptic tincture on cuts and wounds.\n\n"
+           "💡 **Key Properties:** Metals are malleable (beaten into sheets), ductile (drawn into wires), and sonorous. Non-metals are brittle insulators!",
+        hi="Metals (Dhaatu) aur Non-Metals (Adhaatu) hamare rozmarra ke jeevan mein behad zaroori hain!\n\n"
+           "🥇 **Metals ka Mahatva (Daily Life Uses):**\n"
+           "• **Loha (Iron):** Mazbooti ke kaaran pul, makaan, train aur gaadiyan banane mein use hota hai.\n"
+           "• **Taamba (Copper) aur Aluminium:** Bijli ki taarein aur khana banane ke bartan mein kaam aate hain.\n"
+           "• **Sona (Gold) aur Chandi (Silver):** Gehne banane mein use hote hain kyunki inmein chamak hoti hai aur zang nahi lagta.\n\n"
+           "🧪 **Non-Metals ka Mahatva (Daily Life Uses):**\n"
+           "• **Oxygen:** Sabhi jeevon ke saans lene aur zinda rehne ke liye sabse zaroori gas hai!\n"
+           "• **Nitrogen aur Phosphorus:** Kheti mein khaad (fertilizers) banane mein kaam aate hain.\n"
+           "• **Carbon:** Hamare shareer, khane aur pencil ki lead (graphite) mein hota hai.\n"
+           "• **Chlorine:** Peene ke paani ke keede maar kar use saaf banane ke liye use hota hai.\n"
+           "• **Iodine:** Chot lagne par antiseptic tincture ke roop mein lagaya jaata hai.\n\n"
+           "💡 **Khaas baatein:** Metals malleable aur ductile hote hain. Non-metals brittle hote hain!",
+        keywords=["metal", "metals", "nonmetal", "nonmetals", "non-metal", "non-metals", "dhaatu", "dhatu", "adhaatu",
+                  "importance of metals and non-metals in daily life", "importance of metals and non-metals",
+                  "importance of metals", "importance of non-metals", "daily life", "iron", "copper", "aluminium",
+                  "gold", "oxygen", "nitrogen", "chlorine", "iodine", "malleability", "ductility", "sonorous"]),
 }
 
 HOME_ACTIVITIES = {

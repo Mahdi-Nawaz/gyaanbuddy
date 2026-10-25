@@ -23,6 +23,7 @@ ALLOWED_VISUALS = (
     [f"body:{b['key']}" for b in C.BODY_PARTS] + ["body:kidneys:detail"] + [f"physics:{k}" for k in C.PHYSICS]
     + [f"chem:mol:{k}" for k in C.MOLECULES] + [f"chem:states:{k}" for k in C.STATES]
     + [f"chem:ph:{k}" for k in C.PH_SUBSTANCES] + [f"chem:atom:{z}" for z in C.ELEMENT_BY_Z]
+    + ["chem:metals"]
     + MATH_VISUALS
 )
 
@@ -82,7 +83,7 @@ def _build_lessons() -> list[dict]:
                             en=f"{p['en']}\n\n📐 Formula: {p['formula']}", hi=f"{p['hi']}\n\n📐 Formula: {p['formula']}",
                             keywords=set(p["keywords"])))
     for k, c in C.CHEM_TEXT.items():
-        vis = {"atom": "chem:atom:8", "molecule": "chem:mol:H2O", "states": "chem:states:liquid", "ph": "chem:ph:lemon"}[k]
+        vis = {"atom": "chem:atom:8", "molecule": "chem:mol:H2O", "states": "chem:states:liquid", "ph": "chem:ph:lemon", "metals": "chem:metals"}[k]
         lessons.append(dict(key=k, subject="Chemistry", topic=c["title_en"], visual=vis,
                             en=c["en"], hi=c["hi"], keywords=set(c["keywords"])))
     for k, m in C.MOLECULES.items():
@@ -124,33 +125,78 @@ def find_lesson(query: str, lang: str) -> TutorReply | None:
     el = _element_lesson(query, lang)
     if el:
         return el
-    toks = _tokens(query) - _STOP
+
+    norm_query = safety.normalize(query).lower()
+    raw_toks = _tokens(query) - _STOP
+
+    # Generate stemmed forms (e.g., "newtons" -> "newton", "laws" -> "law", "lungs" -> "lung")
+    expanded_toks = set(raw_toks)
+    for t in raw_toks:
+        if t.endswith("s") and len(t) > 3:
+            expanded_toks.add(t[:-1])
+        if t.endswith("es") and len(t) > 4:
+            expanded_toks.add(t[:-2])
+        if t.endswith("ing") and len(t) > 5:
+            expanded_toks.add(t[:-3])
+
     best, score = None, 0
     for les in LESSONS:
-        s = len(toks & {k.lower() for k in les["keywords"]})
+        s = 0
+        topic_lower = les["topic"].lower()
+        key_lower = les["key"].lower()
+
+        # Direct topic match in query string
+        if topic_lower in norm_query or key_lower in norm_query:
+            s += 8
+
+        matched_tokens = set()
+        for kw in les["keywords"]:
+            kw_clean = safety.normalize(kw).lower()
+            if not kw_clean:
+                continue
+            # Phrase match: "laws of motion", "newtons 2nd law", "ohms law", etc.
+            if kw_clean in norm_query:
+                s += 8 + len(kw_clean.split()) * 3
+            # Collect matching tokens without multiple counting
+            kw_tokens = set(kw_clean.split())
+            matched_tokens |= (kw_tokens & expanded_toks)
+
+        # Award score based on unique matching tokens
+        s += len(matched_tokens) * 4
+
         if s > score:
             best, score = les, s
-    if best is None:
+
+    if best is None or score < 2:
         return None
     return TutorReply(best[lang], best["visual"], subject=best["subject"], topic=best["topic"])
 
 
 def offline_answer(question: str, lang: str) -> TutorReply:
     toks = _tokens(question)
-    if toks and toks <= C.GREETINGS | {"buddy", "gyaanbuddy", "hai"}:
-        txt = ("Hello! 👋 I'm GyaanBuddy. Ask me about the human body, physics or chemistry, in English or Hinglish!"
+    if toks and toks <= C.GREETINGS | {"buddy", "gyaanbuddy", "hai", "hello", "hi"}:
+        txt = ("Hello! 👋 I'm GyaanBuddy, your friendly science and math buddy. Ask me about the human body, physics, chemistry, or math!"
                if lang == "en" else
-               "Namaste! 👋 Main GyaanBuddy hoon. Mujhse insaani sharir, physics ya chemistry ke baare mein poochho, "
-               "English ya Hinglish mein!")
+               "Namaste! 👋 Main GyaanBuddy hoon, aapka vigyan aur ganit saathi. Mujhse human body, physics, chemistry ya maths ke sawaal poochhein!")
         return TutorReply(txt, topic="Greeting")
     found = find_lesson(question, lang)
     if found:
         return found
-    txt = ("I don't know that one yet in offline mode. 🤔 Try asking about: heart, lungs, brain, bones, pendulum, "
-           "projectile, Ohm's law, atoms, water or pH. (Add an API key to ask anything!)"
+    txt = ("I am currently in offline mode for school science and math topics for Nursery to Class 8! 🌟\n\n"
+           "Here are great topics you can explore:\n"
+           "• 🧍 **Human Body**: Brain & lobes, Heart & blood, Lungs, Kidneys, Bones\n"
+           "• ⚡ **Physics**: Newton's Laws (F=m×a), Gravity, Light refraction, Electric circuits, Pendulums\n"
+           "• 📐 **Maths**: Pythagoras theorem, Circles & area, Fractions, Algebra\n"
+           "• 🧪 **Chemistry**: Oxygen atom structure, Water molecule (H₂O), Acid & pH, States of matter\n\n"
+           "💡 Try asking one of the quick suggestions above or search any topic in the Search Bar!"
            if lang == "en" else
-           "Yeh topic abhi offline mode mein mujhe nahi aata. 🤔 Yeh try karo: dil, fefde, dimaag, haddiyan, pendulum, "
-           "projectile, Ohm's law, atoms, paani ya pH. (API key daalo toh kuch bhi pooch sakte ho!)")
+           "Main abhi offline mode mein hoon aur Nursery se Class 8 ke vigyan aur ganit ke vishayon par madad karta hoon! 🌟\n\n"
+           "Yeh mazedaar topics try karein:\n"
+           "• 🧍 **Insaani Sharir**: Dimaag, Dil, Fefde, Gurde, Haddiyan\n"
+           "• ⚡ **Physics**: Newton ke Niyam (F=m×a), Gravity, Light, Bijli circuit, Pendulum\n"
+           "• 📐 **Ganit**: Pythagoras Pramey, Circle ka area, Fractions, Algebra\n"
+           "• 🧪 **Chemistry**: Oxygen Parmanu, Paani (H₂O), Acid aur pH, Padarth ki awasthayein\n\n"
+           "💡 Upar diye gaye quick suggestions dabayein ya Search Bar mein koi bhi topic khojein!")
     return TutorReply(txt, topic="Unknown")
 
 
@@ -168,6 +214,12 @@ def _llm_answer(question: str, lang: str, age: str, history: list[dict], api_key
     client = anthropic.Anthropic(api_key=api_key)
     system = SYSTEM_PROMPT.format(age=age, lang_rule=LANG_RULE[lang], style=AGE_GUIDE.get(age, AGE_GUIDE["9-12"]),
                                   visuals=", ".join(ALLOWED_VISUALS))
+    try:
+        import student_memory
+        system = system + "\n\n" + student_memory.get_student_context_prompt()
+    except Exception:
+        pass
+
     msgs = []
     for h in history[-6:]:
         msgs += [{"role": "user", "content": h["q"]}, {"role": "assistant", "content": h["a"]}]
@@ -200,4 +252,20 @@ def answer(question: str, lang: str = "en", age: str = "9-12", history: list[dic
     if not ok:
         return TutorReply(safe_text, blocked=True, category="output_filter", topic="blocked:output")
     reply.text, reply.notice = safe_text, notice
+
+    # Record interaction to persistent student memory & fine-tuning dataset
+    try:
+        import student_memory
+        student_memory.record_student_chat(
+            grade=age,
+            lang=lang,
+            question=q,
+            answer_text=reply.text,
+            subject=reply.subject,
+            topic=reply.topic,
+            visual=reply.visual
+        )
+    except Exception:
+        pass
+
     return reply
