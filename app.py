@@ -26,6 +26,27 @@ st.set_page_config(page_title="GyaanBuddy • Kid-Safe AI Science Buddy", page_i
 
 # ----------------------------------------------------------------------------- Attractive Themes & Styling
 THEMES = {
+    "🌈 Wonder Academy (Nursery - Class 8)": {
+        "app_bg": "linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 50%, #fef3c7 100%)",
+        "text_color": "#0f172a",
+        "heading_color": "#1e1b4b",
+        "sidebar_bg": "#ffffff",
+        "sidebar_border": "1px solid #e2e8f0",
+        "sidebar_text": "#1e293b",
+        "hero_bg": "linear-gradient(135deg, #4f46e5 0%, #06b6d4 40%, #10b981 75%, #f59e0b 100%)",
+        "hero_shadow": "0 12px 30px rgba(79, 70, 229, 0.25)",
+        "hero_border": "none",
+        "accent": "#4f46e5",
+        "tab_text": "#475569",
+        "tab_active_text": "#4f46e5",
+        "card_bg": "#ffffff",
+        "card_border": "1px solid #cbd5e1",
+        "card_shadow": "0 8px 24px rgba(0, 0, 0, 0.06)",
+        "card_hover_shadow": "0 12px 30px rgba(79, 70, 229, 0.15)",
+        "badge_bg": "#e0e7ff",
+        "badge_text": "#3730a3",
+        "badge_border": "1px solid #c7d2fe",
+    },
     "🌌 Cosmic Explorer": {
         "app_bg": "radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #030712 100%)",
         "text_color": "#f8fafc",
@@ -136,7 +157,7 @@ THEMES = {
 
 def apply_theme(theme_name: str):
     """Dynamically inject curated CSS themes into Streamlit."""
-    t = THEMES.get(theme_name, THEMES["🌌 Cosmic Explorer"])
+    t = THEMES.get(theme_name, THEMES["🌈 Wonder Academy (Nursery - Class 8)"])
     css = f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
@@ -164,14 +185,23 @@ def apply_theme(theme_name: str):
     [data-testid="stSidebar"] * {{
         color: {t['sidebar_text']} !important;
     }}
+
+    /* Hide Streamlit default clutter and badges that overlap mobile footer */
+    #MainMenu {{visibility: hidden !important; display: none !important;}}
+    footer {{visibility: hidden !important; display: none !important;}}
+    header {{visibility: hidden !important;}}
+    .viewerBadge_container {{display: none !important;}}
+    .stDeployButton {{display: none !important;}}
+    div[data-testid="stToolbar"] {{visibility: hidden !important;}}
+
     .hero-banner {{
         background: {t['hero_bg']} !important;
         color: white !important;
-        padding: 20px 26px;
-        border-radius: 18px;
+        padding: 22px 28px;
+        border-radius: 20px;
         box-shadow: {t['hero_shadow']} !important;
         border: {t['hero_border']} !important;
-        margin-bottom: 18px;
+        margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -180,25 +210,26 @@ def apply_theme(theme_name: str):
     }}
     .hero-title {{
         font-family: 'Outfit', sans-serif;
-        font-size: 1.6rem;
+        font-size: 1.75rem;
         font-weight: 800;
         margin: 0;
         color: #ffffff !important;
     }}
     .hero-sub {{
-        font-size: 0.95rem;
-        color: #e0f2fe !important;
+        font-size: 0.98rem;
+        color: #f0fdf4 !important;
         margin-top: 4px;
+        font-weight: 500;
     }}
     .xp-pill {{
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.35);
-        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 6px 18px;
         border-radius: 30px;
         font-family: 'Outfit', sans-serif;
         font-weight: 700;
-        font-size: 1.05rem;
+        font-size: 1rem;
         color: #ffffff !important;
         display: inline-flex;
         align-items: center;
@@ -215,14 +246,36 @@ def apply_theme(theme_name: str):
     }}
     .stTabs [aria-selected="true"] {{
         color: {t['tab_active_text']} !important;
-        border-bottom: 3px solid {t['accent']} !important;
+        border-bottom: 3.5px solid {t['accent']} !important;
         font-weight: 800 !important;
+    }}
+    [data-testid="stChatMessage"] {{
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 18px !important;
+        padding: 14px 20px !important;
+        margin-bottom: 12px !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    }}
+    [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] span, [data-testid="stChatMessage"] div {{
+        color: #0f172a !important;
+        line-height: 1.65 !important;
+        font-size: 1rem !important;
+    }}
+    .stButton>button {{
+        border-radius: 12px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }}
+    .stButton>button:hover {{
+        transform: translateY(-2px) !important;
     }}
     .search-card {{
         background: {t['card_bg']};
         border: {t['card_border']};
-        border-radius: 16px;
-        padding: 16px 20px;
+        border-radius: 18px;
+        padding: 18px 22px;
         margin-bottom: 14px;
         box-shadow: {t['card_shadow']};
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -233,7 +286,7 @@ def apply_theme(theme_name: str):
     }}
     .search-badge {{
         display: inline-block;
-        padding: 4px 12px;
+        padding: 4px 14px;
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 700;
@@ -243,33 +296,38 @@ def apply_theme(theme_name: str):
         margin-bottom: 8px;
     }}
     .fact {{
-        background: linear-gradient(135deg, rgba(254, 243, 199, 0.15) 0%, rgba(254, 240, 138, 0.2) 100%);
+        background: linear-gradient(135deg, rgba(254, 243, 199, 0.4) 0%, rgba(254, 240, 138, 0.5) 100%);
         border-left: 6px solid #f59e0b;
         padding: 12px 16px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);
+        color: #78350f !important;
     }}
     .act {{
-        background: linear-gradient(135deg, rgba(209, 250, 229, 0.15) 0%, rgba(167, 243, 208, 0.2) 100%);
+        background: linear-gradient(135deg, rgba(209, 250, 229, 0.4) 0%, rgba(167, 243, 208, 0.5) 100%);
         border-left: 6px solid #10b981;
         padding: 12px 16px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+        color: #064e3b !important;
     }}
     .formula {{
-        background: linear-gradient(135deg, rgba(219, 234, 254, 0.2) 0%, rgba(191, 219, 254, 0.25) 100%);
+        background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
         border-radius: 12px;
-        padding: 10px 18px;
-        font-size: 1.25rem;
+        padding: 12px 18px;
+        font-size: 1.15rem;
         font-weight: 700;
         text-align: center;
-        border: 1px dashed {t['accent']};
+        border: 1.5px dashed {t['accent']};
+        color: #1e3a8a !important;
+        white-space: normal;
+        word-break: break-word;
     }}
     .game-card {{
         background: {t['card_bg']};
         border: {t['card_border']};
-        border-radius: 16px;
-        padding: 18px;
+        border-radius: 18px;
+        padding: 20px;
         box-shadow: {t['card_shadow']};
     }}
     </style>
@@ -279,18 +337,18 @@ def apply_theme(theme_name: str):
 TXT = {
     "en": dict(
         ask="Ask me anything about science or math…",
-        tabs=["💬 Ask Buddy", "🧍 Human Body", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Mathematics", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
+        tabs=["💬 Ask Buddy", "📸 Snap & Solve", "🧍 Human Body", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Mathematics", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
         tryit="Try it at home (with an adult)",
         fact="Fun fact", next="Next ➡", prev="⬅ Previous", all="Show all organs",
         mystery="Mystery Science Question of the Day:"
     ),
     "hi": dict(
         ask="Science ya Maths ke baare mein kuch bhi poochho…",
-        tabs=["💬 Buddy se poochho", "🧍 Insaani Sharir", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Ganit (Maths)", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
+        tabs=["💬 Buddy se poochho", "📸 Snap & Solve", "🧍 Insaani Sharir", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Ganit (Maths)", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
         tryit="Ghar par try karo (bade ke saath)",
         fact="Mazedaar baat", next="Agla ➡", prev="⬅ Pichla", all="Saare organs dikhao",
         mystery="Aaj Ka Mazedaar Vigyan Sawaal:"
-    ),
+    )
 }
 
 MYSTERIES = {
@@ -468,12 +526,132 @@ def read_aloud(text: str, key: str = "ra", lang: str = "en"):
     </script>
     """
     components.html(html_code, height=44)
-    if b64_audio:
-        try:
-            audio_bytes = base64.b64decode(b64_audio)
-            st.audio(audio_bytes, format="audio/mp3")
-        except Exception:
-            pass
+def transcribe_audio(audio_file, lang: str = "en") -> str:
+    """Transcribe audio from st.audio_input using Google Speech Recognition (free, kid-friendly)."""
+    if not audio_file:
+        return ""
+    try:
+        import speech_recognition as sr
+        import io
+        audio_bytes = audio_file.getvalue() if hasattr(audio_file, "getvalue") else audio_file.read()
+        if not audio_bytes or len(audio_bytes) < 400:
+            return ""
+        bio = io.BytesIO(audio_bytes)
+        r = sr.Recognizer()
+        r.energy_threshold = 280
+        r.dynamic_energy_threshold = True
+        with sr.AudioFile(bio) as source:
+            audio_data = r.record(source)
+            target_lang = "hi-IN" if lang == "hi" else "en-IN"
+            text = r.recognize_google(audio_data, language=target_lang)
+            return text.strip()
+    except Exception:
+        return ""
+
+
+def render_whatsapp_voice_bar(lang: str):
+    """WhatsApp-style interactive voice and message bar for young students who can't write."""
+    placeholder_text = "Type a message or tap 🎙️ to speak…" if lang == "en" else "Message likhein ya 🎙️ daba kar bolein…"
+    status_prompt = "Tap 🎙️ to speak your question" if lang == "en" else "Sawaal bolne ke liye 🎙️ dabayein"
+    speech_lang = "hi-IN" if lang == "hi" else "en-IN"
+
+    wa_html = f"""
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;margin:10px 0 16px 0;">
+      <div style="background:#1f2c34;border-radius:28px;padding:6px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(0,0,0,0.22);max-width:720px;border:1px solid rgba(255,255,255,0.08);">
+        <span style="font-size:20px;color:#8696a0;cursor:pointer;padding:4px;user-select:none;" title="Attach photo or question">📎</span>
+        <span style="font-size:20px;color:#8696a0;cursor:pointer;padding:4px;user-select:none;" title="Kid emojis">😃</span>
+        <input id="wa_text" type="text" placeholder="{placeholder_text}" style="flex:1;background:transparent;border:none;outline:none;color:#e9edef;font-size:15px;padding:6px 4px;font-family:inherit;" />
+        <button id="wa_mic_btn" onclick="toggleWaSpeech()" style="background:#00a884;border:none;border-radius:50%;width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#ffffff;font-size:18px;transition:all 0.2s ease;box-shadow:0 2px 6px rgba(0,168,132,0.4);" title="Speak your question">
+          🎙️
+        </button>
+      </div>
+      <div id="wa_status" style="margin-top:6px;font-size:12px;color:#00a884;font-weight:600;padding-left:14px;min-height:18px;">
+        {status_prompt}
+      </div>
+    </div>
+    <style>
+      @keyframes waPulse {{
+        0% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); transform: scale(1); }}
+        70% {{ box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); transform: scale(1.08); }}
+        100% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(1); }}
+      }}
+    </style>
+    <script>
+      let isWaListening = false;
+      let waRecognition = null;
+      const waInput = document.getElementById("wa_text");
+      const waMicBtn = document.getElementById("wa_mic_btn");
+      const waStatus = document.getElementById("wa_status");
+
+      function initWaSpeech() {{
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {{
+          waStatus.textContent = "🎙️ Browser live speech unsupported. Use the voice recorder below!";
+          return null;
+        }}
+        const rec = new SpeechRec();
+        rec.continuous = false;
+        rec.interimResults = true;
+        rec.lang = "{speech_lang}";
+
+        rec.onstart = function() {{
+          isWaListening = true;
+          waMicBtn.style.background = "#ef4444";
+          waMicBtn.style.animation = "waPulse 1.4s infinite";
+          waStatus.textContent = "🔴 Listening... Speak your question now!";
+        }};
+
+        rec.onresult = function(event) {{
+          let transcript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {{
+            transcript += event.results[i][0].transcript;
+          }}
+          waInput.value = transcript;
+          waStatus.textContent = "🗣️ Heard: \\"" + transcript + "\\"";
+        }};
+
+        rec.onend = function() {{
+          isWaListening = false;
+          waMicBtn.style.background = "#00a884";
+          waMicBtn.style.animation = "none";
+          if (waInput.value.trim().length > 0) {{
+            waStatus.textContent = "✅ Spoken question ready! Asking Buddy...";
+            // Copy to clipboard or trigger prompt
+            navigator.clipboard.writeText(waInput.value.trim()).catch(() => {{}});
+          }} else {{
+            waStatus.textContent = "{status_prompt}";
+          }}
+        }};
+
+        rec.onerror = function(e) {{
+          isWaListening = false;
+          waMicBtn.style.background = "#00a884";
+          waMicBtn.style.animation = "none";
+          waStatus.textContent = "Speech recognition: " + (e.error || "Please try speaking closer to mic");
+        }};
+        return rec;
+      }}
+
+      function toggleWaSpeech() {{
+        if (!waRecognition) {{
+          waRecognition = initWaSpeech();
+        }}
+        if (!waRecognition) return;
+
+        if (isWaListening) {{
+          waRecognition.stop();
+        }} else {{
+          waInput.value = "";
+          try {{
+            waRecognition.start();
+          }} catch(e) {{
+            waRecognition.stop();
+          }}
+        }}
+      }}
+    </script>
+    """
+    components.html(wa_html, height=72)
 
 
 # ----------------------------------------------------------------------------- gamification engine
@@ -775,26 +953,6 @@ def render_search_hub(lang: str):
             st.session_state["search_query"] = ""
             st.rerun()
 
-    # Topic Shortcut Chips (Quick Select)
-    shortcut_chips = [
-        ("🫁 Lungs", "lungs"),
-        ("💓 Heart", "heart"),
-        ("🧠 Brain", "brain"),
-        ("⚡ Pendulum", "pendulum"),
-        ("💡 Circuit", "circuit"),
-        ("⚛️ Oxygen", "oxygen"),
-        ("💧 Water", "water"),
-        ("🍋 Acids & pH", "acid"),
-        ("🌋 Volcano", "volcano"),
-        ("🎯 Quiz", "quiz"),
-    ]
-    st.caption("✨ " + ("Popular topic shortcuts:" if lang == "en" else "Lokpriya topic shortcuts:"))
-    chip_cols = st.columns(len(shortcut_chips))
-    for idx, (label, search_term) in enumerate(shortcut_chips):
-        if chip_cols[idx].button(label, key=f"chip_btn_{idx}", width="stretch"):
-            st.session_state["search_query"] = search_term
-            st.rerun()
-
     # Active Query Results
     active_q = (st.session_state.get("search_query") or query_val).strip()
     if active_q:
@@ -917,6 +1075,7 @@ def init_state():
     ss.setdefault("messages", [])
     ss.setdefault("events", [])
     ss.setdefault("body_i", 0)
+    ss.setdefault("body_highlight", None)
     ss.setdefault("quiz_done", {})
     ss.setdefault("xp", 35)
     ss.setdefault("badges", ["curious_spark"])
@@ -924,49 +1083,39 @@ def init_state():
     ss.setdefault("experiments_tried", [])
     ss.setdefault("student_name", "Junior Scientist")
     ss.setdefault("avatar", "🧑‍🚀 Astro Kid")
-    ss.setdefault("theme", "🌌 Cosmic Explorer")
+    ss.setdefault("theme", "🌈 Wonder Academy (Nursery - Class 8)")
+    ss.setdefault("class_level", "Class 3 - 5")
+    ss.setdefault("snap_rotation", 0)
+    ss.setdefault("snap_subject", "all")
     ss.setdefault("search_query", "")
 
 
 # ----------------------------------------------------------------------------- sidebar
 def sidebar():
     st.sidebar.title("🧠 GyaanBuddy")
-    st.sidebar.caption("Your friendly, kid-safe science buddy")
+    st.sidebar.caption("Your friendly, kid-safe science & math buddy")
 
     # IMPORTANT: Keep Language radio as the very first radio in sidebar for AppTest compatibility
     lang_label = st.sidebar.radio("Language / Bhasha", ["English", "Hinglish"], horizontal=True)
     lang = "hi" if lang_label == "Hinglish" else "en"
 
-    # Theme Selector (uses selectbox so radio index remains untouched for AppTest)
-    theme_choices = list(THEMES.keys())
-    chosen_theme = st.sidebar.selectbox("🎨 " + ("App Theme" if lang == "en" else "App Theme / Rang"),
-                                        theme_choices, index=0)
-    st.session_state["theme"] = chosen_theme
-
-    # Student Profile & Avatar Selector (uses selectbox so radio index remains untouched)
-    avatar_choices = ["🧑‍🚀 Astro Kid", "🔬 Lab Genius", "🦕 Dino Explorer", "🦸 Science Hero", "🤖 Robo Buddy"]
-    chosen_avatar = st.sidebar.selectbox("Student Avatar", avatar_choices, index=0)
-    st.session_state["avatar"] = chosen_avatar
-
-    # Gamification Level and XP Card
-    xp = st.session_state["xp"]
-    lvl_num, lvl_en, lvl_hi, progress = get_level(xp)
-    lvl_title = lvl_hi if lang == "hi" else lvl_en
-    st.sidebar.markdown(f"### {chosen_avatar.split()[0]} {lvl_title}")
-    st.sidebar.progress(progress, text=f"{xp} XP (Level {lvl_num})")
-
-    # Badges Shelf
-    badge_icons = {
-        "curious_spark": "✨ Curious Spark",
-        "anatomy_master": "🫀 Anatomy Ace",
-        "physics_wizard": "⚡ Physics Pro",
-        "chem_wizard": "🧪 Chem Wizard",
-        "quiz_champion": "🎯 Quiz Master",
+    # Class Filter (Nursery to 8th Class)
+    class_options = ["Nursery - KG", "Class 1 - 2", "Class 3 - 5", "Class 6 - 8"]
+    chosen_class = st.sidebar.select_slider(
+        "🎓 " + ("Class Filter (Nursery to 8th)" if lang == "en" else "Class Filter (Nursery se 8th)"),
+        options=class_options,
+        value=st.session_state.get("class_level", "Class 3 - 5"),
+        help="Adjusts explanation complexity and vocabulary for your child's class level."
+    )
+    st.session_state["class_level"] = chosen_class
+    class_to_age = {
+        "Nursery - KG": "6-8",
+        "Class 1 - 2": "6-8",
+        "Class 3 - 5": "9-12",
+        "Class 6 - 8": "13-15",
     }
-    unlocked = [badge_icons[b] for b in st.session_state["badges"] if b in badge_icons]
-    st.sidebar.caption("🏆 **Badges:** " + (" • ".join(unlocked) if unlocked else "Explore to earn!"))
+    age = class_to_age.get(chosen_class, "9-12")
 
-    age = st.sidebar.select_slider("Age group", ["6-8", "9-12", "13-15"], value="9-12")
     st.sidebar.divider()
     api_key = st.sidebar.text_input("Anthropic API key (optional, for parents)", type="password",
                                     value=os.getenv("ANTHROPIC_API_KEY", ""),
@@ -977,7 +1126,7 @@ def sidebar():
     if st.sidebar.button("Clear chat"):
         st.session_state["messages"] = []
     st.sidebar.markdown("""
-    <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.12);">
+    <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(0, 0, 0, 0.08);">
       <span style="font-size: 0.85rem; opacity: 0.85;">🚀 Created by <b>Mahdi Nawaz</b></span>
     </div>
     """, unsafe_allow_html=True)
@@ -992,100 +1141,54 @@ def tab_chat(lang, age, api_key, model):
     # Interactive Mystery Science Prompt Starter
     mysteries = MYSTERIES[lang]
     st.markdown(f"💡 **{t['mystery']}**")
-    m_cols = st.columns(len(mysteries))
-    for i, (q_text, label) in enumerate(mysteries):
-        if m_cols[i].button(label, key=f"myst_{i}", width="stretch"):
+    m_cols = st.columns(min(len(mysteries), 3))
+    for i, (q_text, label) in enumerate(mysteries[:3]):
+        if m_cols[i % len(m_cols)].button(label, key=f"myst_{i}", width="stretch"):
             st.session_state["pending"] = q_text
             st.rerun()
 
-    if not st.session_state["messages"]:
-        st.caption("Or try one of these questions:" if lang == "en" else "Ya in sawaalon mein se chunhein:")
-        cols = st.columns(len(C.EXAMPLES[lang]))
-        for i, ex in enumerate(C.EXAMPLES[lang]):
-            if cols[i].button(ex, key=f"ex{i}", width="stretch"):
-                st.session_state["pending"] = ex
+    # 🎤 Voice Question Input for Young Students (Nursery to 8th Class)
+    st.markdown("##### 🎙️ " + ("Voice Question (Can't write? Speak to Buddy!)" if lang == "en" else "Awaaz Se Poochhein (Likhna mushkil hai? Bol kar poochhein!)"))
+    render_whatsapp_voice_bar(lang)
+
+    v_c1, v_c2 = st.columns([1.2, 1])
+    with v_c1:
+        voice_rec = st.audio_input(
+            "🎤 " + ("Record voice question (auto-transcribed)" if lang == "en" else "Awaaz record karein (auto-transcribed)"),
+            key="voice_rec_input"
+        )
+        if voice_rec:
+            with st.spinner("🎧 Listening to your voice recording… 🎙️" if lang == "en" else "Awaaz sun raha hoon… 🎙️"):
+                spoken_text = transcribe_audio(voice_rec, lang)
+            if spoken_text:
+                st.success(f"🗣️ " + (f"Heard: \"{spoken_text}\"" if lang == "en" else f"Suna: \"{spoken_text}\""))
+                st.session_state["pending"] = spoken_text
+                st.rerun()
+            else:
+                st.info("💡 " + ("Voice recorded! Buddy is listening. Tap a quick question below or ask in chat:" if lang == "en" else "Awaaz record ho gayi!"))
+    with v_c2:
+        st.caption("⚡ " + ("Quick Spoken Questions (tap to ask):" if lang == "en" else "Bolne Wale Sawaal (tap karein):"))
+        spoken_prompts = [
+            ("⚡ What is force?", "What is force and motion?"),
+            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
+            ("🫀 How does the heart pump blood?", "What does the heart do in our body?"),
+            ("🍎 Why do things fall down?", "How does gravity pull things down?"),
+            ("🍕 What is 1/2 of a pizza?", "Explain fractions with pizza"),
+        ] if lang == "en" else [
+            ("⚡ Force kya hota hai?", "Explain force"),
+            ("🌌 Aasman neela kyun hai?", "Why is the sky blue?"),
+            ("🫀 Dil kaise dhadakta hai?", "Dil kya kaam karta hai?"),
+            ("🍎 Cheezein neeche kyun girti hain?", "Gravity kya hai?"),
+            ("🍕 Pizza ka 1/2 kya hota hai?", "Fractions samjhao"),
+        ]
+        sp_c1, sp_c2 = st.columns(2)
+        for s_i, (s_label, s_q) in enumerate(spoken_prompts):
+            target_col = sp_c1 if s_i % 2 == 0 else sp_c2
+            if target_col.button(s_label, key=f"sp_p_{s_i}", width="stretch"):
+                st.session_state["pending"] = s_q
                 st.rerun()
 
-    # 📸 Snap & Solve: Camera & Image Question Uploader
-    with st.expander("📸 " + ("Snap & Solve • Camera & Image Question Helper" if lang == "en" else "Snap & Solve • Sawaal Ki Photo Kheencho / Upload Karo"), expanded=False):
-        st.caption("Take a photo of your textbook question or upload an image to get instant step-by-step help!" if lang == "en" else
-                   "Apni textbook ke sawaal ki photo kheencho ya upload karo aur step-by-step solution pao!")
-        
-        snap_col1, snap_col2 = st.columns([1, 1])
-        with snap_col1:
-            cam_img = st.camera_input("📷 " + ("Take photo of question" if lang == "en" else "Sawaal ki photo lein"), key="snap_cam_input")
-        with snap_col2:
-            file_img = st.file_uploader("📁 " + ("Or upload image" if lang == "en" else "Ya image upload karein"), type=["png", "jpg", "jpeg", "webp"], key="snap_file_input")
-        
-        active_img = cam_img or file_img
-        if active_img:
-            st.image(active_img, caption="Question Photo Preview", width=320)
-            st.success("✅ Image ready!" if lang == "en" else "✅ Photo tayyar hai!")
-            
-        st.markdown("##### ⚡ " + ("Quick Question Presets (or type your question):" if lang == "en" else "Quick Sawaal Presets (ya apna sawaal likhein):"))
-        presets = [
-            ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
-            ("⭕ Area of circle with radius 7 cm", "What is the area and circumference of a circle with radius 7 cm?"),
-            ("⚖️ Solve linear equation 2x + 6 = 16", "Solve the linear equation 2x + 6 = 16 for x"),
-            ("🫘 How do kidney nephrons filter blood?", "How do kidney nephrons filter blood and make urine?"),
-            ("🍕 Convert fraction 3/8 to % and decimal", "Convert 3/8 into decimal and percentage"),
-            ("⚡ Time period of a 1m pendulum", "Calculate the time period of a 1m pendulum on Earth"),
-        ]
-        p_cols = st.columns(3)
-        for p_idx, (p_title, p_query) in enumerate(presets):
-            if p_cols[p_idx % 3].button(p_title, key=f"snap_preset_{p_idx}", width="stretch"):
-                st.session_state["snap_problem_text"] = p_query
-                st.rerun()
-                
-        user_prob = st.text_input(
-            "Question text",
-            value=st.session_state.get("snap_problem_text", ""),
-            placeholder="Type question or select a preset above..." if lang == "en" else "Sawaal likhein ya upar se preset chunein...",
-            key="snap_problem_input",
-            label_visibility="collapsed"
-        )
-        
-        solve_btn = st.button("🚀 " + ("Solve This Question" if lang == "en" else "Yeh Sawaal Hal Karein"), key="btn_do_snap_solve", type="primary")
-        if solve_btn:
-            q_to_solve = user_prob.strip() or ("Analyze and solve the school question in this photo" if active_img else "")
-            if not q_to_solve and not active_img:
-                st.warning("Please take a photo or select a question to solve!" if lang == "en" else "Kripya photo lein ya koi sawaal chunein!")
-            else:
-                if api_key and active_img:
-                    import anthropic
-                    client = anthropic.Anthropic(api_key=api_key)
-                    img_bytes = active_img.getvalue()
-                    b64_data = base64.b64encode(img_bytes).decode("utf-8")
-                    mime = getattr(active_img, "type", "image/jpeg") or "image/jpeg"
-                    sys_prompt = f"You are GyaanBuddy, a friendly tutor for school students up to Class 8 in India. Language: {'English' if lang == 'en' else 'Hinglish'}. Carefully read the question in the image and solve it step-by-step with simple explanations, formulas, and encouraging emojis."
-                    try:
-                        resp = client.messages.create(
-                            model=model or "claude-3-5-sonnet-20241022",
-                            max_tokens=600,
-                            system=sys_prompt,
-                            messages=[{
-                                "role": "user",
-                                "content": [
-                                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
-                                    {"type": "text", "text": q_to_solve or "Please solve this question step-by-step for a school student."}
-                                ]
-                            }]
-                        )
-                        sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
-                        st.session_state["messages"].append({"role": "user", "text": f"📸 [Photo Question]: {q_to_solve}"})
-                        st.session_state["messages"].append({"role": "assistant", "text": sol_text, "q": q_to_solve})
-                        add_xp(20, "Solved photo question!", badge_id="curious_spark")
-                        st.rerun()
-                    except Exception as e:
-                        st.info(f"AI Vision Helper falling back to offline tutor: {e}")
-                
-                if not q_to_solve:
-                    q_to_solve = "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"
-                r = tutor_engine.answer(q_to_solve, lang, age)
-                st.session_state["messages"].append({"role": "user", "text": f"📸 [Question]: {q_to_solve}"})
-                st.session_state["messages"].append({"role": "assistant", "text": r.text, "visual": r.visual, "q": q_to_solve})
-                add_xp(20, "Solved question!", badge_id="curious_spark")
-                st.rerun()
+    st.divider()
 
     for i, m in enumerate(st.session_state["messages"]):
         with st.chat_message(m["role"], avatar="🧒" if m["role"] == "user" else "🧠"):
@@ -1116,10 +1219,172 @@ def tab_chat(lang, age, api_key, model):
         st.rerun()
 
 
+# ----------------------------------------------------------------------------- snap & solve tab
+def tab_snap_solve(lang, age, api_key, model):
+    st.subheader(TXT[lang]["tabs"][1])
+    st.caption("📸 " + ("Take a photo of your notebook or textbook question, or choose a subject below for step-by-step guidance!"
+                        if lang == "en" else "Apni textbook ya copy ke sawaal ki photo kheencho ya subject chuno aur solution pao!"))
+
+    # Subject Section Filter ("this should be separate for all sections")
+    subjects = [
+        ("🌟 All Science & Math", "all"),
+        ("📐 Mathematics", "math"),
+        ("⚡ Physics", "physics"),
+        ("🧍 Human Body", "body"),
+        ("🧪 Chemistry", "chem"),
+    ] if lang == "en" else [
+        ("🌟 Sabhi Subjects", "all"),
+        ("📐 Ganit (Maths)", "math"),
+        ("⚡ Physics", "physics"),
+        ("🧍 Sharir (Biology)", "body"),
+        ("🧪 Chemistry", "chem"),
+    ]
+    s_cols = st.columns(len(subjects))
+    for s_idx, (s_label, s_key) in enumerate(subjects):
+        is_sel = (st.session_state.get("snap_subject", "all") == s_key)
+        if s_cols[s_idx].button(s_label, key=f"snap_subj_btn_{s_idx}", width="stretch", type="primary" if is_sel else "secondary"):
+            st.session_state["snap_subject"] = s_key
+            st.rerun()
+
+    active_subj = st.session_state.get("snap_subject", "all")
+
+    # Camera & Image Upload
+    snap_col1, snap_col2 = st.columns([1, 1])
+    with snap_col1:
+        cam_img = st.camera_input("📷 " + ("Take photo of question" if lang == "en" else "Sawaal ki photo lein"), key="snap_cam_input")
+    with snap_col2:
+        file_img = st.file_uploader("📁 " + ("Or upload question photo" if lang == "en" else "Ya image upload karein"), type=["png", "jpg", "jpeg", "webp"], key="snap_file_input")
+
+    active_img = cam_img or file_img
+    if active_img:
+        from PIL import Image
+        pil_img = Image.open(active_img)
+        rot = st.session_state.get("snap_rotation", 0)
+        if rot != 0:
+            pil_img = pil_img.rotate(rot, expand=True)
+
+        img_col1, img_col2 = st.columns([1.5, 1])
+        with img_col1:
+            st.image(pil_img, caption="Question Photo Preview", width=330)
+            st.success("✅ Image ready!" if lang == "en" else "✅ Photo tayyar hai!")
+        with img_col2:
+            st.markdown("##### ⚙️ " + ("Photo Tools" if lang == "en" else "Photo Tools"))
+            if st.button("🔄 " + ("Rotate 90°" if lang == "en" else "90° Ghumaayein"), key="btn_rot_snap"):
+                st.session_state["snap_rotation"] = (st.session_state.get("snap_rotation", 0) + 90) % 360
+                st.rerun()
+            if rot != 0 and st.button("↩️ " + ("Reset Rotation" if lang == "en" else "Reset Ghumaav"), key="btn_rot_reset"):
+                st.session_state["snap_rotation"] = 0
+                st.rerun()
+
+    # Subject-specific Presets
+    subject_presets = {
+        "physics": [
+            ("⚡ What is force & motion?", "What is force and Newton's law?"),
+            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
+            ("🍎 How does gravity work?", "How does gravity work and why do things fall?"),
+            ("💡 Ohm's Law (V = I × R)", "Explain Ohm's law with voltage, current and resistance"),
+            ("🕰️ Time period of a pendulum", "Calculate the time period of a pendulum"),
+        ],
+        "math": [
+            ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
+            ("⭕ Area of circle with radius 7 cm", "What is the area and circumference of a circle with radius 7 cm?"),
+            ("⚖️ Solve linear equation 2x + 6 = 16", "Solve the linear equation 2x + 6 = 16 for x"),
+            ("🍕 Convert fraction 3/8 to % and decimal", "Convert 3/8 into decimal and percentage"),
+            ("🥫 3D Cylinder surface area & volume", "Calculate surface area and volume of cylinder r=4 h=8"),
+        ],
+        "body": [
+            ("🫀 How does the heart pump blood?", "What does the heart do in the circulatory system?"),
+            ("🫁 How do lungs breathe oxygen?", "How do lungs take in oxygen and breathe out carbon dioxide?"),
+            ("🧠 What are the parts of the brain?", "What are the parts and functions of the brain?"),
+            ("🫘 How do kidneys filter blood?", "How do kidney nephrons filter blood and make urine?"),
+            ("🦴 How many bones in the body?", "How many bones are in the human skeleton?"),
+        ],
+        "chem": [
+            ("⚛️ Oxygen atom: protons & electrons", "What is an atom of oxygen?"),
+            ("💧 Water molecule (H2O) structure", "What is water H2O made of?"),
+            ("🍋 What is pH of lemon juice?", "What is the pH of lemon juice?"),
+            ("🌋 Baking soda & vinegar reaction", "Explain baking soda and vinegar fizz reaction"),
+            ("🧊 Ice, liquid water and steam states", "What are the three states of matter?"),
+        ],
+    }
+    if active_subj == "all":
+        cur_presets = [
+            ("⚡ What is force?", "What is force and Newton's law?"),
+            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
+            ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
+            ("⚖️ Solve linear equation 2x + 6 = 16", "Solve the linear equation 2x + 6 = 16 for x"),
+            ("🫀 How does the heart pump blood?", "What does the heart do in the circulatory system?"),
+            ("⚛️ Oxygen atom structure", "What is an atom of oxygen?"),
+        ]
+    else:
+        cur_presets = subject_presets.get(active_subj, [])
+
+    st.markdown("##### ⚡ " + ("Quick Question Presets (or type your question):" if lang == "en" else "Quick Sawaal Presets (ya apna sawaal likhein):"))
+    p_cols = st.columns(min(len(cur_presets), 3))
+    for p_idx, (p_title, p_query) in enumerate(cur_presets):
+        col_idx = p_idx % len(p_cols)
+        if p_cols[col_idx].button(p_title, key=f"snap_p_{active_subj}_{p_idx}", width="stretch"):
+            st.session_state["snap_problem_text"] = p_query
+            st.rerun()
+
+    user_prob = st.text_input(
+        "Question text",
+        value=st.session_state.get("snap_problem_text", ""),
+        placeholder="Type question or select a preset above..." if lang == "en" else "Sawaal likhein ya upar se preset chunein...",
+        key="snap_problem_input",
+        label_visibility="collapsed"
+    )
+
+    solve_btn = st.button("🚀 " + ("Solve This Question" if lang == "en" else "Yeh Sawaal Hal Karein"), key="btn_do_snap_solve", type="primary")
+    if solve_btn:
+        q_to_solve = user_prob.strip()
+        if not q_to_solve and not active_img:
+            st.warning("Please take a photo or select a question to solve!" if lang == "en" else "Kripya photo lein ya koi sawaal chunein!")
+        elif not q_to_solve and active_img and not api_key:
+            st.info("💡 Please type what question is in your photo or click a preset above, and GyaanBuddy will solve it with formulas and diagrams!" if lang == "en" else
+                    "💡 Kripya batayein photo mein kya sawaal hai ya upar se topic chunein!")
+        else:
+            if api_key and active_img:
+                import anthropic
+                client = anthropic.Anthropic(api_key=api_key)
+                img_bytes = active_img.getvalue()
+                b64_data = base64.b64encode(img_bytes).decode("utf-8")
+                mime = getattr(active_img, "type", "image/jpeg") or "image/jpeg"
+                sys_prompt = f"You are GyaanBuddy, a friendly tutor for school students up to Class 8 in India. Language: {'English' if lang == 'en' else 'Hinglish'}. Carefully read the question in the image and solve it step-by-step with simple explanations, formulas, and encouraging emojis."
+                try:
+                    resp = client.messages.create(
+                        model=model or "claude-3-5-sonnet-20241022",
+                        max_tokens=600,
+                        system=sys_prompt,
+                        messages=[{
+                            "role": "user",
+                            "content": [
+                                {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
+                                {"type": "text", "text": q_to_solve or "Please solve this question step-by-step for a school student."}
+                            ]
+                        }]
+                    )
+                    sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
+                    st.session_state["messages"].append({"role": "user", "text": f"📸 [Photo Question]: {q_to_solve or 'School Problem in Image'}"})
+                    st.session_state["messages"].append({"role": "assistant", "text": sol_text, "q": q_to_solve})
+                    add_xp(20, "Solved photo question!", badge_id="curious_spark")
+                    st.rerun()
+                except Exception as e:
+                    st.info(f"AI Vision Helper falling back to offline tutor: {e}")
+
+            if not q_to_solve:
+                q_to_solve = "What is force and Newton's law?"
+            r = tutor_engine.answer(q_to_solve, lang, age)
+            st.session_state["messages"].append({"role": "user", "text": f"📸 [Question]: {q_to_solve}"})
+            st.session_state["messages"].append({"role": "assistant", "text": r.text, "visual": r.visual, "q": q_to_solve})
+            add_xp(20, "Solved question!", badge_id="curious_spark")
+            st.rerun()
+
+
 # ----------------------------------------------------------------------------- body tab
 def tab_body(lang):
     t = TXT[lang]
-    st.subheader(t["tabs"][1])
+    st.subheader(t["tabs"][2])
 
     body_chips = [
         ("🧠 Brain", "brain"),
@@ -1134,6 +1399,26 @@ def tab_body(lang):
     render_subject_search("body", "Human Body Anatomy", "Heart, Lungs, Brain, Kidneys, Bones, Digestion...", body_chips, lang)
 
     parts = C.BODY_PARTS
+
+    # Body System Filters (per Bing anatomical diagram categories)
+    systems = [
+        ("🌟 " + ("All Organs" if lang == "en" else "Sabhi Organs"), None),
+        ("🫀 " + ("Circulatory" if lang == "en" else "Circulatory (Dil)"), "Circulatory system"),
+        ("🫁 " + ("Respiratory" if lang == "en" else "Respiratory (Fefde)"), "Respiratory system"),
+        ("🍕 " + ("Digestive" if lang == "en" else "Digestive (Pet/Jigar)"), "Digestive system"),
+        ("🧠 " + ("Nervous" if lang == "en" else "Nervous (Dimaag)"), "Nervous system"),
+        ("🦴 " + ("Skeletal" if lang == "en" else "Skeletal (Haddiyan)"), "Skeletal system"),
+        ("🫘 " + ("Urinary" if lang == "en" else "Urinary (Gurde)"), "Urinary system"),
+    ]
+    sys_cols = st.columns(len(systems))
+    for s_idx, (s_label, s_sys) in enumerate(systems):
+        if sys_cols[s_idx].button(s_label, key=f"body_sys_{s_idx}", width="stretch"):
+            if s_sys is not None:
+                for o_idx, bp in enumerate(parts):
+                    if bp.get("system") == s_sys:
+                        st.session_state["body_i"] = o_idx
+                        break
+            st.rerun()
 
     # Organ Mastered Progress Counter
     learned_count = len(st.session_state["learned_organs"])
@@ -1241,16 +1526,18 @@ def tab_body(lang):
 # ----------------------------------------------------------------------------- physics tab
 def tab_physics(lang):
     t = TXT[lang]
-    st.subheader(t["tabs"][2])
+    st.subheader(t["tabs"][3])
 
     physics_chips = [
         ("⚽ Projectile", "projectile"),
+        ("⚡ Force", "force"),
+        ("🌌 Blue Sky", "sky"),
+        ("🍎 Gravity", "gravity"),
         ("🕰️ Pendulum", "pendulum"),
         ("💡 Ohm's Law", "ohm"),
         ("🌈 Refraction", "refraction"),
-        ("🌌 Gravity", "gravity"),
     ]
-    render_subject_search("physics", "Physics Lab", "Projectile, Pendulum, Ohm's Law, Circuit, Refraction...", physics_chips, lang)
+    render_subject_search("physics", "Physics Lab", "Force, Sky, Gravity, Friction, Projectile, Pendulum, Circuit...", physics_chips, lang)
 
     key = st.radio("Experiment", list(C.PHYSICS), horizontal=True,
                    format_func=lambda k: C.PHYSICS[k]["title_" + lang])
@@ -1302,6 +1589,14 @@ def tab_physics(lang):
             st.plotly_chart(V.vi_fig(volts, ohms), width="stretch", key="vi")
         st.caption("Make R bigger and watch the bulb get dimmer!" if lang == "en" else
                    "R badhao aur dekho bulb dim hota jaata hai!")
+    elif key == "force":
+        show_svg(V.force_svg(lang), 480)
+    elif key == "sky":
+        show_svg(V.blue_sky_svg(lang), 480)
+    elif key == "gravity":
+        show_svg(V.gravity_svg(lang), 480)
+    elif key == "friction":
+        show_svg(V.friction_svg(lang), 480)
     else:
         c1, c2, c3 = st.columns(3)
         m1 = c1.selectbox("Top material", list(V.MEDIA), index=0)
@@ -1319,7 +1614,7 @@ def tab_physics(lang):
 # ----------------------------------------------------------------------------- chemistry tab
 def tab_chem(lang):
     t = TXT[lang]
-    st.subheader(t["tabs"][3])
+    st.subheader(t["tabs"][4])
 
     chem_chips = [
         ("⚛️ Atom", "atom"),
@@ -1397,7 +1692,7 @@ def tab_chem(lang):
 # ----------------------------------------------------------------------------- mathematics tab (Class 1 to 8)
 def tab_maths(lang):
     t = TXT[lang]
-    st.subheader(t["tabs"][4])
+    st.subheader(t["tabs"][5])
     st.caption("Interactive Visual Geometry, Pythagoras Theorem, Fraction Pizza, Algebra Balance Scale, and Speed Math Arena!" if lang == "en" else
                "Visual Geometry, Pythagoras Pramey, Fraction Pizza, Algebra Tarazu Scale aur Speed Math Challenge!")
 
@@ -1589,7 +1884,7 @@ def tab_maths(lang):
 # ----------------------------------------------------------------------------- quiz arena
 def tab_quiz(lang):
     t = TXT[lang]
-    st.subheader(t["tabs"][5])
+    st.subheader(t["tabs"][6])
     subjects = ["All"] + sorted({q["subject"] for q in C.QUIZ})
     subj = st.radio("Subject", subjects, horizontal=True)
     qs = [(i, q) for i, q in enumerate(C.QUIZ) if subj == "All" or q["subject"] == subj]
@@ -1624,7 +1919,7 @@ def tab_quiz(lang):
 
 # ----------------------------------------------------------------------------- parent & awards corner
 def tab_parent(lang):
-    st.subheader(TXT[lang]["tabs"][6])
+    st.subheader(TXT[lang]["tabs"][7])
     st.caption("🔒 Privacy: GyaanBuddy keeps only topic labels in this browser session. It does not store your child's "
                "words, name or any personal details, and nothing is saved when the page is closed.")
 
@@ -1669,18 +1964,18 @@ def tab_parent(lang):
 def main():
     init_state()
     lang, age, api_key, model = sidebar()
-    apply_theme(st.session_state.get("theme", "🌌 Cosmic Explorer"))
+    apply_theme(st.session_state.get("theme", "🌈 Wonder Academy (Nursery - Class 8)"))
 
-    # Top Hero Banner with Avatar, Level and XP Pill
+    # Top Hero Banner with Class Level & GyaanBuddy
+    class_lvl = st.session_state.get("class_level", "Class 3 - 5")
     xp = st.session_state["xp"]
     lvl_num, lvl_en, lvl_hi, _ = get_level(xp)
     lvl_title = lvl_hi if lang == "hi" else lvl_en
-    avatar = st.session_state["avatar"]
 
     st.markdown(f"""
     <div class="hero-banner">
       <div>
-        <div class="hero-title">{avatar} • GyaanBuddy</div>
+        <div class="hero-title">🧠 GyaanBuddy • <span style="font-size:1.1rem;background:rgba(255,255,255,0.22);padding:4px 12px;border-radius:12px;">🎓 {class_lvl}</span></div>
         <div class="hero-sub">{"Your friendly AI science & math buddy • Learn the fun way!" if lang == "en" else "Aapka friendly vigyan aur ganit saathi • Seekho mazedaar tareeke se!"}</div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
@@ -1697,16 +1992,18 @@ def main():
     with tabs[0]:
         tab_chat(lang, age, api_key, model)
     with tabs[1]:
-        tab_body(lang)
+        tab_snap_solve(lang, age, api_key, model)
     with tabs[2]:
-        tab_physics(lang)
+        tab_body(lang)
     with tabs[3]:
-        tab_chem(lang)
+        tab_physics(lang)
     with tabs[4]:
-        tab_maths(lang)
+        tab_chem(lang)
     with tabs[5]:
-        tab_quiz(lang)
+        tab_maths(lang)
     with tabs[6]:
+        tab_quiz(lang)
+    with tabs[7]:
         tab_parent(lang)
 
     # Footer with Creator Credit

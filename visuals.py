@@ -279,13 +279,13 @@ def _body_outline() -> str:
                C240 365 238 345 232 320 
                C226 290 228 265 234 230 
                C240 195 238 155 222 134 Z" 
-            fill="url(#body-skin)" opacity="0.35" stroke="#94a3b8" stroke-width="2"/>
+            fill="url(#body-skin)" opacity="0.60" stroke="#64748b" stroke-width="2"/>
       <!-- Anatomical Arms (translucent medical contour) -->
-      <path d="M124 140 C110 170 102 220 98 270 C94 310 90 350 86 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.35"/>
-      <path d="M236 140 C250 170 258 220 262 270 C266 310 270 350 274 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.35"/>
+      <path d="M124 140 C110 170 102 220 98 270 C94 310 90 350 86 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.5"/>
+      <path d="M236 140 C250 170 258 220 262 270 C266 310 270 350 274 385" stroke="#94a3b8" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.5"/>
       <!-- Anatomical Legs (translucent medical contour) -->
-      <path d="M144 375 C140 420 138 475 136 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.3"/>
-      <path d="M216 375 C220 420 222 475 224 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.3"/>
+      <path d="M144 375 C140 420 138 475 136 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.45"/>
+      <path d="M216 375 C220 420 222 475 224 530" stroke="#94a3b8" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.45"/>
     </g>"""
 
 
@@ -296,7 +296,7 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
     systems = {b["key"]: b["system"] for b in C.BODY_PARTS}
 
     # Cardiovascular Great Vessels (Abdominal Aorta & Inferior Vena Cava) context
-    vessels_op = "0.85" if highlight is None or highlight in ("heart", "kidneys") else "0.15"
+    vessels_op = "0.85" if highlight is None or highlight in ("heart", "kidneys") else "0.45"
     vessels = f"""
     <!-- Cardiovascular Great Vessels (Aorta & Inferior Vena Cava) -->
     <g id="body-vessels" opacity="{vessels_op}">
@@ -307,7 +307,7 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
     </g>"""
 
     # Trachea (Cartilaginous airway down to lungs)
-    trachea_op = "0.8" if highlight is None or highlight == "lungs" else "0.15"
+    trachea_op = "0.8" if highlight is None or highlight == "lungs" else "0.45"
     trachea = f"""
     <!-- Trachea (Airway with cartilage rings) -->
     <g id="body-trachea" opacity="{trachea_op}">
@@ -328,7 +328,7 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
         elif key == highlight:
             op, extra = 1.0, ' filter="url(#glow)"'
         else:
-            op, extra = 0.12, ""
+            op, extra = 0.45, ""
         parts.append(f'<g opacity="{op}"{extra}>{o["svg"]}</g>')
 
     labels = []
@@ -1550,6 +1550,302 @@ def algebra_balance_svg(a: int = 2, b: int = 5, c: int = 15, lang: str = "en") -
 </svg>"""
 
 
+def force_svg(lang: str = "en") -> str:
+    """Clear, kid-friendly vector diagram of Force & Motion (F = m * a)."""
+    is_hi = (lang == "hi")
+    title = "FORCE &amp; MOTION • PUSH OR PULL" if not is_hi else "FORCE AUR GATI • DHAKKA YA KHEENCHNA"
+    sub = "Sir Isaac Newton's 2nd Law of Motion" if not is_hi else "Sir Isaac Newton Ka Dusra Niyam"
+    push_lbl = "Push Force F = 20 N" if not is_hi else "Dhakka (Push) F = 20 N"
+    acc_lbl = "Acceleration a = 4 m/s²" if not is_hi else "Gati Badhna a = 4 m/s²"
+    fric_lbl = "Friction f = 5 N (resists motion)" if not is_hi else "Gharshan f = 5 N (rokne wali force)"
+    weight_lbl = "Weight W = mg" if not is_hi else "Vajan W = mg"
+    normal_lbl = "Normal Support N" if not is_hi else "Support Force N"
+    summary_1 = "Force can start, stop, speed up, or change the direction of an object." if not is_hi else "Force kisi cheez ko chala sakti hai, rok sakti hai ya disha badal sakti hai."
+    summary_2 = "Unit: Newton (N) • 1 Newton = 1 kg × 1 m/s²" if not is_hi else "Unit: Newton (N) • 1 Newton = 1 kg × 1 m/s²"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="force-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="box-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="push-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f97316"/><stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <marker id="arrow-push" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrow-acc" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrow-fric" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#8b5cf6"/>
+    </marker>
+    <marker id="arrow-vert" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <rect width="480" height="340" rx="16" fill="url(#force-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="480" height="46" rx="16" fill="#0f172a"/>
+  <rect x="0" y="28" width="480" height="18" fill="#0f172a"/>
+  <text x="240" y="23" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="13" font-weight="800" fill="#38bdf8" letter-spacing="0.5">{title}</text>
+  <text x="240" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#94a3b8">{sub}</text>
+
+  <!-- Ground surface -->
+  <line x1="40" y1="195" x2="440" y2="195" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+  <path d="M60 195 L50 205 M100 195 L90 205 M140 195 L130 205 M180 195 L170 205 M220 195 L210 205 M260 195 L250 205 M300 195 L290 205 M340 195 L330 205 M380 195 L370 205 M420 195 L410 205" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Block (Mass m = 5 kg) -->
+  <rect x="180" y="110" width="85" height="85" rx="8" fill="url(#box-grad)" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="222" y="147" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="14" font-weight="800" fill="#ffffff">MASS</text>
+  <text x="222" y="167" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="12" font-weight="700" fill="#e0f2fe">m = 5 kg</text>
+
+  <!-- Applied Push Force Arrow (Right) -->
+  <line x1="85" y1="152" x2="175" y2="152" stroke="url(#push-grad)" stroke-width="6" marker-end="url(#arrow-push)"/>
+  <rect x="70" y="120" width="100" height="22" rx="4" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+  <text x="120" y="135" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="10" font-weight="700" fill="#b91c1c">{push_lbl}</text>
+
+  <!-- Acceleration Vector (Above block) -->
+  <line x1="222" y1="84" x2="310" y2="84" stroke="#0284c7" stroke-width="4.5" marker-end="url(#arrow-acc)"/>
+  <text x="266" y="74" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="11" font-weight="700" fill="#0284c7">{acc_lbl}</text>
+
+  <!-- Friction Arrow (Left opposition) -->
+  <line x1="222" y1="200" x2="160" y2="200" stroke="#8b5cf6" stroke-width="4" marker-end="url(#arrow-fric)"/>
+  <text x="155" y="217" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#7c3aed">{fric_lbl}</text>
+
+  <!-- Normal Force (Up) & Gravity Weight (Down) -->
+  <line x1="222" y1="110" x2="222" y2="60" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrow-vert)"/>
+  <text x="232" y="67" font-family="Arial, sans-serif" font-size="9" font-weight="700" fill="#047857">{normal_lbl}</text>
+
+  <!-- Bottom Explanatory Card -->
+  <g transform="translate(18, 235)">
+    <rect width="444" height="92" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+    <rect x="12" y="12" width="135" height="30" rx="6" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="79" y="32" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="14" font-weight="800" fill="#1d4ed8">F = m × a</text>
+    <text x="160" y="24" font-family="'Trebuchet MS', Arial, sans-serif" font-size="11" font-weight="700" fill="#0f172a">{summary_1}</text>
+    <text x="160" y="42" font-family="Arial, sans-serif" font-size="10.5" fill="#475569">{summary_2}</text>
+    <line x1="16" y1="56" x2="428" y2="56" stroke="#f1f5f9" stroke-width="1"/>
+    <text x="16" y="74" font-family="Arial, sans-serif" font-size="10" fill="#64748b">⚽ Kick a ball (push) • 🧲 Magnet pulls iron • 🚗 Car brakes use friction to stop</text>
+  </g>
+</svg>"""
+
+
+def blue_sky_svg(lang: str = "en") -> str:
+    """Vibrant, educational SVG explaining Rayleigh Scattering (Why the sky is blue)."""
+    is_hi = (lang == "hi")
+    title = "WHY IS THE SKY BLUE? • RAYLEIGH SCATTERING" if not is_hi else "AASMAN NEELA KYUN HAI? • RAYLEIGH SCATTERING"
+    sub = "Sunlight + Earth's Atmosphere = Blue Sky!" if not is_hi else "Suraj Ki Roshni + Atmosphere = Neela Aasman!"
+    sun_lbl = "White Sunlight (All Colors)" if not is_hi else "Suraj Ki Roshni (7 Rang)"
+    red_lbl = "Red &amp; Yellow waves pass straight through (longer waves)" if not is_hi else "Laal aur peele waves seedhe nikal jaate hain"
+    blue_lbl = "Blue waves hit air molecules and scatter everywhere!" if not is_hi else "Blue waves hawa ke kanon se takra kar phailti hain!"
+    obs_lbl = "Looking up: We see scattered blue light!" if not is_hi else "Upar dekhne par: Neeli roshni dikhti hai!"
+    law_lbl = "Rayleigh's Law: Scattering ∝ 1 / λ⁴ (Blue scatters 10× more than Red)" if not is_hi else "Rayleigh Niyam: Scattering ∝ 1 / λ⁴ (Neela rang 10 guna zyada phailta hai)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="sky-card-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/><stop offset="60%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="sun-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fde047"/><stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <marker id="arrow-blue" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="480" height="340" rx="16" fill="url(#sky-card-bg)" stroke="#0284c7" stroke-width="1.5"/>
+
+  <!-- Top Dark Header Bar -->
+  <rect x="0" y="0" width="480" height="46" rx="16" fill="#0c4a6e"/>
+  <rect x="0" y="28" width="480" height="18" fill="#0c4a6e"/>
+  <text x="240" y="23" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="13" font-weight="800" fill="#38bdf8" letter-spacing="0.5">{title}</text>
+  <text x="240" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#e0f2fe">{sub}</text>
+
+  <!-- Radiant Sun on Upper Left -->
+  <g transform="translate(60, 95)">
+    <circle cx="0" cy="0" r="28" fill="url(#sun-grad)"/>
+    <circle cx="0" cy="0" r="34" fill="none" stroke="#fef08a" stroke-width="2" stroke-dasharray="4 3" opacity="0.8"/>
+    <!-- Sunbeams -->
+    <line x1="-38" y1="0" x2="-46" y2="0" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="38" y1="0" x2="46" y2="0" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="0" y1="-38" x2="0" y2="-46" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="0" y1="38" x2="0" y2="46" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="26" y1="26" x2="34" y2="34" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="-26" y1="-26" x2="-34" y2="-34" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="0" y="4" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="11" font-weight="800" fill="#78350f">SUN</text>
+  </g>
+  <text x="60" y="145" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="9.5" font-weight="700" fill="#082f49">{sun_lbl}</text>
+
+  <!-- Atmosphere Zone -->
+  <rect x="155" y="60" width="220" height="155" rx="14" fill="#ffffff" fill-opacity="0.35" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <text x="265" y="78" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="10" font-weight="800" fill="#0369a1">EARTH'S ATMOSPHERE (Air: N₂ &amp; O₂)</text>
+
+  <!-- Air Molecules (Particles) -->
+  <g transform="translate(190, 110)">
+    <circle cx="0" cy="0" r="9" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+    <text x="0" y="3" text-anchor="middle" font-size="7" font-weight="800" fill="#fff">N₂</text>
+    <line x1="-4" y1="-7" x2="-22" y2="-22" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="6" y1="-6" x2="24" y2="-20" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="7" y1="5" x2="22" y2="22" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="-6" y1="5" x2="-20" y2="20" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <g transform="translate(290, 125)">
+    <circle cx="0" cy="0" r="9" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+    <text x="0" y="3" text-anchor="middle" font-size="7" font-weight="800" fill="#fff">O₂</text>
+    <line x1="0" y1="-7" x2="0" y2="-26" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="7" y1="0" x2="26" y2="0" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="-7" y1="0" x2="-26" y2="0" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+    <line x1="0" y1="7" x2="0" y2="26" stroke="#0284c7" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <g transform="translate(240, 165)">
+    <circle cx="0" cy="0" r="8" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+    <text x="0" y="3" text-anchor="middle" font-size="6.5" font-weight="800" fill="#fff">N₂</text>
+    <line x1="5" y1="-5" x2="18" y2="-18" stroke="#0284c7" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+    <line x1="-5" y1="5" x2="-18" y2="18" stroke="#0284c7" stroke-width="1.8" marker-end="url(#arrow-blue)"/>
+  </g>
+
+  <!-- Incoming Sunlight Rays -->
+  <line x1="95" y1="105" x2="180" y2="110" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <line x1="95" y1="112" x2="175" y2="112" stroke="#facc15" stroke-width="2.5"/>
+
+  <!-- Long wavelengths (Red / Orange passing straight) -->
+  <path d="M100 120 Q180 125 410 135" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round" marker-end="url(#arrow-red)"/>
+  <path d="M100 128 Q180 135 410 148" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrow-red)"/>
+  <text x="420" y="142" font-family="'Trebuchet MS', Arial, sans-serif" font-size="9" font-weight="700" fill="#b91c1c">Red light passes through</text>
+
+  <!-- Earth Ground with Student Observer -->
+  <path d="M0 220 Q240 205 480 220 L480 340 L0 340 Z" fill="#15803d"/>
+  <g transform="translate(420, 212)">
+    <circle cx="0" cy="-24" r="7" fill="#fde68a" stroke="#b45309" stroke-width="1"/>
+    <line x1="0" y1="-17" x2="0" y2="-2" stroke="#1d4ed8" stroke-width="3"/>
+    <line x1="0" y1="-2" x2="-5" y2="12" stroke="#0f172a" stroke-width="2.5"/>
+    <line x1="0" y1="-2" x2="5" y2="12" stroke="#0f172a" stroke-width="2.5"/>
+    <line x1="-3" y1="-26" x2="-18" y2="-42" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="2 2"/>
+  </g>
+  <text x="415" y="195" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="8.5" font-weight="700" fill="#ffffff">👦 Kid looking up</text>
+
+  <!-- Informational Callout Box -->
+  <g transform="translate(18, 235)">
+    <rect width="444" height="92" rx="10" fill="#ffffff" stroke="#bae6fd" stroke-width="1.5"/>
+    <text x="16" y="22" font-family="'Trebuchet MS', Arial, sans-serif" font-size="11.5" font-weight="800" fill="#0369a1">{blue_lbl}</text>
+    <text x="16" y="40" font-family="Arial, sans-serif" font-size="10" fill="#334155">{red_lbl}</text>
+    <text x="16" y="58" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#0284c7">{obs_lbl}</text>
+    <rect x="16" y="66" width="412" height="20" rx="4" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+    <text x="222" y="80" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="9" font-weight="700" fill="#0369a1">{law_lbl}</text>
+  </g>
+</svg>"""
+
+
+def gravity_svg(lang: str = "en") -> str:
+    """Clear, attractive SVG demonstrating Earth's gravitational pull (w = m * g)."""
+    is_hi = (lang == "hi")
+    title = "GRAVITY • WHY THINGS FALL DOWN" if not is_hi else "GRAVITY • CHEEZEIN NEECHE KYUN GIRTI HAIN"
+    formula = "Weight W = m × g  (g ≈ 9.8 m/s² on Earth)" if not is_hi else "Bhaar W = m × g  (g ≈ 9.8 m/s² Dharti Par)"
+    desc = "Earth's mass creates an invisible pulling force toward its center." if not is_hi else "Dharti ka wazan har cheez ko apne center ki taraf kheenchta hai."
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="grav-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="earth-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/><stop offset="50%" stop-color="#10b981"/><stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <marker id="arrow-down" markerWidth="6" markerHeight="6" refX="3" refY="5" orient="auto">
+      <path d="M0,0 L3,6 L6,0 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <rect width="480" height="340" rx="16" fill="url(#grav-bg)" stroke="#334155" stroke-width="1.5"/>
+  <text x="240" y="32" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="14" font-weight="800" fill="#38bdf8">{title}</text>
+  <text x="240" y="50" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" fill="#94a3b8">{desc}</text>
+
+  <!-- Falling Ball -->
+  <g transform="translate(240, 95)">
+    <circle cx="0" cy="0" r="18" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+    <text x="0" y="5" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="11" font-weight="800" fill="#fff">m = 1 kg</text>
+  </g>
+
+  <!-- Gravity vector arrows -->
+  <line x1="240" y1="120" x2="240" y2="180" stroke="#ef4444" stroke-width="5" marker-end="url(#arrow-down)"/>
+  <rect x="255" y="135" width="130" height="26" rx="6" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+  <text x="320" y="152" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="11" font-weight="700" fill="#b91c1c">Pull: g = 9.8 m/s² ⬇</text>
+
+  <!-- Curved Earth Horizon -->
+  <path d="M-20 220 Q240 180 500 220 L500 340 L-20 340 Z" fill="url(#earth-grad)"/>
+  <text x="240" y="245" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="16" font-weight="900" fill="#ffffff" letter-spacing="2">PLANET EARTH</text>
+
+  <!-- Formula banner -->
+  <g transform="translate(40, 275)">
+    <rect width="400" height="45" rx="10" fill="#ffffff" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="200" y="28" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="13" font-weight="800" fill="#0369a1">{formula}</text>
+  </g>
+</svg>"""
+
+
+def friction_svg(lang: str = "en") -> str:
+    """Clear, educational SVG showing surface friction and interlocking asperities."""
+    is_hi = (lang == "hi")
+    title = "FRICTION • SURFACE GRIP &amp; HEAT" if not is_hi else "FRICTION • GHARSHAN AUR GARMI"
+    desc = "Microscopic roughness between surfaces resists sliding motion" if not is_hi else "Do satah ke beech chhote khurdure kan gati ko rokte hain"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 340" width="480" height="340">
+  <defs>
+    <linearGradient id="fric-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <marker id="fric-push" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="fric-opp" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <rect width="480" height="340" rx="16" fill="url(#fric-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="240" y="28" text-anchor="middle" font-family="'Trebuchet MS', Arial, sans-serif" font-size="14" font-weight="800" fill="#0f172a">{title}</text>
+  <text x="240" y="44" text-anchor="middle" font-family="Arial, sans-serif" font-size="10.5" fill="#64748b">{desc}</text>
+
+  <!-- Top Block moving Right -->
+  <rect x="160" y="75" width="160" height="60" rx="6" fill="#3b82f6" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="240" y="110" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="13" font-weight="700" fill="#ffffff">Moving Block</text>
+
+  <line x1="330" y1="105" x2="410" y2="105" stroke="#2563eb" stroke-width="5" marker-end="url(#fric-push)"/>
+  <text x="370" y="95" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="11" font-weight="700" fill="#2563eb">Motion ➔</text>
+
+  <line x1="150" y1="145" x2="80" y2="145" stroke="#ef4444" stroke-width="5" marker-end="url(#fric-opp)"/>
+  <text x="115" y="135" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="11" font-weight="700" fill="#ef4444">Friction ⬅</text>
+
+  <!-- Microscopic Interlocking Teeth -->
+  <path d="M120 135 L130 142 L140 135 L150 142 L160 135 L170 142 L180 135 L190 142 L200 135 L210 142 L220 135 L230 142 L240 135 L250 142 L260 135 L270 142 L280 135 L290 142 L300 135 L310 142 L320 135 L330 142 L340 135 L350 142 L360 135" stroke="#e11d48" stroke-width="2.5" fill="none"/>
+  <text x="240" y="160" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#be123c">Microscopic roughness grips and opposes sliding</text>
+
+  <!-- Bottom Floor Surface -->
+  <rect x="80" y="170" width="320" height="50" rx="4" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>
+  <text x="240" y="200" text-anchor="middle" font-family="'Trebuchet MS', sans-serif" font-size="13" font-weight="700" fill="#ffffff">Floor Surface</text>
+
+  <!-- Explanatory card -->
+  <g transform="translate(30, 240)">
+    <rect width="420" height="80" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+    <text x="16" y="24" font-family="'Trebuchet MS', sans-serif" font-size="12" font-weight="800" fill="#0f172a">Formula: Friction f = μ × N</text>
+    <text x="16" y="44" font-family="Arial, sans-serif" font-size="10.5" fill="#475569">💡 Walking: Friction prevents shoes from slipping.</text>
+    <text x="16" y="62" font-family="Arial, sans-serif" font-size="10.5" fill="#475569">🔥 Heat: Rubbing hands creates warmth because friction turns motion into thermal energy!</text>
+  </g>
+</svg>"""
+
+
 # ============================================================================= DISPATCH (used by the chat)
 def render_spec(spec: str, lang: str = "en"):
     """Turn a visual spec string into ("svg", str) or ("plotly", Figure). Returns None if unknown."""
@@ -1562,6 +1858,14 @@ def render_spec(spec: str, lang: str = "en"):
         if parts[0] == "physics":
             if parts[1] == "ohm":
                 return "svg", circuit_svg(6, 3)
+            if parts[1] == "force":
+                return "svg", force_svg(lang)
+            if parts[1] == "sky":
+                return "svg", blue_sky_svg(lang)
+            if parts[1] == "gravity":
+                return "svg", gravity_svg(lang)
+            if parts[1] == "friction":
+                return "svg", friction_svg(lang)
             return "plotly", {"projectile": projectile_fig, "pendulum": pendulum_fig,
                               "refraction": refraction_fig}[parts[1]]()
         if parts[0] == "chem":

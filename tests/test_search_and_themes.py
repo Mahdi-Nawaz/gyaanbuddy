@@ -10,6 +10,7 @@ import visuals as V
 
 def test_theme_definitions_and_css():
     expected_themes = [
+        "🌈 Wonder Academy (Nursery - Class 8)",
         "🌌 Cosmic Explorer",
         "☀️ Sunny Playground",
         "🌿 Emerald Bio-Lab",
@@ -65,11 +66,11 @@ def test_apptest_with_search_and_theme():
     # Check that language radio is still at index 0
     assert at.sidebar.radio[0].label == "Language / Bhasha"
     
-    # Check theme selector exists in sidebar
-    theme_select = [sb for sb in at.sidebar.selectbox if "Theme" in sb.label]
-    assert len(theme_select) == 1
+    # Check class filter exists in sidebar
+    class_filter = [sl for sl in at.sidebar.select_slider if "Class" in sl.label]
+    assert len(class_filter) == 1
     
-    # Change theme
-    theme_select[0].set_value("☀️ Sunny Playground").run()
+    # Change class
+    class_filter[0].set_value("Class 6 - 8").run()
     assert not at.exception
-    assert at.session_state["theme"] == "☀️ Sunny Playground"
+    assert at.session_state["class_level"] == "Class 6 - 8"
