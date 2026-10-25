@@ -203,33 +203,56 @@ def apply_theme(theme_name: str):
 
     /* Clean Streamlit Header - KEEP sidebar toggle button 100% visible on mobile and desktop */
     header[data-testid="stHeader"] {{
-        background: transparent !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
         visibility: visible !important;
-        height: auto !important;
+        height: 3.5rem !important;
+        display: flex !important;
+        align-items: center !important;
         z-index: 999990 !important;
+        border-bottom: 1px solid rgba(203, 213, 225, 0.5) !important;
     }}
-    [data-testid="stSidebarCollapsedControl"] {{
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"],
+    header button[aria-label*="sidebar" i] {{
         visibility: visible !important;
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         background: #ffffff !important;
         border: 2px solid #6366f1 !important;
         border-radius: 12px !important;
-        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
-        margin: 6px 0 0 8px !important;
-        z-index: 999999 !important;
+        box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+        margin: 4px 0 0 10px !important;
+        z-index: 9999999 !important;
         color: #4f46e5 !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        cursor: pointer !important;
     }}
-    [data-testid="stSidebarCollapsedControl"] button {{
+    [data-testid="stSidebarCollapsedControl"] button,
+    [data-testid="collapsedControl"] button,
+    header button[aria-label*="sidebar" i] {{
         color: #4f46e5 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
+        border: none !important;
     }}
-    [data-testid="stSidebarCollapsedControl"] svg {{
+    [data-testid="stSidebarCollapsedControl"] svg,
+    [data-testid="collapsedControl"] svg,
+    header button[aria-label*="sidebar" i] svg {{
         fill: #4f46e5 !important;
         stroke: #4f46e5 !important;
+        width: 24px !important;
+        height: 24px !important;
     }}
     .stDeployButton {{display: none !important;}}
     #MainMenu {{visibility: hidden !important; display: none !important;}}
     footer {{visibility: hidden !important; display: none !important;}}
-    div[data-testid="stToolbar"] {{visibility: hidden !important;}}
 
     .hero-banner {{
         background: {t['hero_bg']} !important;
@@ -547,7 +570,13 @@ def apply_theme(theme_name: str):
         .block-container {{
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
-            padding-top: 0.75rem !important;
+            padding-top: 3.8rem !important;
+        }}
+        [data-testid="stSidebar"] {{
+            max-width: 86vw !important;
+            width: 320px !important;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6) !important;
+            z-index: 99999999 !important;
         }}
         .hero-banner {{
             padding: 16px 18px !important;
@@ -705,10 +734,90 @@ def apply_theme(theme_name: str):
             } catch(e) {}
         }
         setInterval(injectCameraFlipBtn, 1200);
+
+        // 4. Guaranteed Phone Sidebar Toggle & Mobile Floating Menu Pill
+        function toggleSidebar() {
+            try {
+                const win = window.parent || window;
+                const doc = win.document;
+                const collBtn = doc.querySelector('[data-testid="stSidebarCollapsedControl"] button')
+                             || doc.querySelector('[data-testid="collapsedControl"] button')
+                             || doc.querySelector('header button[aria-label*="sidebar" i]')
+                             || doc.querySelector('header button');
+                const sidebar = doc.querySelector('[data-testid="stSidebar"]') || doc.querySelector('section[data-testid="stSidebar"]');
+                
+                if (sidebar) {
+                    const isOpen = sidebar.getAttribute('aria-expanded') === 'true'
+                                || (sidebar.offsetWidth > 50 && sidebar.style.display !== 'none' && !sidebar.style.marginLeft.includes('-'));
+                    if (isOpen) {
+                        const closeBtn = sidebar.querySelector('button[aria-label*="close" i]') 
+                                      || sidebar.querySelector('[data-testid="stSidebarCollapseButton"] button')
+                                      || sidebar.querySelector('button');
+                        if (closeBtn) {
+                            closeBtn.click();
+                            return;
+                        } else {
+                            sidebar.setAttribute('aria-expanded', 'false');
+                            sidebar.style.display = 'none';
+                            return;
+                        }
+                    }
+                }
+                
+                if (collBtn) {
+                    collBtn.click();
+                } else if (sidebar) {
+                    sidebar.setAttribute('aria-expanded', 'true');
+                    sidebar.style.display = 'block';
+                    sidebar.style.visibility = 'visible';
+                    sidebar.style.transform = 'none';
+                    sidebar.style.position = 'fixed';
+                    sidebar.style.top = '0';
+                    sidebar.style.left = '0';
+                    sidebar.style.height = '100vh';
+                    sidebar.style.width = '320px';
+                    sidebar.style.maxWidth = '86vw';
+                    sidebar.style.zIndex = '99999999';
+                    sidebar.style.boxShadow = '0 0 40px rgba(0,0,0,0.6)';
+                }
+            } catch(e) {}
+        }
+        window.__gb_toggle_sidebar = toggleSidebar;
+        if (window.parent && window.parent !== window) {
+            window.parent.__gb_toggle_sidebar = toggleSidebar;
+        }
+
+        function injectMobileMenuPill() {
+            try {
+                const win = window.parent || window;
+                const doc = win.document;
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(win.navigator.userAgent) || (win.innerWidth <= 768);
+                if (isMobile) {
+                    if (!doc.getElementById('gb-mobile-sidebar-pill')) {
+                        const pill = doc.createElement('button');
+                        pill.id = 'gb-mobile-sidebar-pill';
+                        pill.type = 'button';
+                        pill.innerHTML = '☰ Menu';
+                        pill.style.cssText = 'position:fixed;top:8px;left:8px;z-index:99999999;background:#ffffff;color:#4338ca;font-family:Outfit,sans-serif;font-weight:800;font-size:0.85rem;padding:7px 14px;border:2px solid #6366f1;border-radius:20px;box-shadow:0 4px 16px rgba(99,102,241,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;outline:none;-webkit-tap-highlight-color:transparent;';
+                        pill.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleSidebar();
+                        };
+                        doc.body.appendChild(pill);
+                    }
+                }
+            } catch(e) {}
+        }
+        setInterval(injectMobileMenuPill, 1000);
     })();
     </script>
     """
     st.markdown(js_camera, unsafe_allow_html=True)
+    try:
+        st.components.v1.html(js_camera, height=0)
+    except Exception:
+        pass
 
 
 TXT = {
@@ -1600,71 +1709,9 @@ def sidebar():
 
             st.divider()
             st.markdown(f"**👤 Student:** `{prof.get('student_name', s_name)}`")
-            st.markdown(f"**Level:** `{prof.get('assessed_level')}`")
-            st.markdown(f"**Total Chats Logged:** `{prof.get('total_chats', len(st.session_state.get('messages', [])))}`")
-            mastered = prof.get("topics_mastered", [])
-            if mastered:
-                st.markdown(f"🌟 **Mastered:** {', '.join(mastered[-3:])}")
-            practicing = prof.get("topics_practicing", [])
-            if practicing:
-                st.markdown(f"📈 **Practicing:** {', '.join(practicing[-3:])}")
-
-            ds_bytes = student_memory.get_training_dataset_bytes()
-            if not ds_bytes:
-                init_sample = {
-                    "messages": [
-                        {"role": "system", "content": f"You are GyaanBuddy, an AI tutor for school students in India. Target: Class {chosen_class}."},
-                        {"role": "user", "content": f"Hello Buddy! I am ready to study Class {chosen_class} science and math."},
-                        {"role": "assistant", "content": f"Welcome, {prof.get('student_name', s_name)}! I am your AI learning buddy."}
-                    ]
-                }
-                ds_bytes = (json.dumps(init_sample, ensure_ascii=False) + "\n").encode("utf-8")
-
-            # Universal download for Phone, Laptop, and Tablet (.jsonl)
-            st.caption("📥 **Export & Sync:** 📱 Phone • 📟 Tab • 💻 Laptop")
-            st.download_button(
-                "📥 " + ("Download Dataset (.jsonl)" if lang == "en" else "Dataset Download Karein (.jsonl)"),
-                data=ds_bytes,
-                file_name=f"gyaanbuddy_dataset_class_{chosen_class}.jsonl",
-                mime="application/octet-stream",
-                use_container_width=True,
-                key="btn_dl_train_ds",
-                help="Universal format for fine-tuning AI models. Downloads smoothly on iOS Safari, Android, and Desktop!"
-            )
-
-            # Mobile/Tablet Instant View & Copy Expander
-            with st.expander("👁️ " + ("Preview / Copy Dataset" if lang == "en" else "Dataset Dekhein / Copy Karein")):
-                st.caption("Tap copy to use training data without needing a .jsonl app on mobile:")
-                st.code(ds_bytes.decode("utf-8", errors="ignore")[:2500], language="json")
-
-            # Universal download for Phone, Tablet, and Laptop (.txt readable notes)
-            report_lines = [
-                f"🧠 GYAANBUDDY STUDENT LEARNING NOTES",
-                f"====================================",
-                f"Student: {prof.get('student_name', s_name)}",
-                f"Grade Level: Class {chosen_class}",
-                f"Total Chats: {prof.get('total_chats', len(st.session_state.get('messages', [])))}",
-                f"Assessed Level: {prof.get('assessed_level', 'Rising Explorer')}",
-                f"Mastered Topics: {', '.join(prof.get('topics_mastered', ['General Science', 'Mathematics']))}",
-                f"Generated on: {datetime.now().strftime('%d %B %Y, %I:%M %p')}",
-                f"",
-                f"--- RECENT STUDY CHATS ---",
-            ]
-            for m in st.session_state.get("messages", [])[-15:]:
-                role = "Student" if m.get("role") == "user" else "GyaanBuddy"
-                report_lines.append(f"[{role}]: {m.get('text', '')}")
-                report_lines.append("")
-            report_txt = "\n".join(report_lines).encode("utf-8")
-
-            st.download_button(
-                "📄 " + ("Download Study Notes (.txt)" if lang == "en" else "Study Notes Download Karein (.txt)"),
-                data=report_txt,
-                file_name=f"gyaanbuddy_notes_class_{chosen_class}.txt",
-                mime="text/plain; charset=utf-8",
-                use_container_width=True,
-                key="btn_dl_student_notes",
-                help="Universal text notes: opens smoothly on every iPhone, iPad, Android phone, and laptop!"
-            )
+            st.markdown(f"**🎓 Class:** `Class {s_grade}`")
+            st.markdown(f"**🌟 Level:** `{prof.get('assessed_level', 'Rising Explorer')}`")
+            st.markdown(f"**💬 Chats Logged:** `{prof.get('total_chats', len(st.session_state.get('messages', [])))}`")
             if st.button("🔄 " + ("Reset Profile Memory" if lang == "en" else "Profile Reset Karein"), key="btn_reset_student_prof", use_container_width=True):
                 student_memory.reset_student_profile()
                 st.toast("Student profile memory reset!")
@@ -2981,15 +3028,31 @@ def main():
     lvl_num, lvl_en, lvl_hi, _ = get_level(xp)
     lvl_title = lvl_hi if lang == "hi" else lvl_en
 
+    btn_menu_label = "☰ Menu" if lang == "en" else "☰ Menu"
     st.markdown(f"""
     <div class="hero-banner">
-      <div>
-        <div class="hero-title">🧠 GyaanBuddy • <span style="font-size:1.1rem;background:rgba(255,255,255,0.22);padding:4px 12px;border-radius:12px;">🎓 {class_lvl}</span></div>
-        <div class="hero-sub">{"Your friendly AI science & math buddy • Learn the fun way!" if lang == "en" else "Aapka friendly vigyan aur ganit saathi • Seekho mazedaar tareeke se!"}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span class="xp-pill">⭐ {xp} XP</span>
-        <span class="xp-pill">{lvl_title}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:12px;">
+        <div>
+          <div class="hero-title" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span>🧠 GyaanBuddy •</span>
+            <button type="button"
+                    onclick="(function(){{var p=window.parent||window;if(p.__gb_toggle_sidebar){{p.__gb_toggle_sidebar();return;}}var d=p.document;var b=d.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')||d.querySelector('[data-testid=\\'collapsedControl\\'] button')||d.querySelector('header button');if(b)b.click();}})()"
+                    style="font-size:0.95rem;background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.5);color:#ffffff;padding:4px 12px;border-radius:12px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+              🎓 {class_lvl}
+            </button>
+          </div>
+          <div class="hero-sub">{"Your friendly AI science & math buddy • Learn the fun way!" if lang == "en" else "Aapka friendly vigyan aur ganit saathi • Seekho mazedaar tareeke se!"}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <button type="button"
+                  id="btn-hero-menu-toggle"
+                  onclick="(function(){{var p=window.parent||window;if(p.__gb_toggle_sidebar){{p.__gb_toggle_sidebar();return;}}var d=p.document;var b=d.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')||d.querySelector('[data-testid=\\'collapsedControl\\'] button')||d.querySelector('header button');if(b)b.click();}})()"
+                  style="background:#ffffff; color:#4338ca; border:2px solid #6366f1; border-radius:12px; font-weight:800; font-size:0.85rem; padding:6px 14px; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,0.18); display:inline-flex; align-items:center; gap:6px;">
+            {btn_menu_label}
+          </button>
+          <span class="xp-pill">⭐ {xp} XP</span>
+          <span class="xp-pill">{lvl_title}</span>
+        </div>
       </div>
     </div>
     """, unsafe_allow_html=True)
