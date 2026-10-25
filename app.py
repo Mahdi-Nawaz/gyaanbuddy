@@ -3028,31 +3028,15 @@ def main():
     lvl_num, lvl_en, lvl_hi, _ = get_level(xp)
     lvl_title = lvl_hi if lang == "hi" else lvl_en
 
-    btn_menu_label = "☰ Menu" if lang == "en" else "☰ Menu"
     st.markdown(f"""
     <div class="hero-banner">
-      <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:12px;">
-        <div>
-          <div class="hero-title" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-            <span>🧠 GyaanBuddy •</span>
-            <button type="button"
-                    onclick="(function(){{var p=window.parent||window;if(p.__gb_toggle_sidebar){{p.__gb_toggle_sidebar();return;}}var d=p.document;var b=d.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')||d.querySelector('[data-testid=\\'collapsedControl\\'] button')||d.querySelector('header button');if(b)b.click();}})()"
-                    style="font-size:0.95rem;background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.5);color:#ffffff;padding:4px 12px;border-radius:12px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
-              🎓 {class_lvl}
-            </button>
-          </div>
-          <div class="hero-sub">{"Your friendly AI science & math buddy • Learn the fun way!" if lang == "en" else "Aapka friendly vigyan aur ganit saathi • Seekho mazedaar tareeke se!"}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <button type="button"
-                  id="btn-hero-menu-toggle"
-                  onclick="(function(){{var p=window.parent||window;if(p.__gb_toggle_sidebar){{p.__gb_toggle_sidebar();return;}}var d=p.document;var b=d.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')||d.querySelector('[data-testid=\\'collapsedControl\\'] button')||d.querySelector('header button');if(b)b.click();}})()"
-                  style="background:#ffffff; color:#4338ca; border:2px solid #6366f1; border-radius:12px; font-weight:800; font-size:0.85rem; padding:6px 14px; cursor:pointer; box-shadow:0 3px 10px rgba(0,0,0,0.18); display:inline-flex; align-items:center; gap:6px;">
-            {btn_menu_label}
-          </button>
-          <span class="xp-pill">⭐ {xp} XP</span>
-          <span class="xp-pill">{lvl_title}</span>
-        </div>
+      <div>
+        <div class="hero-title">🧠 GyaanBuddy • <span style="font-size:1.1rem;background:rgba(255,255,255,0.22);padding:4px 12px;border-radius:12px;">🎓 {class_lvl}</span></div>
+        <div class="hero-sub">{"Your friendly AI science & math buddy • Learn the fun way!" if lang == "en" else "Aapka friendly vigyan aur ganit saathi • Seekho mazedaar tareeke se!"}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="xp-pill">⭐ {xp} XP</span>
+        <span class="xp-pill">{lvl_title}</span>
       </div>
     </div>
     """, unsafe_allow_html=True)
