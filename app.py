@@ -787,29 +787,13 @@ def apply_theme(theme_name: str):
             window.parent.__gb_toggle_sidebar = toggleSidebar;
         }
 
-        function injectMobileMenuPill() {
-            try {
-                const win = window.parent || window;
-                const doc = win.document;
-                const isMobile = /Android|iPhone|iPad|iPod/i.test(win.navigator.userAgent) || (win.innerWidth <= 768);
-                if (isMobile) {
-                    if (!doc.getElementById('gb-mobile-sidebar-pill')) {
-                        const pill = doc.createElement('button');
-                        pill.id = 'gb-mobile-sidebar-pill';
-                        pill.type = 'button';
-                        pill.innerHTML = '☰ Menu';
-                        pill.style.cssText = 'position:fixed;top:8px;left:8px;z-index:99999999;background:#ffffff;color:#4338ca;font-family:Outfit,sans-serif;font-weight:800;font-size:0.85rem;padding:7px 14px;border:2px solid #6366f1;border-radius:20px;box-shadow:0 4px 16px rgba(99,102,241,0.4);cursor:pointer;display:flex;align-items:center;gap:6px;outline:none;-webkit-tap-highlight-color:transparent;';
-                        pill.onclick = function(e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleSidebar();
-                        };
-                        doc.body.appendChild(pill);
-                    }
-                }
-            } catch(e) {}
-        }
-        setInterval(injectMobileMenuPill, 1000);
+        // Clean up any stray mobile pill elements from DOM
+        try {
+            const win = window.parent || window;
+            const doc = win.document;
+            const p = doc.getElementById('gb-mobile-sidebar-pill');
+            if (p) p.remove();
+        } catch(e) {}
     })();
     </script>
     """
