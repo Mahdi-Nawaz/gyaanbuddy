@@ -451,6 +451,52 @@ MATH_TOPICS = {
         keywords=["algebra", "equation", "samikaran", "variable", "linear", "solve", "balance", "scale"]),
 }
 
+# ----------------------------------------------------------------------------- general science (trees & animals)
+NATURE_TOPICS = {
+    "tree_parts": dict(
+        title_en="🌳 Parts of a Tree & Plant (Roots, Stem, Leaves)",
+        title_hi="🌳 Ped aur Paudhe ke Hisse (Jad, Tana, Patti)",
+        en="A tree is a living organism with specialized parts: Roots anchor the tree and drink water from the soil; the Trunk and Branches give support and transport sap; Leaves catch sunlight to make food; and Flowers develop into Fruits with Seeds.",
+        hi="Ped (tree) ek jeevit prani hai: Jado (roots) ped ko zameen mein thame rakhti hain aur paani peeti hain; Tana (trunk) sahara deta hai aur poshan pahunchata hai; Pattiyan (leaves) dhoop se khana banati hain; aur Phool phal aur beej banate hain.",
+        formula="Tree Anatomy: Roots ➔ Trunk ➔ Branches ➔ Leaves ➔ Flowers & Fruits",
+        keywords=["tree", "trees", "plant", "plants", "ped", "paudha", "paudhe", "roots", "stem", "leaves", "leaf", "branches", "trunk", "flower", "fruit", "jad", "tana", "patti", "botany", "nature"]),
+    "photosynthesis": dict(
+        title_en="☀️ Photosynthesis (How Trees Make Food)",
+        title_hi="☀️ Prakash Sanshleshan (Pattiyan Khana Kaise Banati Hain)",
+        en="Photosynthesis is the magical process where green leaves use Sunlight, Carbon Dioxide (CO2) from the air, and Water (H2O) from the roots to make Glucose sugar (food) and release fresh Oxygen (O2) for all of us to breathe!",
+        hi="Photosynthesis woh jaadui kriya hai jismein hari pattiyan dhoop (sunlight), hawa se carbon dioxide (CO2) aur zameen se paani (H2O) lekar glucose (khana) banati hain aur humare saans lene ke liye taaza oxygen (O2) chhodti hain!",
+        formula="6CO₂ + 6H₂O + Sunlight ➔ C₆H₁₂O₆ (Glucose) + 6O₂ (Oxygen)",
+        keywords=["photosynthesis", "prakash sanshleshan", "chlorophyll", "green leaves", "sunlight", "carbon dioxide", "oxygen", "plant food", "stomata", "glucose"]),
+    "butterfly_lifecycle": dict(
+        title_en="🦋 Life Cycle of a Butterfly (Metamorphosis)",
+        title_hi="🦋 Titli Ka Jeevan Chakra (Metamorphosis)",
+        en="A butterfly undergoes a remarkable complete metamorphosis in 4 stages: 1. Egg laid on a leaf ➔ 2. Caterpillar (larva) that eats and grows ➔ 3. Chrysalis (pupa/cocoon) where it transforms ➔ 4. Adult Butterfly with colourful wings!",
+        hi="Titli 4 khoobsurat charno mein poori tarah badalti hai: 1. Patti par Chhota Anda (Egg) ➔ 2. Bhookha Caterpillar (Kida) ➔ 3. Chrysalis (Cocoon) jismein badlaav hota hai ➔ 4. Sundar Pankhon Wali Badi Titli (Butterfly)!",
+        formula="Egg ➔ Caterpillar (Larva) ➔ Chrysalis (Pupa) ➔ Adult Butterfly",
+        keywords=["butterfly", "titli", "caterpillar", "chrysalis", "cocoon", "pupa", "larva", "metamorphosis", "life cycle", "insect"]),
+    "frog_lifecycle": dict(
+        title_en="🐸 Life Cycle of a Frog (Tadpole to Frog)",
+        title_hi="🐸 Mendhak Ka Jeevan Chakra (Tadpole se Mendhak)",
+        en="Frogs are amphibians that start life in water! The mother frog lays jelly eggs in water. They hatch into Tadpoles with tails and gills like fish. Gradually they grow back legs, then front legs, absorb their tail, develop lungs, and hop onto land as Adult Frogs!",
+        hi="Mendhak (frog) jal-thalchar (amphibian) hai! Paani mein jelly ande hote hain jinse machhli jaisa Tadpole nikalta hai. Dheere-dheere uske pair nikalte hain, poonchh gayab hoti hai, fefde bante hain aur woh koodne wala mendhak ban jaata hai!",
+        formula="Frog Eggs ➔ Tadpole (Water/Gills) ➔ Froglet ➔ Adult Frog (Land/Lungs)",
+        keywords=["frog", "frogs", "mendhak", "tadpole", "amphibian", "froglet", "metamorphosis", "life cycle", "water animal"]),
+    "animal_diets": dict(
+        title_en="🦁 Animal Diets: Herbivores, Carnivores & Omnivores",
+        title_hi="🦁 Jaanwaron Ka Khana: Shakahari, Mansahari aur Sarvahari",
+        en="Animals eat different foods based on their body design: 1. Herbivores (cows, deer, rabbits) eat plants and grass. 2. Carnivores (lions, tigers, eagles) hunt and eat meat. 3. Omnivores (bears, crows, humans) eat both plants and meat!",
+        hi="Jaanwar alag-alag khana khate hain: 1. Shakahari (Herbivores jaise gaay, hiran) ped-paudhe aur ghaas khate hain. 2. Mansahari (Carnivores jaise sher, baagh) maans khate hain. 3. Sarvahari (Omnivores jaise bhalu, kauwa, insaan) dono khate hain!",
+        formula="Herbivore (Plants) • Carnivore (Meat) • Omnivore (Both)",
+        keywords=["herbivore", "carnivore", "omnivore", "shakahari", "mansahari", "sarvahari", "animal diet", "animals", "animal", "jaanwar", "deer", "lion", "tiger", "bear"]),
+    "food_chain": dict(
+        title_en="🌱 The Forest Food Chain & Ecosystem",
+        title_hi="🌱 Jungle Ki Aahar Shrinkhla (Food Chain)",
+        en="All living things are connected in a food chain! The Sun gives energy to Plants (Producers). Deer or Rabbits (Primary Consumers) eat the grass. A Lion (Apex Predator) eats the deer. When animals pass away, Fungi and Bacteria (Decomposers) return nutrients to the soil for new trees to grow!",
+        hi="Sabhi jeev aahar shrinkhla (food chain) se jude hain! Suraj ki dhoop se Paudhe (Producers) bante hain. Hiran ya khargosh ghaas khate hain. Sher unka shikaar karta hai. Baad mein mushrooms (decomposers) mitti ko poshan lautate hain jisse naye ped ug sakein!",
+        formula="Sun ➔ Producer (Plant) ➔ Herbivore (Deer) ➔ Predator (Lion) ➔ Decomposer (Soil)",
+        keywords=["food chain", "food web", "producer", "consumer", "predator", "ecosystem", "aahar shrinkhla", "forest", "jungle", "wildlife", "grass", "deer", "lion", "decomposer"]),
+}
+
 # ----------------------------------------------------------------------------- hinglish helpers
 GREETINGS = {"hi", "hello", "hey", "namaste", "namaskar", "hii", "hiii", "yo", "good morning", "good evening"}
 

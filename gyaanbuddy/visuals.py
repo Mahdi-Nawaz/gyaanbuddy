@@ -1881,6 +1881,377 @@ def metals_nonmetals_svg(lang: str = "en") -> str:
 </svg>"""
 
 
+# ============================================================================= GENERAL SCIENCE (TREES & ANIMALS)
+def tree_plant_svg(lang: str = "en") -> str:
+    """Detailed visual diagram of a living tree & flowering plant with roots, trunk, branches, leaves and fruit."""
+    title = "🌳 Anatomy of a Living Tree & Plant" if lang == "en" else "🌳 Ped aur Paudhe ke Hisse"
+    lbl_leaves = "Leaves: Catch sunlight & make food" if lang == "en" else "Pattiyan: Dhoop se khana banati hain"
+    lbl_fruit = "Fruit & Flower: Seeds for new plants" if lang == "en" else "Phal aur Phool: Naye ped ke beej"
+    lbl_trunk = "Trunk / Stem: Transports water & sap" if lang == "en" else "Tana (Trunk): Paani aur poshan le jaata hai"
+    lbl_roots = "Roots: Drink water & anchor tree" if lang == "en" else "Jad (Roots): Paani sokhti hain aur sahara deti hain"
+    lbl_soil = "Soil & Ground Layer (Mitti)" if lang == "en" else "Zameen aur Mitti (Soil Layer)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" width="620" height="440">
+  <defs>
+    <linearGradient id="sky-gd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <linearGradient id="soil-gd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#78350f"/>
+      <stop offset="100%" stop-color="#451a03"/>
+    </linearGradient>
+    <linearGradient id="trunk-gd" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#854d0e"/>
+      <stop offset="50%" stop-color="#a16207"/>
+      <stop offset="100%" stop-color="#713f12"/>
+    </linearGradient>
+    <filter id="leaf-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#15803d" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="620" height="320" fill="url(#sky-gd)"/>
+  <!-- Soil Underground -->
+  <rect y="320" width="620" height="120" fill="url(#soil-gd)"/>
+
+  <!-- Title Header -->
+  <rect x="20" y="14" width="580" height="38" rx="10" fill="#ffffff" fill-opacity="0.9" stroke="#10b981" stroke-width="1.5"/>
+  <text x="310" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#065f46" text-anchor="middle">{title}</text>
+
+  <!-- Golden Sun in sky -->
+  <circle cx="530" cy="80" r="30" fill="#facc15" stroke="#f59e0b" stroke-width="3"/>
+  <line x1="530" y1="40" x2="530" y2="30" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="530" y1="120" x2="530" y2="130" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="490" y1="80" x2="480" y2="80" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="570" y1="80" x2="580" y2="80" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Sprawling Roots Underground -->
+  <path d="M 290 320 Q 270 360 230 400 M 270 360 Q 240 375 200 380 M 310 320 Q 330 365 370 410 M 330 365 Q 360 385 410 395 M 300 320 L 300 425 M 300 370 Q 285 395 270 415 M 300 375 Q 315 395 330 418" stroke="#fef3c7" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Main Trunk -->
+  <path d="M 270 325 C 275 250 280 200 270 170 L 330 170 C 320 200 325 250 330 325 Z" fill="url(#trunk-gd)"/>
+
+  <!-- Branches -->
+  <path d="M 280 200 Q 230 170 180 150 M 230 170 Q 210 130 190 110 M 320 200 Q 370 170 420 150 M 370 170 Q 390 130 410 110" stroke="#854d0e" stroke-width="10" stroke-linecap="round" fill="none"/>
+
+  <!-- Lush Green Foliage / Crown Canopy -->
+  <g filter="url(#leaf-glow)">
+    <circle cx="210" cy="140" r="50" fill="#15803d"/>
+    <circle cx="390" cy="140" r="50" fill="#15803d"/>
+    <circle cx="250" cy="110" r="60" fill="#16a34a"/>
+    <circle cx="350" cy="110" r="60" fill="#16a34a"/>
+    <circle cx="300" cy="90" r="65" fill="#22c55e"/>
+    <circle cx="300" cy="145" r="55" fill="#15803d"/>
+  </g>
+
+  <!-- Fruits / Red Apples -->
+  <circle cx="230" cy="130" r="9" fill="#dc2626"/>
+  <circle cx="360" cy="120" r="9" fill="#dc2626"/>
+  <circle cx="290" cy="85" r="9" fill="#dc2626"/>
+  <circle cx="320" cy="150" r="9" fill="#dc2626"/>
+  <circle cx="260" cy="155" r="9" fill="#dc2626"/>
+
+  <!-- Blossoms / Pink Flowers -->
+  <circle cx="200" cy="100" r="7" fill="#f472b6"/>
+  <circle cx="200" cy="100" r="3" fill="#fef08a"/>
+  <circle cx="390" cy="95" r="7" fill="#f472b6"/>
+  <circle cx="390" cy="95" r="3" fill="#fef08a"/>
+
+  <!-- Educational Callout Badges -->
+  <rect x="25" y="70" width="160" height="38" rx="8" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="35" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#15803d">🍃 Leaves (Pattiyan)</text>
+  <text x="35" y="100" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#334155">{lbl_leaves}</text>
+  <line x1="185" y1="89" x2="230" y2="105" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <rect x="425" y="140" width="170" height="38" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="435" y="156" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#dc2626">🍎 Fruits &amp; Flowers</text>
+  <text x="435" y="170" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#334155">{lbl_fruit}</text>
+  <line x1="425" y1="155" x2="370" y2="125" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <rect x="30" y="240" width="180" height="38" rx="8" fill="#ffffff" stroke="#a16207" stroke-width="1.5"/>
+  <text x="40" y="256" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#854d0e">🪵 Trunk / Stem (Tana)</text>
+  <text x="40" y="270" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#334155">{lbl_trunk}</text>
+  <line x1="210" y1="259" x2="270" y2="250" stroke="#a16207" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <rect x="30" y="350" width="180" height="42" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="1.5"/>
+  <text x="40" y="367" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#b45309">🌱 Roots (Jad)</text>
+  <text x="40" y="382" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" fill="#334155">{lbl_roots}</text>
+  <line x1="210" y1="370" x2="250" y2="370" stroke="#d97706" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <text x="590" y="340" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#fef3c7" text-anchor="end">⬇ {lbl_soil}</text>
+</svg>"""
+
+
+def photosynthesis_svg(lang: str = "en") -> str:
+    """Dynamic visual of photosynthesis in a green leaf with sun rays, water, CO2 and oxygen."""
+    title = "☀️ Photosynthesis: How Plants Make Food" if lang == "en" else "☀️ Prakash Sanshleshan (Photosynthesis)"
+    lbl_sun = "Sunlight Energy ☀️" if lang == "en" else "Dhoop / Saur Urja ☀️"
+    lbl_co2 = "Carbon Dioxide (CO₂) 🌬️" if lang == "en" else "Carbon Dioxide (CO₂) 🌬️"
+    lbl_h2o = "Water (H₂O) from Roots 💧" if lang == "en" else "Jad se Paani (H₂O) 💧"
+    lbl_o2 = "Fresh Oxygen (O₂) Released! 💨" if lang == "en" else "Taaza Oxygen (O₂) Nikalti Hai! 💨"
+    lbl_sugar = "Glucose Sugar (Plant Food) 🍬" if lang == "en" else "Glucose (Paudhe Ka Khana) 🍬"
+    lbl_chlor = "Chlorophyll (Green Pigment)" if lang == "en" else "Chlorophyll (Hara Rang)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 430" width="640" height="430">
+  <defs>
+    <linearGradient id="ps-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#ecfdf5"/>
+    </linearGradient>
+    <linearGradient id="leaf-gd" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/>
+      <stop offset="50%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#15803d"/>
+    </linearGradient>
+    <filter id="sun-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#facc15" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <rect width="640" height="430" rx="16" fill="url(#ps-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Title Header -->
+  <rect x="25" y="14" width="590" height="38" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+  <text x="320" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#047857" text-anchor="middle">{title}</text>
+
+  <!-- Big Glowing Sun on Top Left -->
+  <g transform="translate(60, 85)" filter="url(#sun-glow)">
+    <circle cx="0" cy="0" r="32" fill="#facc15" stroke="#f59e0b" stroke-width="3"/>
+    <text x="0" y="6" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#78350f" text-anchor="middle">SUN</text>
+  </g>
+  <!-- Beaming Sunlight Arrows -->
+  <path d="M 85 105 L 200 175" stroke="#eab308" stroke-width="4" stroke-dasharray="6,4"/>
+  <text x="145" y="130" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#b45309">{lbl_sun}</text>
+
+  <!-- Giant Leaf in Center -->
+  <g transform="translate(320, 215)">
+    <!-- Leaf outline -->
+    <path d="M -150 40 Q -80 -110 90 -90 Q 170 -10 160 50 Q 70 130 -80 100 Q -130 80 -150 40 Z" fill="url(#leaf-gd)" stroke="#14532d" stroke-width="3"/>
+    <!-- Main Vein -->
+    <path d="M -150 40 Q -10 10 160 50" stroke="#bbf7d0" stroke-width="4.5" fill="none"/>
+    <!-- Side Veins -->
+    <path d="M -90 28 Q -40 -30 20 -70" stroke="#bbf7d0" stroke-width="2.5" fill="none"/>
+    <path d="M -30 20 Q 30 -20 100 -40" stroke="#bbf7d0" stroke-width="2.5" fill="none"/>
+    <path d="M -70 26 Q -40 60 20 85" stroke="#bbf7d0" stroke-width="2.5" fill="none"/>
+    <path d="M 0 20 Q 50 60 100 70" stroke="#bbf7d0" stroke-width="2.5" fill="none"/>
+
+    <!-- Chlorophyll badge inside leaf -->
+    <rect x="-60" y="-12" width="140" height="26" rx="6" fill="#14532d" fill-opacity="0.8"/>
+    <text x="10" y="6" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">🌿 {lbl_chlor}</text>
+  </g>
+
+  <!-- Left Inputs: Water & CO2 -->
+  <g transform="translate(30, 220)">
+    <rect width="145" height="42" rx="8" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+    <text x="10" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#1e293b">IN: Air</text>
+    <text x="10" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#475569">{lbl_co2}</text>
+    <line x1="145" y1="21" x2="190" y2="230" stroke="#64748b" stroke-width="2.5" stroke-dasharray="4,3"/>
+  </g>
+  <g transform="translate(30, 290)">
+    <rect width="145" height="42" rx="8" fill="#ffffff" stroke="#0284c7" stroke-width="1.5"/>
+    <text x="10" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#0369a1">IN: Soil Water</text>
+    <text x="10" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" fill="#0284c7">{lbl_h2o}</text>
+    <line x1="145" y1="21" x2="200" y2="270" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="4,3"/>
+  </g>
+
+  <!-- Right Outputs: Oxygen & Sugar -->
+  <g transform="translate(465, 170)">
+    <rect width="150" height="48" rx="8" fill="#ecfeff" stroke="#06b6d4" stroke-width="1.5"/>
+    <text x="10" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#0891b2">OUT: Fresh Air</text>
+    <text x="10" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="600" fill="#0e7490">{lbl_o2}</text>
+    <line x1="0" y1="24" x2="-45" y2="35" stroke="#06b6d4" stroke-width="2.5"/>
+  </g>
+  <g transform="translate(465, 250)">
+    <rect width="150" height="48" rx="8" fill="#fefce8" stroke="#ca8a04" stroke-width="1.5"/>
+    <text x="10" y="18" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#a16207">OUT: Energy Store</text>
+    <text x="10" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="600" fill="#854d0e">{lbl_sugar}</text>
+    <line x1="0" y1="24" x2="-35" y2="0" stroke="#ca8a04" stroke-width="2.5"/>
+  </g>
+
+  <!-- Bottom Balanced Chemical Equation Card -->
+  <g transform="translate(25, 360)">
+    <rect width="590" height="52" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+    <text x="295" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="middle">🔬 Photosynthesis Reaction Formula:</text>
+    <text x="295" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#1e293b" text-anchor="middle">6 CO₂  +  6 H₂O  +  Sunlight  ➔  C₆H₁₂O₆ (Glucose)  +  6 O₂ (Oxygen)</text>
+  </g>
+</svg>"""
+
+
+def butterfly_lifecycle_svg(lang: str = "en") -> str:
+    """Complete 4-stage metamorphosis diagram for Butterfly life cycle."""
+    title = "🦋 Complete Metamorphosis: Life Cycle of a Butterfly" if lang == "en" else "🦋 Titli Ka Jeevan Chakra (4 Charn)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 420" width="620" height="420">
+  <defs>
+    <linearGradient id="bf-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fdf4ff"/>
+      <stop offset="100%" stop-color="#faf5ff"/>
+    </linearGradient>
+    <filter id="bf-sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="620" height="420" rx="16" fill="url(#bf-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Title -->
+  <rect x="20" y="14" width="580" height="38" rx="10" fill="#ffffff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="310" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#7e22ce" text-anchor="middle">{title}</text>
+
+  <!-- Circular connecting arrow tracks -->
+  <circle cx="310" cy="225" r="135" fill="none" stroke="#e9d5ff" stroke-width="8" stroke-dasharray="10,6"/>
+
+  <!-- Stage 1: Egg (Top-Left) -->
+  <g transform="translate(110, 80)" filter="url(#bf-sh)">
+    <rect width="150" height="95" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="2"/>
+    <text x="15" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857">1. Egg (Anda) 🥚</text>
+    <path d="M 30 70 Q 75 40 120 70 Q 75 90 30 70 Z" fill="#22c55e"/>
+    <circle cx="70" cy="65" r="4" fill="#fef08a" stroke="#ca8a04" stroke-width="1"/>
+    <circle cx="80" cy="63" r="4" fill="#fef08a" stroke="#ca8a04" stroke-width="1"/>
+    <circle cx="90" cy="66" r="4" fill="#fef08a" stroke="#ca8a04" stroke-width="1"/>
+    <text x="75" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#475569" text-anchor="middle">Laid on green leaves</text>
+  </g>
+
+  <!-- Stage 2: Caterpillar (Top-Right) -->
+  <g transform="translate(360, 80)" filter="url(#bf-sh)">
+    <rect width="150" height="95" rx="12" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+    <text x="15" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#b45309">2. Caterpillar 🐛</text>
+    <circle cx="50" cy="58" r="9" fill="#84cc16"/>
+    <circle cx="65" cy="56" r="9" fill="#65a30d"/>
+    <circle cx="80" cy="58" r="9" fill="#84cc16"/>
+    <circle cx="95" cy="56" r="9" fill="#65a30d"/>
+    <circle cx="110" cy="54" r="10" fill="#a3e635"/>
+    <circle cx="107" cy="51" r="2" fill="#000000"/>
+    <text x="75" y="86" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#475569" text-anchor="middle">Eats leaves and grows</text>
+  </g>
+
+  <!-- Stage 3: Chrysalis / Pupa (Bottom-Right) -->
+  <g transform="translate(360, 245)" filter="url(#bf-sh)">
+    <rect width="150" height="95" rx="12" fill="#ffffff" stroke="#0ea5e9" stroke-width="2"/>
+    <text x="15" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#0369a1">3. Chrysalis 🛖</text>
+    <line x1="40" y1="42" x2="110" y2="42" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
+    <line x1="75" y1="42" x2="75" y2="52" stroke="#d97706" stroke-width="2"/>
+    <path d="M 68 52 C 65 65 65 75 75 80 C 85 75 85 65 82 52 Z" fill="#059669" stroke="#047857" stroke-width="1.5"/>
+    <text x="75" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#475569" text-anchor="middle">Metamorphosis inside!</text>
+  </g>
+
+  <!-- Stage 4: Adult Butterfly (Bottom-Left) -->
+  <g transform="translate(110, 245)" filter="url(#bf-sh)">
+    <rect width="150" height="95" rx="12" fill="#ffffff" stroke="#ec4899" stroke-width="2"/>
+    <text x="15" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#be185d">4. Adult Butterfly 🦋</text>
+    <ellipse cx="60" cy="52" rx="16" ry="12" fill="#f43f5e" transform="rotate(-25 60 52)"/>
+    <ellipse cx="90" cy="52" rx="16" ry="12" fill="#f43f5e" transform="rotate(25 90 52)"/>
+    <ellipse cx="63" cy="68" rx="12" ry="9" fill="#fb923c" transform="rotate(20 63 68)"/>
+    <ellipse cx="87" cy="68" rx="12" ry="9" fill="#fb923c" transform="rotate(-20 87 68)"/>
+    <ellipse cx="75" cy="60" rx="3" ry="16" fill="#1e1b4b"/>
+    <text x="75" y="90" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#475569" text-anchor="middle">Flies and pollinates</text>
+  </g>
+
+  <!-- Center Hub Label -->
+  <circle cx="310" cy="225" r="32" fill="#a855f7" stroke="#ffffff" stroke-width="3"/>
+  <text x="310" y="222" font-family="'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="800" fill="#ffffff" text-anchor="middle">4-STAGE</text>
+  <text x="310" y="235" font-family="'Segoe UI', Roboto, sans-serif" font-size="8" font-weight="700" fill="#fdf4ff" text-anchor="middle">CYCLE</text>
+
+  <!-- Bottom Summary -->
+  <g transform="translate(40, 360)">
+    <rect width="540" height="42" rx="10" fill="#ffffff" stroke="#c084fc" stroke-width="1.5"/>
+    <text x="270" y="26" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#6b21a8" text-anchor="middle">✨ Egg ➔ Caterpillar (Eats) ➔ Chrysalis (Transforms) ➔ Butterfly (Flies)!</text>
+  </g>
+</svg>"""
+
+
+def nature_foodchain_svg(lang: str = "en") -> str:
+    """Ecosystem food chain flow: Sun -> Plant Producer -> Herbivore -> Apex Predator -> Decomposer."""
+    title = "🌱 Forest Ecosystem & Food Chain" if lang == "en" else "🌱 Jungle Ki Food Chain (Aahar Shrinkhla)"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" width="640" height="380">
+  <defs>
+    <linearGradient id="fc-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0fdf4"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="640" height="380" rx="16" fill="url(#fc-bg)" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Title Header -->
+  <rect x="25" y="14" width="590" height="38" rx="10" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+  <text x="320" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="800" fill="#065f46" text-anchor="middle">{title}</text>
+
+  <!-- 5 Horizontal Steps -->
+  <!-- Step 1: Sun -->
+  <g transform="translate(25, 90)">
+    <rect width="105" height="170" rx="12" fill="#fefce8" stroke="#facc15" stroke-width="2"/>
+    <circle cx="52" cy="50" r="26" fill="#fde047" stroke="#eab308" stroke-width="2"/>
+    <text x="52" y="56" font-size="22" text-anchor="middle">☀️</text>
+    <text x="52" y="105" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#854d0e" text-anchor="middle">The Sun</text>
+    <text x="52" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#a16207" text-anchor="middle">PRIMARY</text>
+    <text x="52" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#713f12" text-anchor="middle">Energy Source</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <text x="138" y="180" font-size="20" fill="#10b981">➔</text>
+
+  <!-- Step 2: Producer (Grass) -->
+  <g transform="translate(150, 90)">
+    <rect width="105" height="170" rx="12" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+    <circle cx="52" cy="50" r="26" fill="#bbf7d0" stroke="#16a34a" stroke-width="2"/>
+    <text x="52" y="56" font-size="22" text-anchor="middle">🌿</text>
+    <text x="52" y="105" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#15803d" text-anchor="middle">Green Grass</text>
+    <text x="52" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#16a34a" text-anchor="middle">PRODUCER</text>
+    <text x="52" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#166534" text-anchor="middle">Makes own food</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <text x="263" y="180" font-size="20" fill="#10b981">➔</text>
+
+  <!-- Step 3: Herbivore (Deer) -->
+  <g transform="translate(275, 90)">
+    <rect width="105" height="170" rx="12" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+    <circle cx="52" cy="50" r="26" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+    <text x="52" y="56" font-size="22" text-anchor="middle">🦌</text>
+    <text x="52" y="105" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#1e40af" text-anchor="middle">Forest Deer</text>
+    <text x="52" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#2563eb" text-anchor="middle">HERBIVORE</text>
+    <text x="52" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#1e3a8a" text-anchor="middle">Eats plants</text>
+  </g>
+
+  <!-- Arrow 3 -->
+  <text x="388" y="180" font-size="20" fill="#10b981">➔</text>
+
+  <!-- Step 4: Carnivore (Lion) -->
+  <g transform="translate(400, 90)">
+    <rect width="105" height="170" rx="12" fill="#fff1f2" stroke="#f43f5e" stroke-width="2"/>
+    <circle cx="52" cy="50" r="26" fill="#fecdd3" stroke="#e11d48" stroke-width="2"/>
+    <text x="52" y="56" font-size="22" text-anchor="middle">🦁</text>
+    <text x="52" y="105" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#9f1239" text-anchor="middle">Wild Lion</text>
+    <text x="52" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#e11d48" text-anchor="middle">CARNIVORE</text>
+    <text x="52" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#881337" text-anchor="middle">Apex Predator</text>
+  </g>
+
+  <!-- Arrow 4 -->
+  <text x="513" y="180" font-size="20" fill="#10b981">➔</text>
+
+  <!-- Step 5: Decomposer (Fungi) -->
+  <g transform="translate(525, 90)">
+    <rect width="90" height="170" rx="12" fill="#faf5ff" stroke="#a855f7" stroke-width="2"/>
+    <circle cx="45" cy="50" r="26" fill="#e9d5ff" stroke="#9333ea" stroke-width="2"/>
+    <text x="45" y="56" font-size="22" text-anchor="middle">🍄</text>
+    <text x="45" y="105" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="800" fill="#6b21a8" text-anchor="middle">Mushrooms</text>
+    <text x="45" y="125" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="700" fill="#9333ea" text-anchor="middle">DECOMPOSER</text>
+    <text x="45" y="140" font-family="'Segoe UI', Roboto, sans-serif" font-size="9" fill="#581c87" text-anchor="middle">Returns nutrients</text>
+  </g>
+
+  <!-- Bottom Takeaway -->
+  <g transform="translate(25, 290)">
+    <rect width="590" height="60" rx="12" fill="#ffffff" stroke="#10b981" stroke-width="1.5"/>
+    <text x="295" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#047857" text-anchor="middle">💡 Ecology Rule of Nature:</text>
+    <text x="295" y="44" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#334155" text-anchor="middle">Energy flows from the Sun ➔ Plants store it ➔ Animals eat food ➔ Decomposers feed the soil for new trees!</text>
+  </g>
+</svg>"""
+
+
 # ============================================================================= DISPATCH (used by the chat)
 def render_spec(spec: str, lang: str = "en"):
     """Turn a visual spec string into ("svg", str) or ("plotly", Figure). Returns None if unknown."""
@@ -1915,6 +2286,15 @@ def render_spec(spec: str, lang: str = "en"):
             if parts[1] == "ph":
                 en, hi, ph = C.PH_SUBSTANCES[parts[2]]
                 return "svg", ph_svg(ph, hi if lang == "hi" else en)
+        if parts[0] == "nature":
+            if parts[1] in ("tree", "plant"):
+                return "svg", tree_plant_svg(lang)
+            if parts[1] == "photosynthesis":
+                return "svg", photosynthesis_svg(lang)
+            if parts[1] in ("butterfly", "metamorphosis"):
+                return "svg", butterfly_lifecycle_svg(lang)
+            if parts[1] in ("foodchain", "chain"):
+                return "svg", nature_foodchain_svg(lang)
         if parts[0] == "reaction":
             return "svg", reaction_svg(parts[1], lang)
         if parts[0] == "vital":
@@ -1937,4 +2317,5 @@ def render_spec(spec: str, lang: str = "en"):
     except (KeyError, IndexError, ValueError):
         return None
     return None
+
 

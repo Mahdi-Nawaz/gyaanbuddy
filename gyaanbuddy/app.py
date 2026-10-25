@@ -477,21 +477,116 @@ def apply_theme(theme_name: str):
         padding: 20px;
         box-shadow: {t['card_shadow']};
     }}
+
+    /* 📱 Ultra-Smooth Mobile Phone Experience */
+    @media (max-width: 768px) {{
+        .block-container {{
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+            padding-top: 0.75rem !important;
+        }}
+        .hero-banner {{
+            padding: 16px 18px !important;
+            border-radius: 16px !important;
+            gap: 8px !important;
+        }}
+        .hero-title {{
+            font-size: 1.35rem !important;
+        }}
+        .hero-sub {{
+            font-size: 0.88rem !important;
+        }}
+        .xp-pill {{
+            font-size: 0.85rem !important;
+            padding: 4px 12px !important;
+        }}
+        /* Mobile app-style horizontal scrolling navigation tabs */
+        .stTabs [data-baseweb="tab-list"] {{
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: none !important;
+            padding: 6px !important;
+            border-radius: 14px !important;
+            gap: 6px !important;
+        }}
+        .stTabs [data-baseweb="tab-list"]::-webkit-scrollbar {{
+            display: none !important;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            font-size: 0.88rem !important;
+            padding: 8px 12px !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }}
+        /* Mobile touch targets (min 44px) */
+        .stButton>button, 
+        button[data-testid="baseButton-secondary"], 
+        button[data-testid="baseButton-primary"] {{
+            min-height: 44px !important;
+            padding: 10px 14px !important;
+            font-size: 0.92rem !important;
+            width: 100% !important;
+        }}
+        /* Make sure SVG diagrams never overflow mobile screen */
+        svg {{
+            max-width: 100% !important;
+            height: auto !important;
+        }}
+        /* Mobile chat bubbles */
+        [data-testid="stChatMessage"] {{
+            padding: 10px 14px !important;
+            border-radius: 14px !important;
+            margin-bottom: 8px !important;
+        }}
+        /* Selectbox and dropdowns mobile friendly */
+        div[data-baseweb="select"] {{
+            min-height: 44px !important;
+        }}
+        /* Clean full width on phone columns */
+        [data-testid="column"] {{
+            min-width: 100% !important;
+            flex: 1 1 100% !important;
+            margin-bottom: 6px !important;
+        }}
+    }}
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
 
+
 TXT = {
     "en": dict(
         ask="Ask me anything about science or math…",
-        tabs=["💬 Ask Buddy", "📸 Snap & Solve", "🧍 Human Body", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Mathematics", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
+        tabs=[
+            "💬 Ask Buddy",
+            "🌿 General Science",
+            "⚡ Physics Lab",
+            "🧪 Chemistry Lab",
+            "📐 Mathematics",
+            "🧍 Human Body",
+            "📸 Snap & Solve",
+            "🎯 Quiz Arena",
+            "👨‍👩‍👧 Parent & Awards",
+        ],
         tryit="Try it at home (with an adult)",
         fact="Fun fact", next="Next ➡", prev="⬅ Previous", all="Show all organs",
         mystery="Mystery Science Question of the Day:"
     ),
     "hi": dict(
         ask="Science ya Maths ke baare mein kuch bhi poochho…",
-        tabs=["💬 Buddy se poochho", "📸 Snap & Solve", "🧍 Insaani Sharir", "⚡ Physics Lab", "🧪 Chemistry Lab", "📐 Ganit (Maths)", "🎯 Quiz Arena", "👨‍👩‍👧 Parent & Awards"],
+        tabs=[
+            "💬 Buddy se poochho",
+            "🌿 Saamaanya Vigyan",
+            "⚡ Physics Lab",
+            "🧪 Chemistry Lab",
+            "📐 Ganit (Maths)",
+            "🧍 Insaani Sharir",
+            "📸 Snap & Solve",
+            "🎯 Quiz Arena",
+            "👨‍👩‍👧 Parent & Awards",
+        ],
         tryit="Ghar par try karo (bade ke saath)",
         fact="Mazedaar baat", next="Agla ➡", prev="⬅ Pichla", all="Saare organs dikhao",
         mystery="Aaj Ka Mazedaar Vigyan Sawaal:"
@@ -971,6 +1066,29 @@ def build_search_index() -> list[dict]:
                 "spec": spec,
                 "keywords": m.get("keywords", []) + ["mathematics", "math", "ganit", "formula", "mensuration", "algebra", "geometry"]
             })
+    # 11. General Science (Trees, Plants & Animals)
+    if hasattr(C, "NATURE_TOPICS"):
+        nature_specs = {
+            "tree_parts": ("nature:tree", "🌳"),
+            "photosynthesis": ("nature:photosynthesis", "☀️"),
+            "butterfly_lifecycle": ("nature:butterfly", "🦋"),
+            "frog_lifecycle": ("nature:butterfly", "🐸"),
+            "animal_diets": ("nature:foodchain", "🦁"),
+            "food_chain": ("nature:foodchain", "🌱"),
+        }
+        for k, n in C.NATURE_TOPICS.items():
+            spec, icon = nature_specs.get(k, ("nature:tree", "🌿"))
+            index.append({
+                "category_en": "🌿 General Science (Trees & Animals)",
+                "category_hi": "🌿 Saamaanya Vigyan (Ped aur Jaanwar)",
+                "icon": icon,
+                "title_en": n["title_en"],
+                "title_hi": n["title_hi"],
+                "desc_en": n["en"],
+                "desc_hi": n["hi"],
+                "spec": spec,
+                "keywords": n.get("keywords", []) + ["general science", "nature", "trees", "plants", "animals", "wildlife", "science"]
+            })
     return index
 
 SEARCH_INDEX = build_search_index()
@@ -1004,287 +1122,176 @@ def search_topics(q: str, limit: int = 8) -> list[dict]:
     return [item for _, item in scored[:limit]]
 
 
-def render_unified_top_bar(lang: str, age: str, api_key: str | None, model: str):
-    """Unified 1School-style Top Action Bar: Search Bar + Camera Snap & Solve + Voice Mic + Quick Topic Pills."""
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(240,249,255,0.95) 100%);
-                border: 2px solid #c7d2fe; border-radius: 20px; padding: 14px 18px; margin-bottom: 20px;
-                box-shadow: 0 8px 24px rgba(79, 70, 229, 0.08);">
-    """, unsafe_allow_html=True)
+def handle_section_query(q_text: str, sec_label: str, lang: str, age: str = "10-12", api_key: str | None = None, model: str | None = None):
+    """Solve student query in any section, append to chat history (like ChatGPT), and persist permanently."""
+    history = [{"q": a["q"], "a": a["text"]} for a in st.session_state.get("messages", [])
+               if a.get("role") == "assistant" and a.get("q") and not a.get("blocked")]
+    ans = tutor_engine.answer(q_text, lang, age, history, api_key, model)
 
-    col_in, col_btn, col_cam, col_mic, col_clr = st.columns([5.0, 1.2, 1.3, 1.3, 0.9])
-    with col_in:
-        curr_val = st.session_state.get("global_search_q", "")
-        in_val = st.text_input(
-            "Global Search Bar",
-            value=curr_val,
-            placeholder="🔍 " + ("Search any topic: Newton's 2nd law, Heart, Brain, Pythagoras, Oxygen, Gravity..." if lang == "en" else
-                                 "Sawaal ya topic khojein: Newton ka niyam, Dil, Dimaag, Pythagoras, Oxygen..."),
-            key="global_search_input",
+    # 1. Update session state messages
+    st.session_state["messages"].append({
+        "role": "user",
+        "text": q_text,
+        "subject": sec_label
+    })
+    st.session_state["messages"].append({
+        "role": "assistant",
+        "text": ans.text,
+        "visual": ans.visual,
+        "q": q_text,
+        "subject": sec_label,
+        "topic": ans.topic or sec_label,
+        "notice": ans.notice,
+        "blocked": ans.blocked
+    })
+
+    # 2. Persist to data/chat_history.jsonl & training dataset
+    try:
+        import student_memory
+        grade = str(st.session_state.get("class_level", "5"))
+        student_memory.record_student_chat(
+            grade=f"Class {grade}" if grade.isdigit() else grade,
+            lang=lang,
+            question=q_text,
+            answer_text=ans.text,
+            subject=sec_label,
+            topic=ans.topic or sec_label,
+            xp=15,
+            visual=ans.visual
+        )
+    except Exception:
+        pass
+
+    log("question", sec_label, ans.topic or sec_label, mode=ans.mode)
+    add_xp(15, f"Researched {sec_label} question!")
+    return ans
+
+
+def render_section_tools(sec_id: str, sec_label: str, placeholder: str, lang: str, age: str = "10-12", api_key: str | None = None, model: str | None = None) -> str:
+    """Standardized tool bar for every section:
+    1. Text search bar with direct Search button
+    2. Camera drawer (upload, click photo, screenshot paste via Clipboard)
+    3. Voice drawer (speak question)
+    Every search or question solved is automatically saved to chat history like ChatGPT!
+    """
+    c_srch, c_btn, c_cam, c_mic = st.columns([5.2, 1.4, 1.2, 1.2])
+    with c_srch:
+        query = st.text_input(
+            f"Search in {sec_label}",
+            value=st.session_state.get(f"{sec_id}_search", ""),
+            placeholder=placeholder,
+            key=f"{sec_id}_search_bar",
             label_visibility="collapsed"
         )
-    with col_btn:
-        if st.button("🔍 " + ("Search" if lang == "en" else "Khojein"), key="btn_global_search", width="stretch", type="primary"):
-            st.session_state["global_search_q"] = in_val
-            st.session_state["show_top_cam"] = False
-            st.session_state["show_top_voice"] = False
-            st.rerun()
-    with col_cam:
-        cam_active = st.session_state.get("show_top_cam", False)
-        if st.button("📷 " + ("Camera" if lang == "en" else "Camera"), key="btn_toggle_top_cam", width="stretch", type="primary" if cam_active else "secondary"):
-            st.session_state["show_top_cam"] = not cam_active
-            st.session_state["show_top_voice"] = False
-            st.rerun()
-    with col_mic:
-        voice_active = st.session_state.get("show_top_voice", False)
-        if st.button("🎙️ " + ("Voice" if lang == "en" else "Awaaz"), key="btn_toggle_top_voice", width="stretch", type="primary" if voice_active else "secondary"):
-            st.session_state["show_top_voice"] = not voice_active
-            st.session_state["show_top_cam"] = False
-            st.rerun()
-    with col_clr:
-        if st.button("✖️", key="btn_global_clear", width="stretch", help="Clear Search & Tools"):
-            st.session_state["global_search_q"] = ""
-            st.session_state["show_top_cam"] = False
-            st.session_state["show_top_voice"] = False
+        st.session_state[f"{sec_id}_search"] = query
+    with c_btn:
+        search_clicked = st.button("🔍 " + ("Search" if lang == "en" else "Khojein"), key=f"{sec_id}_btn_search", width="stretch", type="primary")
+
+    with c_cam:
+        cam_active = st.session_state.get(f"{sec_id}_show_cam", False)
+        if st.button("📷 " + ("Camera" if lang == "en" else "Camera"), key=f"{sec_id}_cam_toggle", width="stretch"):
+            st.session_state[f"{sec_id}_show_cam"] = not cam_active
+            st.session_state[f"{sec_id}_show_mic"] = False
             st.rerun()
 
-    # Quick 1School-style Topic Pills
-    quick_chips = [
-        ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
-        ("⚡ Newton's 2nd Law", "explain newtons 2nd law"),
-        ("🫀 Heart & Blood", "How does the heart pump blood?"),
-        ("🧠 Brain & Lobes", "What are the parts and functions of the brain?"),
-        ("📐 Pythagoras", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
-        ("⚛️ Oxygen Atom", "What is an atom of oxygen?"),
-    ] if lang == "en" else [
-        ("🥇 Dhaatu aur Adhaatu", "Importance of metals and non-metals in daily life"),
-        ("⚡ Newton ka Niyam", "Newton ka niyam samjhao"),
-        ("🫀 Dil aur Rakt", "Dil kya kaam karta hai?"),
-        ("🧠 Dimaag ke Hisse", "Dimaag ke khaas hisse kya hain?"),
-        ("📐 Pythagoras", "Pythagoras pramey kya hai"),
-        ("⚛️ Oxygen Parmanu", "Oxygen parmanu kya hai"),
-    ]
-    q_cols = st.columns(len(quick_chips))
-    for qc_idx, (qc_label, qc_query) in enumerate(quick_chips):
-        if q_cols[qc_idx].button(qc_label, key=f"top_qc_{qc_idx}", width="stretch"):
-            st.session_state["global_search_q"] = qc_query
-            st.session_state["show_top_cam"] = False
-            st.session_state["show_top_voice"] = False
+    with c_mic:
+        mic_active = st.session_state.get(f"{sec_id}_show_mic", False)
+        if st.button("🎙️ " + ("Voice" if lang == "en" else "Awaaz"), key=f"{sec_id}_mic_toggle", width="stretch"):
+            st.session_state[f"{sec_id}_show_mic"] = not mic_active
+            st.session_state[f"{sec_id}_show_cam"] = False
             st.rerun()
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Search Triggered
+    if search_clicked and query.strip():
+        with st.spinner("Searching and solving… 🔍" if lang == "en" else "Khoj aur hal ho raha hai… 🔍"):
+            ans = handle_section_query(query.strip(), sec_label, lang, age, api_key, model)
+            st.session_state[f"{sec_id}_sol"] = {"q": query.strip(), "text": ans.text, "visual": ans.visual}
 
-    # 📷 Inline Camera & Screenshot Solver Drawer if toggled
-    if st.session_state.get("show_top_cam", False):
+    # Camera, Upload & Screenshot Paste Drawer
+    if st.session_state.get(f"{sec_id}_show_cam", False):
         with st.container(border=True):
-            st.markdown("##### 📷 " + ("Snap, Upload or Paste Screenshot Question" if lang == "en" else "Photo Lein, Upload Karein ya Screenshot Paste Karein"))
-            c_c1, c_c2 = st.columns([1.1, 1.1])
-            with c_c1:
-                top_cam = st.camera_input("Take photo with camera", key="top_cam_widget")
-            with c_c2:
-                top_file = st.file_uploader(
-                    "📁 " + ("Or upload screenshot / question photo" if lang == "en" else "Ya screenshot photo upload karein"),
-                    type=["png", "jpg", "jpeg", "webp"],
-                    key="top_file_widget"
-                )
-                st.markdown("""
-                <div style="background:#f1f5f9;border:1.5px dashed #6366f1;border-radius:12px;padding:10px 14px;margin-top:6px;text-align:center;">
-                  <span style="font-size:0.95rem;font-weight:700;color:#4338ca;">📋 How to Paste a Screenshot:</span><br>
-                  <span style="font-size:0.85rem;color:#475569;">
-                    Press <b>Win + Shift + S</b> to take a screenshot, save as an image to upload above, OR paste/type question text below!
-                  </span>
-                </div>
-                """, unsafe_allow_html=True)
+            st.markdown("##### 📷 " + ("Question Photo Solver (Upload, Camera or Screenshot)" if lang == "en" else "Photo Sawaal Solver (Upload, Camera ya Screenshot)"))
+            cc1, cc2 = st.columns([1.1, 1.1])
+            with cc1:
+                cam_img = st.camera_input("Take photo of question", key=f"{sec_id}_cam_widget")
+            with cc2:
+                file_img = st.file_uploader("Upload question photo", type=["png", "jpg", "jpeg", "webp"], key=f"{sec_id}_file_widget")
+                try:
+                    import streamlit_paste_button as spb
+                    p_res = spb.paste_image_button(
+                        label="📋 " + ("Paste Screenshot (Win+Shift+S)" if lang == "en" else "Screenshot Paste Karein"),
+                        text_color="#ffffff",
+                        background_color="#4f46e5",
+                        hover_background_color="#4338ca",
+                        key=f"{sec_id}_paste_widget"
+                    )
+                    if p_res.image_data is not None:
+                        buf = io.BytesIO()
+                        p_res.image_data.save(buf, format="PNG")
+                        buf.seek(0)
+                        buf.type = "image/png"
+                        st.session_state[f"{sec_id}_pasted_buf"] = buf
+                except Exception:
+                    pass
 
-            active_pic = top_cam or top_file
-
-            st.markdown("###### ✍️ " + ("Question Text in Screenshot / Photo:" if lang == "en" else "Photo / Screenshot ka Sawaal:"))
-            cam_hint = st.text_input(
-                "Question Text",
-                value=st.session_state.get("top_cam_hint_text", ""),
-                placeholder="e.g. Importance of metals and non-metals in daily life, Pythagoras theorem, Newton's 2nd law..." if lang == "en" else "jaise: Importance of metals and non-metals in daily life, Pythagoras, Newton ka niyam...",
-                key="top_cam_hint_input",
-                label_visibility="collapsed"
-            )
-
-            # Quick Topic Presets
-            cam_presets = [
-                ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
-                ("⚡ Newton's 2nd Law", "explain newtons 2nd law"),
-                ("📐 Pythagoras Triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
-                ("🫀 Heart & Blood Pumping", "How does the heart pump blood through the circulatory system?"),
-                ("🧠 Brain & Lobes", "What are the parts and functions of the human brain?"),
-                ("⚛️ Oxygen Atom", "What is an atom of oxygen?"),
-            ] if lang == "en" else [
-                ("🥇 Dhaatu aur Adhaatu", "Importance of metals and non-metals in daily life"),
-                ("⚡ Newton ka Niyam", "Newton ka niyam samjhao"),
-                ("📐 Pythagoras Pramey", "Pythagoras pramey kya hai"),
-                ("🫀 Dil aur Rakt", "Dil kya kaam karta hai?"),
-                ("🧠 Dimaag ke Hisse", "Dimaag ke khaas hisse kya hain?"),
-                ("⚛️ Oxygen Parmanu", "Oxygen parmanu kya hai"),
-            ]
-            cp_cols = st.columns(len(cam_presets))
-            for cp_i, (cp_lbl, cp_q) in enumerate(cam_presets):
-                if cp_cols[cp_i].button(cp_lbl, key=f"top_cam_p_{cp_i}", width="stretch"):
-                    st.session_state["top_cam_hint_text"] = cp_q
-                    st.rerun()
-
-            btn_cam_search = st.button(
-                "🔍 " + ("Search & Solve Question from Photo / Screenshot" if lang == "en" else "Photo / Screenshot se Sawaal Khojein aur Hal Karein"),
-                key="btn_search_solve_top_cam",
-                type="primary",
-                width="stretch"
-            )
-            if btn_cam_search:
-                q_solve = cam_hint.strip() or st.session_state.get("top_cam_hint_text", "").strip()
-                effective_api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
-                if not effective_api_key:
+            pasted_pic = st.session_state.get(f"{sec_id}_pasted_buf")
+            active_img = cam_img or file_img or pasted_pic
+            if active_img:
+                st.image(active_img, caption="✅ Photo Ready", width=320)
+                if st.button("🚀 " + ("Solve Question in Photo Now" if lang == "en" else "Photo ka Sawaal Hal Karein"), key=f"{sec_id}_btn_solve_photo", type="primary"):
+                    q_prob = query.strip() or f"{sec_label} question"
                     try:
-                        effective_api_key = st.secrets.get("ANTHROPIC_API_KEY")
+                        import pytesseract
+                        from PIL import Image
+                        active_img.seek(0)
+                        ocr_txt = pytesseract.image_to_string(Image.open(active_img)).strip()
+                        if len(ocr_txt) >= 4:
+                            q_prob = " ".join(ocr_txt.split())
                     except Exception:
-                        effective_api_key = None
+                        pass
+                    ans = handle_section_query(q_prob, sec_label, lang, age, api_key, model)
+                    st.session_state[f"{sec_id}_sol"] = {"q": q_prob, "text": ans.text, "visual": ans.visual}
 
-                was_ai = False
-                sol_text = ""
-                vis_spec = None
-
-                # 1. AI Vision if photo is present and API key is set
-                if active_pic and effective_api_key:
-                    try:
-                        import anthropic
-                        client = anthropic.Anthropic(api_key=effective_api_key)
-                        active_pic.seek(0)
-                        img_bytes = active_pic.getvalue()
-                        b64_data = base64.b64encode(img_bytes).decode("utf-8")
-                        mime = getattr(active_pic, "type", "image/jpeg") or "image/jpeg"
-                        sys_prompt = (
-                            "You are GyaanBuddy, a friendly tutor for school students in India. "
-                            "Examine the photo/screenshot. Extract the question and provide clear step-by-step solution with final answer highlighted."
-                        )
-                        v_p = q_solve or "Please solve the question shown in this screenshot step-by-step."
-                        resp = client.messages.create(
-                            model=model or "claude-3-5-sonnet-20241022",
-                            max_tokens=650,
-                            system=sys_prompt,
-                            messages=[{
-                                "role": "user",
-                                "content": [
-                                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": b64_data}},
-                                    {"type": "text", "text": v_p}
-                                ]
-                            }]
-                        )
-                        sol_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
-                        was_ai = True
-                    except Exception:
-                        sol_text = ""
-
-                # 2. Smart curriculum tutor engine
-                if not sol_text:
-                    if not q_solve:
-                        q_solve = "Importance of metals and non-metals in daily life"
-                    ans = tutor_engine.answer(q_solve, lang, age)
-                    sol_text = ans.text
-                    vis_spec = ans.visual
-
-                final_q = q_solve or ("Screenshot Question" if lang == "en" else "Screenshot ka Sawaal")
-                st.session_state["top_cam_sol"] = {
-                    "q": final_q,
-                    "text": sol_text,
-                    "visual": vis_spec,
-                    "is_vision": was_ai
-                }
-                st.session_state["messages"].append({
-                    "role": "user",
-                    "text": f"📸 [Screenshot Question]: {final_q}"
-                })
-                st.session_state["messages"].append({
-                    "role": "assistant",
-                    "text": sol_text,
-                    "visual": vis_spec,
-                    "q": final_q
-                })
-                add_xp(20, "Solved photo question!", badge_id="curious_spark")
-                st.toast("🎉 Question Solved!", icon="🚀")
-
-            # 🎯 Render Solution Card directly inside drawer
-            if st.session_state.get("top_cam_sol"):
-                c_sol = st.session_state["top_cam_sol"]
-                st.markdown("---")
-                badge_m = "🤖 AI Vision Solved" if c_sol.get("is_vision") else "🌟 Curriculum Step-by-Step Solution"
-                st.markdown(f"#### 🎯 {badge_m}")
-                with st.container(border=True):
-                    st.markdown(f"**❓ " + ("Question:" if lang == "en" else "Sawaal:") + f"** {c_sol['q']}")
-                    st.markdown(c_sol["text"])
-                    read_aloud(c_sol["text"], key="top_cam_sol_aud", lang=lang)
-
-                    if c_sol.get("visual"):
-                        st.markdown("##### 🖼️ " + ("Interactive Model / Diagram:" if lang == "en" else "Interactive Diagram:"))
-                        show_visual(c_sol["visual"], lang, "top_cam_sol_vis")
-
-                    st.divider()
-                    s_c1, s_c2 = st.columns([1, 1])
-                    with s_c1:
-                        if st.button("💬 " + ("Ask Follow-up in Buddy Chat" if lang == "en" else "Buddy se Chat mein poochhein"), key="top_cam_fwd_chat", width="stretch"):
-                            st.session_state["pending"] = f"Explain more about: {c_sol['q']}"
-                            st.rerun()
-                    with s_c2:
-                        if st.button("🔄 " + ("Solve Another Question" if lang == "en" else "Dusra Sawaal Hal Karein"), key="top_cam_clear_sol", width="stretch"):
-                            st.session_state["top_cam_sol"] = None
-                            st.session_state["top_cam_hint_text"] = ""
-                            st.rerun()
-
-    # 🎙️ Inline Voice Drawer if toggled
-    if st.session_state.get("show_top_voice", False):
+    # Voice Recording Drawer
+    if st.session_state.get(f"{sec_id}_show_mic", False):
         with st.container(border=True):
-            st.markdown("##### 🎙️ " + ("Speak to Buddy (Voice Question)" if lang == "en" else "Buddy se Bol Kar Poochhein"))
-            render_whatsapp_voice_bar(lang)
-            v_in = st.audio_input("Record voice question", key="top_voice_widget")
+            st.markdown("##### 🎙️ " + ("Voice Question (Speak to Buddy)" if lang == "en" else "Awaaz Se Poochhein"))
+            v_in = st.audio_input("Record voice question", key=f"{sec_id}_audio_widget")
             if v_in:
-                with st.spinner("🎧 Transcribing audio..."):
+                with st.spinner("🎧 Listening..."):
                     spoken = transcribe_audio(v_in, lang)
                 if spoken:
                     st.success(f"🗣️ " + (f"Heard: \"{spoken}\"" if lang == "en" else f"Suna: \"{spoken}\""))
-                    st.session_state["pending"] = spoken
+                    ans = handle_section_query(spoken, sec_label, lang, age, api_key, model)
+                    st.session_state[f"{sec_id}_sol"] = {"q": spoken, "text": ans.text, "visual": ans.visual}
+                    st.session_state[f"{sec_id}_show_mic"] = False
                     st.rerun()
 
-    # 🔍 Active Global Search Results
-    active_q = (st.session_state.get("global_search_q") or in_val).strip()
-    if active_q:
-        results = search_topics(active_q, limit=6)
-        if results:
-            st.markdown(f"#### 🎯 " + (f"Results for **'{active_q}'**:" if lang == "en" else f"**'{active_q}'** ke matches:"))
-            for r_i, r_item in enumerate(results):
-                t_title = r_item["title_hi"] if lang == "hi" else r_item["title_en"]
-                t_cat = r_item["category_hi"] if lang == "hi" else r_item["category_en"]
-                t_desc = r_item["desc_hi"] if lang == "hi" else r_item["desc_en"]
-                with st.container(border=True):
-                    st.markdown(f"""
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                      <h4 style="margin:0;font-size:1.15rem;">{r_item['icon']} {t_title}</h4>
-                      <span class="search-badge">{t_cat}</span>
-                    </div>
-                    <p style="margin:0 0 10px 0;font-size:0.95rem;line-height:1.5;">{t_desc}</p>
-                    """, unsafe_allow_html=True)
-                    b_c1, b_c2, b_c3 = st.columns([1.5, 2, 2.5])
-                    with b_c1:
-                        read_aloud(t_desc, key=f"g_srch_aud_{r_i}", lang=lang)
-                    with b_c2:
-                        if st.button("💬 " + ("Ask Buddy" if lang == "en" else "Buddy se poochhein"), key=f"g_srch_ask_{r_i}", width="stretch"):
-                            st.session_state["pending"] = f"Tell me more about: {r_item['title_en']}"
-                            st.rerun()
-                    sp = r_item.get("spec")
-                    if sp and sp != "quiz":
-                        with st.expander("🖼️ " + ("View Interactive Model" if lang == "en" else "Diagram Dekhein")):
-                            show_visual(sp, lang, f"g_srch_vis_{r_i}")
-            st.divider()
-        else:
-            st.info(f"💡 No direct topic found for '{active_q}'. You can ask Buddy directly in chat!")
+    # If this section has a solved query:
+    if st.session_state.get(f"{sec_id}_sol"):
+        c_sol = st.session_state[f"{sec_id}_sol"]
+        with st.container(border=True):
+            st.markdown(f"#### 🎯 " + (f"Solution for: *\"{c_sol['q']}\"*" if lang == "en" else f"Hal: *\"{c_sol['q']}\"*"))
+            st.markdown(c_sol["text"])
+            if c_sol.get("visual"):
+                show_visual(c_sol["visual"], lang, f"{sec_id}_sol_vis")
+            read_aloud(c_sol["text"], key=f"{sec_id}_sol_aud", lang=lang)
+            st.caption("💾 " + ("Saved to your chat history! You can also view all saved chats in 💬 Ask Buddy." if lang == "en" else "Chat history mein save ho gaya! Aap '💬 Buddy se poochho' mein bhi dekh sakte hain."))
+            if st.button("✖️ " + ("Close Solution" if lang == "en" else "Band karein"), key=f"{sec_id}_sol_close"):
+                st.session_state[f"{sec_id}_sol"] = None
+                st.rerun()
+
+    return query.strip()
 
 
 def init_state():
     ss = st.session_state
-    ss.setdefault("messages", [])
+    if "messages" not in ss or not ss["messages"]:
+        try:
+            import student_memory
+            ss["messages"] = student_memory.load_all_chats()
+        except Exception:
+            ss.setdefault("messages", [])
     ss.setdefault("events", [])
     ss.setdefault("body_i", 0)
     ss.setdefault("body_highlight", None)
@@ -1309,6 +1316,7 @@ def init_state():
     ss.setdefault("math_active_key", "pythagoras")
     ss.setdefault("top_cam_sol", None)
     ss.setdefault("top_cam_hint_text", "")
+
 
 
 # ----------------------------------------------------------------------------- sidebar
@@ -1351,9 +1359,46 @@ def sidebar():
     try:
         import student_memory
         prof = student_memory.load_student_profile()
-        with st.sidebar.expander("🎓 " + ("Student Profile & AI Training Memory" if lang == "en" else "Student Profile & Training Memory"), expanded=False):
+        with st.sidebar.expander("🎓 " + ("Student Profile & AI Sign-In" if lang == "en" else "Student Profile & Sign-In"), expanded=True):
+            st.markdown("##### 👤 " + ("Student Sign-In Details" if lang == "en" else "Student Sign-In Details"))
+            s_name = st.text_input(
+                "Student Name / Naam:",
+                value=st.session_state.get("student_name", prof.get("student_name", "Junior Scientist")),
+                key="sb_prof_name",
+                placeholder="e.g. Aarav, Ananya, Kabir..."
+            )
+            class_options = ["Nursery", "LKG", "UKG", "1", "2", "3", "4", "5", "6", "7", "8"]
+            curr_cls = str(st.session_state.get("class_level", prof.get("student_grade", "5"))).replace("Class ", "")
+            cls_idx = class_options.index(curr_cls) if curr_cls in class_options else 5
+
+            s_grade = st.selectbox(
+                "Class / Grade:",
+                options=class_options,
+                index=cls_idx,
+                key="sb_prof_grade"
+            )
+            s_focus = st.text_input(
+                "Learning Goals / Focus:",
+                value=st.session_state.get("student_focus", prof.get("learning_focus", "NCERT Science & Math")),
+                key="sb_prof_focus",
+                placeholder="e.g. Science, Trees & Animals, Maths..."
+            )
+            if st.button("💾 " + ("Save & Sign In" if lang == "en" else "Save & Sign In Karein"), key="btn_save_student_prof", type="primary", width="stretch"):
+                st.session_state["student_name"] = s_name
+                st.session_state["class_level"] = s_grade
+                st.session_state["student_focus"] = s_focus
+                prof["student_name"] = s_name
+                prof["student_grade"] = f"Class {s_grade}"
+                prof["learning_focus"] = s_focus
+                prof["assessed_level"] = student_memory.assess_student_level(f"Class {s_grade}", prof.get("total_chats", 0), prof.get("topics_mastered", []))
+                student_memory.save_student_profile(prof)
+                st.toast(f"🌟 Welcome, {s_name}! Profile saved for Class {s_grade}.", icon="🎉")
+                st.rerun()
+
+            st.divider()
+            st.markdown(f"**👤 Student:** `{prof.get('student_name', s_name)}`")
             st.markdown(f"**Level:** `{prof.get('assessed_level')}`")
-            st.markdown(f"**Total Chats Logged:** `{prof.get('total_chats', 0)}`")
+            st.markdown(f"**Total Chats Logged:** `{prof.get('total_chats', len(st.session_state.get('messages', [])))}`")
             mastered = prof.get("topics_mastered", [])
             if mastered:
                 st.markdown(f"🌟 **Mastered:** {', '.join(mastered[-3:])}")
@@ -1378,6 +1423,7 @@ def sidebar():
     except Exception:
         pass
 
+
     st.sidebar.divider()
     env_api_key = os.getenv("ANTHROPIC_API_KEY", "")
     if not env_api_key:
@@ -1392,7 +1438,13 @@ def sidebar():
     st.sidebar.success("AI mode on" if api_key else "Built-in lessons mode")
     st.sidebar.info("🛡️ Safety filter is always on. Private details are hidden and unsafe topics are blocked.")
     if st.sidebar.button("Clear chat"):
+        try:
+            import student_memory
+            student_memory.clear_chat_history()
+        except Exception:
+            pass
         st.session_state["messages"] = []
+        st.rerun()
     st.sidebar.markdown("""
     <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(0, 0, 0, 0.08);">
       <span style="font-size: 0.85rem; opacity: 0.85;">🚀 Created by <b>Mahdi Nawaz</b></span>
@@ -1406,60 +1458,27 @@ def tab_chat(lang, age, api_key, model):
     t = TXT[lang]
     st.subheader(t["tabs"][0])
 
-    # Interactive Mystery Science Prompt Starter
-    mysteries = MYSTERIES[lang]
-    st.markdown(f"💡 **{t['mystery']}**")
-    m_cols = st.columns(min(len(mysteries), 3))
-    for i, (q_text, label) in enumerate(mysteries[:3]):
-        if m_cols[i % len(m_cols)].button(label, key=f"myst_{i}", width="stretch"):
-            st.session_state["pending"] = q_text
-            st.rerun()
-
     # 🎤 Voice Question Input for Young Students (Nursery to 8th Class)
-    st.markdown("##### 🎙️ " + ("Voice Question (Can't write? Speak to Buddy!)" if lang == "en" else "Awaaz Se Poochhein (Likhna mushkil hai? Bol kar poochhein!)"))
-    render_whatsapp_voice_bar(lang)
-
-    v_c1, v_c2 = st.columns([1.2, 1])
-    with v_c1:
-        voice_rec = st.audio_input(
-            "🎤 " + ("Record voice question (auto-transcribed)" if lang == "en" else "Awaaz record karein (auto-transcribed)"),
-            key="voice_rec_input"
-        )
-        if voice_rec:
-            with st.spinner("🎧 Listening to your voice recording… 🎙️" if lang == "en" else "Awaaz sun raha hoon… 🎙️"):
-                spoken_text = transcribe_audio(voice_rec, lang)
-            if spoken_text:
-                st.success(f"🗣️ " + (f"Heard: \"{spoken_text}\"" if lang == "en" else f"Suna: \"{spoken_text}\""))
-                st.session_state["pending"] = spoken_text
-                st.rerun()
-            else:
-                st.info("💡 " + ("Voice recorded! Buddy is listening. Tap a quick question below or ask in chat:" if lang == "en" else "Awaaz record ho gayi!"))
-    with v_c2:
-        st.caption("⚡ " + ("Quick Spoken Questions (tap to ask):" if lang == "en" else "Bolne Wale Sawaal (tap karein):"))
-        spoken_prompts = [
-            ("⚡ What is force?", "What is force and motion?"),
-            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
-            ("🫀 How does the heart pump blood?", "What does the heart do in our body?"),
-            ("🍎 Why do things fall down?", "How does gravity pull things down?"),
-            ("🍕 What is 1/2 of a pizza?", "Explain fractions with pizza"),
-        ] if lang == "en" else [
-            ("⚡ Force kya hota hai?", "Explain force"),
-            ("🌌 Aasman neela kyun hai?", "Why is the sky blue?"),
-            ("🫀 Dil kaise dhadakta hai?", "Dil kya kaam karta hai?"),
-            ("🍎 Cheezein neeche kyun girti hain?", "Gravity kya hai?"),
-            ("🍕 Pizza ka 1/2 kya hota hai?", "Fractions samjhao"),
-        ]
-        sp_c1, sp_c2 = st.columns(2)
-        for s_i, (s_label, s_q) in enumerate(spoken_prompts):
-            target_col = sp_c1 if s_i % 2 == 0 else sp_c2
-            if target_col.button(s_label, key=f"sp_p_{s_i}", width="stretch"):
-                st.session_state["pending"] = s_q
-                st.rerun()
+    voice_rec = st.audio_input(
+        "🎤 " + ("Record voice question (auto-transcribed)" if lang == "en" else "Awaaz record karein (auto-transcribed)"),
+        key="voice_rec_input"
+    )
+    if voice_rec:
+        with st.spinner("🎧 Listening to your voice recording… 🎙️" if lang == "en" else "Awaaz sun raha hoon… 🎙️"):
+            spoken_text = transcribe_audio(voice_rec, lang)
+        if spoken_text:
+            st.success(f"🗣️ " + (f"Heard: \"{spoken_text}\"" if lang == "en" else f"Suna: \"{spoken_text}\""))
+            st.session_state["pending"] = spoken_text
+            st.rerun()
+        else:
+            st.info("💡 " + ("Voice recorded! Buddy is listening. Ask in chat below:" if lang == "en" else "Awaaz record ho gayi! Neeche chat mein poochhein:"))
 
     st.divider()
 
     for i, m in enumerate(st.session_state["messages"]):
         with st.chat_message(m["role"], avatar="🧒" if m["role"] == "user" else "🧠"):
+            if m.get("subject") and m["role"] == "user":
+                st.caption(f"📚 {m['subject']}")
             st.markdown(m["text"])
             if m.get("notice"):
                 st.caption(m["notice"])
@@ -1473,12 +1492,37 @@ def tab_chat(lang, age, api_key, model):
     q = st.chat_input(t["ask"]) or st.session_state.pop("pending", None)
     if q:
         history = [{"q": a["q"], "a": a["text"]} for a in st.session_state["messages"]
-                   if a["role"] == "assistant" and a.get("q") and not a.get("blocked")]
+                   if a.get("role") == "assistant" and a.get("q") and not a.get("blocked")]
         with st.spinner("Thinking… 🤔" if lang == "en" else "Soch raha hoon… 🤔"):
             r = tutor_engine.answer(q, lang, age, history, api_key, model)
         st.session_state["messages"].append({"role": "user", "text": q})
-        st.session_state["messages"].append({"role": "assistant", "text": r.text, "visual": r.visual, "q": q,
-                                             "notice": r.notice, "blocked": r.blocked})
+        st.session_state["messages"].append({
+            "role": "assistant",
+            "text": r.text,
+            "visual": r.visual,
+            "q": q,
+            "topic": r.topic or "General",
+            "notice": r.notice,
+            "blocked": r.blocked
+        })
+
+        # Persist interaction to Chat history & training dataset like ChatGPT
+        try:
+            import student_memory
+            grade = str(st.session_state.get("class_level", "5"))
+            student_memory.record_student_chat(
+                grade=f"Class {grade}" if grade.isdigit() else grade,
+                lang=lang,
+                question=q,
+                answer_text=r.text,
+                subject=r.subject or "General",
+                topic=r.topic or "General",
+                xp=10,
+                visual=r.visual
+            )
+        except Exception:
+            pass
+
         if r.blocked:
             log("blocked", topic=r.category or "")
         else:
@@ -1489,7 +1533,7 @@ def tab_chat(lang, age, api_key, model):
 
 # ----------------------------------------------------------------------------- snap & solve tab
 def tab_snap_solve(lang, age, api_key, model):
-    st.subheader(TXT[lang]["tabs"][1])
+    st.subheader(TXT[lang]["tabs"][6])
     st.caption("📸 " + ("Take a photo of your notebook or textbook question, or choose a subject below for step-by-step guidance!"
                         if lang == "en" else "Apni textbook ya copy ke sawaal ki photo kheencho ya subject chuno aur solution pao!"))
 
@@ -1544,58 +1588,7 @@ def tab_snap_solve(lang, age, api_key, model):
                 st.session_state["snap_rotation"] = 0
                 st.rerun()
 
-    # Subject-specific Presets
-    subject_presets = {
-        "physics": [
-            ("⚡ What is force & motion?", "What is force and Newton's law?"),
-            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
-            ("🍎 How does gravity work?", "How does gravity work and why do things fall?"),
-            ("💡 Ohm's Law (V = I × R)", "Explain Ohm's law with voltage, current and resistance"),
-            ("🕰️ Time period of a pendulum", "Calculate the time period of a pendulum"),
-        ],
-        "math": [
-            ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
-            ("⭕ Area of circle with radius 7 cm", "What is the area and circumference of a circle with radius 7 cm?"),
-            ("⚖️ Solve linear equation 2x + 6 = 16", "Solve the linear equation 2x + 6 = 16 for x"),
-            ("🍕 Convert fraction 3/8 to % and decimal", "Convert 3/8 into decimal and percentage"),
-            ("🥫 3D Cylinder surface area & volume", "Calculate surface area and volume of cylinder r=4 h=8"),
-        ],
-        "body": [
-            ("🫀 How does the heart pump blood?", "What does the heart do in the circulatory system?"),
-            ("🫁 How do lungs breathe oxygen?", "How do lungs take in oxygen and breathe out carbon dioxide?"),
-            ("🧠 What are the parts of the brain?", "What are the parts and functions of the brain?"),
-            ("🫘 How do kidneys filter blood?", "How do kidney nephrons filter blood and make urine?"),
-            ("🦴 How many bones in the body?", "How many bones are in the human skeleton?"),
-        ],
-        "chem": [
-            ("🥇 Importance of metals & non-metals", "Importance of metals and non-metals in daily life"),
-            ("⚛️ Oxygen atom: protons & electrons", "What is an atom of oxygen?"),
-            ("💧 Water molecule (H2O) structure", "What is water H2O made of?"),
-            ("🍋 What is pH of lemon juice?", "What is the pH of lemon juice?"),
-            ("🌋 Baking soda & vinegar reaction", "Explain baking soda and vinegar fizz reaction"),
-            ("🧊 Ice, liquid water and steam states", "What are the three states of matter?"),
-        ],
-    }
-    if active_subj == "all":
-        cur_presets = [
-            ("🥇 Metals & Non-Metals", "Importance of metals and non-metals in daily life"),
-            ("⚡ What is force?", "What is force and Newton's law?"),
-            ("🌌 Why is the sky blue?", "Why is the sky blue?"),
-            ("📐 Hypotenuse of 3 & 4 cm triangle", "In a right triangle with legs 3 cm and 4 cm, find the hypotenuse"),
-            ("⚖️ Solve linear equation 2x + 6 = 16", "Solve the linear equation 2x + 6 = 16 for x"),
-            ("🫀 How does the heart pump blood?", "What does the heart do in the circulatory system?"),
-            ("⚛️ Oxygen atom structure", "What is an atom of oxygen?"),
-        ]
-    else:
-        cur_presets = subject_presets.get(active_subj, [])
 
-    st.markdown("##### ⚡ " + ("Quick Question Presets (or type your question):" if lang == "en" else "Quick Sawaal Presets (ya apna sawaal likhein):"))
-    p_cols = st.columns(min(len(cur_presets), 3))
-    for p_idx, (p_title, p_query) in enumerate(cur_presets):
-        col_idx = p_idx % len(p_cols)
-        if p_cols[col_idx].button(p_title, key=f"snap_p_{active_subj}_{p_idx}", width="stretch"):
-            st.session_state["snap_problem_text"] = p_query
-            st.rerun()
 
     user_prob = st.text_input(
         "Question text",
@@ -1773,12 +1766,86 @@ def tab_snap_solve(lang, age, api_key, model):
                     st.rerun()
 
 
-# ----------------------------------------------------------------------------- body tab
-def tab_body(lang):
+# ----------------------------------------------------------------------------- nature tab (General Science: Trees & Animals)
+def tab_nature(lang, age="10-12", api_key=None, model=None):
     t = TXT[lang]
-    st.subheader(t["tabs"][2])
+    st.subheader(t["tabs"][1])
+
+    # 1. Section Tools: Search + Direct Search Button + Camera (Upload/Photo/Screenshot) + Voice
+    render_section_tools(
+        "nature",
+        "General Science",
+        "Search parts of tree, photosynthesis, butterfly life cycle, frog, food chain..." if lang == "en" else "Ped ke bhaag, photosynthesis, titli, mendhak, food chain khojein...",
+        lang, age, api_key, model
+    )
+
+    # 2. Interactive Study & Experiment Section
+    st.markdown("#### 🔬 " + ("Interactive Trees, Plants & Animals Lab" if lang == "en" else "Interactive Ped, Paudhe aur Jeev Vigyan Lab"))
+
+    topics = [
+        ("🌳 " + ("Parts of a Tree & Plant Anatomy" if lang == "en" else "Ped aur Paudhe ke Bhaag (Anatomy)"), "tree_parts"),
+        ("☀️ " + ("Photosynthesis: How Plants Make Food" if lang == "en" else "Photosynthesis: Paudhe Bhojan Kaise Banate Hain"), "photosynthesis"),
+        ("🦋 " + ("Butterfly Metamorphosis Life Cycle" if lang == "en" else "Titli Ka Jeevan Chakra (Metamorphosis)"), "butterfly_lifecycle"),
+        ("🐸 " + ("Frog Amphibian Life Cycle" if lang == "en" else "Mendhak Ka Jeevan Chakra (Frog Life Cycle)"), "frog_lifecycle"),
+        ("🦁 " + ("Animal Diets (Herbivores, Carnivores, Omnivores)" if lang == "en" else "Jaanwaron Ka Bhojan (Shakahari, Mansahari)"), "animal_diets"),
+        ("🌱 " + ("Food Chain & Ecosystem Flow" if lang == "en" else "Khaadya Shrinkhala (Food Chain Flow)"), "food_chain"),
+    ]
+
+    selected_idx = st.selectbox(
+        "Choose Nature Study Topic",
+        range(len(topics)),
+        format_func=lambda idx: topics[idx][0],
+        key="nature_topic_select",
+        label_visibility="collapsed"
+    )
+    selected_key = topics[selected_idx][1]
+    nature_data = C.NATURE_TOPICS.get(selected_key, {})
+    title = nature_data.get("title_hi" if lang == "hi" else "title_en", "")
+    desc = nature_data.get("hi" if lang == "hi" else "en", "")
+    fact = nature_data.get("fact_hi" if lang == "hi" else "fact_en", "")
+    act = nature_data.get("activity_hi" if lang == "hi" else "activity_en", "")
+
+    col_vis, col_info = st.columns([1.2, 1])
+    with col_vis:
+        if selected_key == "tree_parts":
+            show_svg(V.tree_plant_svg(lang), 480)
+        elif selected_key == "photosynthesis":
+            show_svg(V.photosynthesis_svg(lang), 480)
+        elif selected_key == "butterfly_lifecycle":
+            show_svg(V.butterfly_lifecycle_svg(lang), 480)
+        elif selected_key == "frog_lifecycle":
+            show_svg(V.butterfly_lifecycle_svg(lang), 480)
+        else:
+            show_svg(V.nature_foodchain_svg(lang), 480)
+
+    with col_info:
+        st.markdown(f"### {title}")
+        st.markdown(desc)
+        if fact:
+            st.markdown(f"<div class='fact'>💡 <b>{'Mazedaar Baat:' if lang == 'hi' else 'Fun Fact:'}</b> {fact}</div>", unsafe_allow_html=True)
+        if act:
+            st.markdown(f"<div class='act' style='margin-top:10px;'>🧪 <b>{'Ghar par karke dekho:' if lang == 'hi' else 'Try at home:'}</b> {act}</div>", unsafe_allow_html=True)
+
+        read_aloud(f"{title}. {desc} {fact}", key=f"aud_nat_{selected_key}", lang=lang)
+        if st.button("⭐ " + ("I Learned This Topic! (+15 XP)" if lang == "en" else "Maine Yeh Seekha! (+15 XP)"), key=f"btn_xp_nat_{selected_key}"):
+            add_xp(15, f"Mastered {title}!", badge_id="nature_explorer", badge_name="Nature Explorer")
+            log("learned", "General Science", selected_key)
+
+
+# ----------------------------------------------------------------------------- body tab
+def tab_body(lang, age="10-12", api_key=None, model=None):
+    t = TXT[lang]
+    st.subheader(t["tabs"][5])
+
+    render_section_tools(
+        "body",
+        "Human Body",
+        "Search brain lobes, heart pumping, lungs, kidneys nephron, skeleton..." if lang == "en" else "Sharir ka sawaal khojein (dimaag, dil, fefde, gurde)...",
+        lang, age, api_key, model
+    )
 
     parts = C.BODY_PARTS
+
 
     # Body System Filters (per Bing anatomical diagram categories)
     systems = [
@@ -1929,12 +1996,26 @@ def tab_body(lang):
 
 
 # ----------------------------------------------------------------------------- physics tab
-def tab_physics(lang):
+def tab_physics(lang, age="10-12", api_key=None, model=None):
     t = TXT[lang]
-    st.subheader(t["tabs"][3])
+    st.subheader(t["tabs"][2])
 
-    key = st.radio("Experiment", list(C.PHYSICS), horizontal=True,
-                   format_func=lambda k: C.PHYSICS[k]["title_" + lang])
+    render_section_tools(
+        "physics",
+        "Physics Lab",
+        "Search projectile, newton, gravity, friction, ohm's law, pendulum, light..." if lang == "en" else "Physics sawaal khojein (gravity, projectile, pendulum, light)...",
+        lang, age, api_key, model
+    )
+
+    p_keys = list(C.PHYSICS.keys())
+    p_titles = {k: C.PHYSICS[k]["title_" + lang] for k in p_keys}
+
+    key = st.selectbox(
+        "🔬 " + ("Choose Experiment:" if lang == "en" else "Experiment Chunein:"),
+        p_keys,
+        format_func=lambda k: p_titles[k],
+        key="phys_exp_select"
+    )
     p = C.PHYSICS[key]
     st.write(p[lang])
     st.markdown(f"<div class='formula'>{p['formula']}</div>", unsafe_allow_html=True)
@@ -2006,9 +2087,16 @@ def tab_physics(lang):
 
 
 # ----------------------------------------------------------------------------- chemistry tab
-def tab_chem(lang):
+def tab_chem(lang, age="10-12", api_key=None, model=None):
     t = TXT[lang]
-    st.subheader(t["tabs"][4])
+    st.subheader(t["tabs"][3])
+
+    render_section_tools(
+        "chem",
+        "Chemistry Lab",
+        "Search atom builder, molecules, states of matter, pH scale, reactions..." if lang == "en" else "Chemistry sawaal khojein (atom, molecule, pH scale, reaction)...",
+        lang, age, api_key, model
+    )
 
     a, m, s, p, rx, h = st.tabs([
         "⚛️ Atom builder", "💧 Molecules", "🧊 States of matter", "🍋 pH scale", "🌋 Virtual Reaction Lab", "🏠 Home experiments"
@@ -2074,9 +2162,16 @@ def tab_chem(lang):
 
 
 # ----------------------------------------------------------------------------- mathematics tab (Class 1 to 8)
-def tab_maths(lang):
+def tab_maths(lang, age="10-12", api_key=None, model=None):
     t = TXT[lang]
-    st.subheader(t["tabs"][5])
+    st.subheader(t["tabs"][4])
+
+    render_section_tools(
+        "math",
+        "Mathematics",
+        "Search circle area, pythagoras, cylinder volume, fractions, algebra..." if lang == "en" else "Maths sawaal khojein (area, pythagoras, fraction, algebra)...",
+        lang, age, api_key, model
+    )
     st.caption("Interactive Visual Geometry, Pythagoras Theorem, Fraction Pizza, Algebra Balance Scale, and Speed Math Arena!" if lang == "en" else
                "Visual Geometry, Pythagoras Pramey, Fraction Pizza, Algebra Tarazu Scale aur Speed Math Challenge!")
 
@@ -2353,25 +2448,24 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # 1School-style Unified Top Bar: Global Search Hub + Camera & Screenshot Snap/Paste + Voice Mic
-    render_unified_top_bar(lang, age, api_key, model)
-
     tabs = st.tabs(TXT[lang]["tabs"])
     with tabs[0]:
         tab_chat(lang, age, api_key, model)
     with tabs[1]:
-        tab_snap_solve(lang, age, api_key, model)
+        tab_nature(lang, age, api_key, model)
     with tabs[2]:
-        tab_body(lang)
+        tab_physics(lang, age, api_key, model)
     with tabs[3]:
-        tab_physics(lang)
+        tab_chem(lang, age, api_key, model)
     with tabs[4]:
-        tab_chem(lang)
+        tab_maths(lang, age, api_key, model)
     with tabs[5]:
-        tab_maths(lang)
+        tab_body(lang, age, api_key, model)
     with tabs[6]:
-        tab_quiz(lang)
+        tab_snap_solve(lang, age, api_key, model)
     with tabs[7]:
+        tab_quiz(lang)
+    with tabs[8]:
         tab_parent(lang)
 
     # Footer with Creator Credit

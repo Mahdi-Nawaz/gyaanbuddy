@@ -19,12 +19,17 @@ MATH_VISUALS = [
     "math:pythagoras", "math:fractions", "math:algebra"
 ]
 
+NATURE_VISUALS = [
+    "nature:tree", "nature:plant", "nature:photosynthesis", "nature:butterfly", "nature:foodchain"
+]
+
 ALLOWED_VISUALS = (
     [f"body:{b['key']}" for b in C.BODY_PARTS] + ["body:kidneys:detail"] + [f"physics:{k}" for k in C.PHYSICS]
     + [f"chem:mol:{k}" for k in C.MOLECULES] + [f"chem:states:{k}" for k in C.STATES]
     + [f"chem:ph:{k}" for k in C.PH_SUBSTANCES] + [f"chem:atom:{z}" for z in C.ELEMENT_BY_Z]
     + ["chem:metals"]
     + MATH_VISUALS
+    + NATURE_VISUALS
 )
 
 AGE_GUIDE = {
@@ -95,6 +100,21 @@ def _build_lessons() -> list[dict]:
             lessons.append(dict(key=f"math_{k}", subject="Mathematics", topic=m["title_en"], visual=f"math:{k}",
                                 en=f"{m['en']}\n\n📐 Formula: {m['formula']}", hi=f"{m['hi']}\n\n📐 Formula: {m['formula']}",
                                 keywords=set(m["keywords"])))
+    if hasattr(C, "NATURE_TOPICS"):
+        vis_map = {
+            "tree_parts": "nature:tree",
+            "photosynthesis": "nature:photosynthesis",
+            "butterfly_lifecycle": "nature:butterfly",
+            "frog_lifecycle": "nature:butterfly",
+            "animal_diets": "nature:foodchain",
+            "food_chain": "nature:foodchain",
+        }
+        for k, n in C.NATURE_TOPICS.items():
+            lessons.append(dict(key=f"nature_{k}", subject="General Science", topic=n["title_en"],
+                                visual=vis_map.get(k, "nature:tree"),
+                                en=f"{n['en']}\n\n🌿 {n['formula']}",
+                                hi=f"{n['hi']}\n\n🌿 {n['formula']}",
+                                keywords=set(n["keywords"])))
     return lessons
 
 

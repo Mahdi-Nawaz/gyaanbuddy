@@ -33,6 +33,8 @@ def load_student_profile() -> dict[str, Any]:
             pass
 
     default_profile: dict[str, Any] = {
+        "student_name": "Junior Scientist",
+        "learning_focus": "NCERT Science & Math",
         "student_grade": "Class 4",
         "assessed_level": "Class 4 • Curious Explorer",
         "total_chats": 0,
@@ -164,14 +166,18 @@ def record_student_chat(
 def get_student_context_prompt() -> str:
     """Generate adaptive context to inject into LLM system prompt so it knows the student's level."""
     profile = load_student_profile()
-    grade = profile.get("student_grade", "Class 4")
-    level = profile.get("assessed_level", "Class 4")
+    name = profile.get("student_name", "Junior Scientist")
+    grade = profile.get("student_grade", "Class 5")
+    level = profile.get("assessed_level", "Class 5")
+    focus = profile.get("learning_focus", "NCERT Science & Math")
     mastered = profile.get("topics_mastered", [])
     practicing = profile.get("topics_practicing", [])
 
     parts = [
+        f"STUDENT NAME: {name}",
         f"STUDENT PROFILE & ASSESSED LEVEL: {level}",
         f"Target Grade Curriculum: {grade}",
+        f"Learning Focus / Goals: {focus}",
     ]
     if mastered:
         parts.append(f"Mastered Topics: {', '.join(mastered[-4:])}")
@@ -179,7 +185,7 @@ def get_student_context_prompt() -> str:
         parts.append(f"Currently Learning / Needs Support: {', '.join(practicing[-4:])}")
 
     parts.append(
-        "ADAPTIVE INSTRUCTION: Calibrate vocabulary and pacing to this student's exact grade and level. "
+        f"ADAPTIVE INSTRUCTION: Address the student warmly by name ({name}). Calibrate vocabulary and pacing to their exact grade ({grade}). "
         "Reference concepts they mastered when introducing new topics, and give encouraging positive feedback!"
     )
     return "\n".join(parts)
@@ -194,9 +200,54 @@ def get_training_dataset_bytes() -> bytes:
     return b""
 
 
+def load_all_chats(limit: int = 15) -> list[dict[str, Any]]:
+    """Load persistent chat history as messages list for session state restoration, like ChatGPT."""
+    _ensure_dir()
+    messages: list[dict[str, Any]] = []
+    if CHAT_LOG_FILE.exists():
+        try:
+            with open(CHAT_LOG_FILE, "r", encoding="utf-8") as f:
+                lines = [line.strip() for line in f if line.strip()]
+            for line in lines[-limit:]:
+                entry = json.loads(line)
+                messages.append({
+                    "role": "user",
+                    "text": entry["question"],
+                    "subject": entry.get("subject", "")
+                })
+                messages.append({
+                    "role": "assistant",
+                    "text": entry["answer"],
+                    "visual": entry.get("visual"),
+                    "q": entry["question"],
+                    "subject": entry.get("subject", ""),
+                    "topic": entry.get("topic", "")
+                })
+        except Exception:
+            pass
+    return messages
+
+
+def clear_chat_history() -> None:
+    """Clear persistent chat history and training logs."""
+    _ensure_dir()
+    if CHAT_LOG_FILE.exists():
+        try:
+            CHAT_LOG_FILE.unlink()
+        except Exception:
+            pass
+    if TRAINING_FILE.exists():
+        try:
+            TRAINING_FILE.unlink()
+        except Exception:
+            pass
+
+
 def reset_student_profile() -> None:
     """Reset learning profile and logs."""
     _ensure_dir()
     if PROFILE_FILE.exists():
         PROFILE_FILE.unlink()
+    clear_chat_history()
     load_student_profile()
+
