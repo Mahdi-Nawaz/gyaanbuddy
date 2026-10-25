@@ -26,9 +26,15 @@ ALLOWED_VISUALS = (
     + MATH_VISUALS
 )
 
-AGE_GUIDE = {"6-8": "very simple words, 1-2 short sentences per idea, fun comparisons",
-             "9-12": "simple words with a little scientific vocabulary, clear examples",
-             "13-15": "clear explanations with proper science terms and a formula when useful"}
+AGE_GUIDE = {
+    "Nursery - KG": "ultra simple words, playful analogies, lots of friendly emojis, 1-2 short sentences",
+    "Class 1 - 2": "very simple words, 1-2 short sentences per idea, fun everyday comparisons",
+    "Class 3 - 5": "simple words with a little scientific vocabulary, clear everyday examples",
+    "Class 6 - 8": "clear explanations with proper science terms, concepts and formulas",
+    "6-8": "very simple words, 1-2 short sentences per idea, fun comparisons",
+    "9-12": "simple words with a little scientific vocabulary, clear examples",
+    "13-15": "clear explanations with proper science terms and a formula when useful",
+}
 
 SYSTEM_PROMPT = """You are GyaanBuddy, a friendly, patient tutor for children aged {age} in India.
 Topics: school science (human body, physics, chemistry), maths basics and general learning.

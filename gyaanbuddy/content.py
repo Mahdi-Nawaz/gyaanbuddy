@@ -125,6 +125,48 @@ PHYSICS = {
         activity_en="Put a pencil in a clear glass of water and look from the side. Why does it look broken?",
         activity_hi="Ek saaf glass paani mein pencil rakho aur side se dekho. Woh tuti hui kyun dikhti hai?",
         keywords=["refraction", "light", "roshni", "bend", "mudna", "snell", "lens", "reflection", "prism"]),
+    "force": dict(
+        title_en="Force & Motion (Push or Pull)", title_hi="Force aur Gati (Dhakka ya Kheenchna)",
+        en="A force is simply a push or a pull! It can make objects speed up, slow down, stop, or turn. "
+           "Sir Isaac Newton showed that Force = Mass × Acceleration (F = m × a). Its unit is the Newton (N).",
+        hi="Force (bal) kisi cheez ko dhakka dena (push) ya kheenchna (pull) hota hai! Yeh kisi cheez ko chala sakti hai, "
+           "rok sakti hai ya disha badal sakti hai. Newton ka niyam: Force = Mass × Acceleration (F = m × a). Unit: Newton (N).",
+        formula="F = m × a",
+        activity_en="Push a toy car on a smooth floor and then on a rough carpet. Where does it stop sooner?",
+        activity_hi="Ek khilona gaadi ko pehle chikne farsh par aur phir darri (carpet) par dhakelo. Kahan jaldi rukti hai?",
+        keywords=["force", "bal", "push", "pull", "motion", "gati", "newton", "acceleration", "mass", "f=ma",
+                  "dhakka", "kheenchna", "speed", "friction", "laws of motion"]),
+    "sky": dict(
+        title_en="Why is the sky blue? (Rayleigh scattering)", title_hi="Aasman neela kyun hai? (Rayleigh scattering)",
+        en="Sunlight looks white, but it holds all rainbow colors! Blue light travels in short, small waves and "
+           "gets scattered in all directions by air molecules in Earth's atmosphere. That is why the sky appears bright blue!",
+        hi="Suraj ki roshni mein rainbow ke 7 rang hote hain! Blue light chhote waves mein chalti hai aur hawa ke "
+           "molecules se takra kar charon taraf phail (scatter) jaati hai. Isliye din mein aasman neela dikhta hai!",
+        formula="Scattering ∝ 1 / λ⁴",
+        activity_en="In a dark room, shine a torch through a clear glass of water with a few drops of milk. Look at the bluish glow from the side!",
+        activity_hi="Andhere kamre mein paani ke glass mein 2 boond doodh milao aur torch ki roshni daalo. Side se halki neeli glow dikhegi!",
+        keywords=["sky", "blue", "blue sky", "aasman", "neela", "scattering", "rayleigh", "sunlight", "atmosphere",
+                  "roshni", "rainbow", "waves"]),
+    "gravity": dict(
+        title_en="Gravity (Why things fall down)", title_hi="Gravity (Cheezein neeche kyun girti hain)",
+        en="Gravity is an invisible pulling force between all masses in the universe. Earth's gravity pulls everything "
+           "towards its centre, keeping our feet on the ground and giving objects weight (w = m × g).",
+        hi="Gravity ek aisi adrishya force hai jo har cheez ko apni taraf kheenchti hai. Dharti ki gravity sabhi "
+           "cheezon ko center ki taraf kheenchti hai, jisse hum zameen par khade rehte hain (w = m × g).",
+        formula="w = m × g  •  g ≈ 9.8 m/s²",
+        activity_en="Drop a flat paper sheet and a crumpled paper ball together from shoulder height. Why does the crumpled ball land first? (Air resistance!)",
+        activity_hi="Ek seedha kagaz aur ek mod kar banayi kagaz ki ball ek saath giraao. Kaun pehle girti hai aur kyun?",
+        keywords=["gravity", "gurutvakarshan", "fall", "girna", "weight", "earth", "mass", "newton", "orbit", "pull"]),
+    "friction": dict(
+        title_en="Friction (Grip, Heat & Stopping)", title_hi="Friction / Gharshan (Rukna aur Garmi)",
+        en="Friction is the resistive force that opposes motion when two surfaces touch each other. "
+           "It creates heat, helps you walk without slipping, and lets car brakes stop the wheels safely.",
+        hi="Friction (gharshan) do satah ke chhoone par gati ko rokne wali force hai. Yeh garmi paida karti hai, "
+           "humein bina phisle chalne mein help karti hai aur gaadiyon ke break lagane mein zaroori hoti hai.",
+        formula="f = μ × N",
+        activity_en="Rub your palms together quickly for 10 seconds. Feel them get warm? That is friction creating heat!",
+        activity_hi="Apni dono hatheliyon ko tezi se 10 second ragdo. Garam lagti hain? Yeh friction ki wajah se heat banti hai!",
+        keywords=["friction", "gharshan", "grip", "slip", "sliding", "rolling", "heat", "brakes", "rough", "smooth"]),
 }
 
 # ----------------------------------------------------------------------------- chemistry
