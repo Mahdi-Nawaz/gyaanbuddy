@@ -1147,7 +1147,7 @@ def init_state():
     ss.setdefault("student_name", "Junior Scientist")
     ss.setdefault("avatar", "🧑‍🚀 Astro Kid")
     ss.setdefault("theme", "🌈 Wonder Academy (Nursery - Class 8)")
-    ss.setdefault("class_level", "Class 3 - 5")
+    ss.setdefault("class_level", "5")
     ss.setdefault("snap_rotation", 0)
     ss.setdefault("snap_subject", "all")
     ss.setdefault("search_query", "")
@@ -1162,22 +1162,32 @@ def sidebar():
     lang_label = st.sidebar.radio("Language / Bhasha", ["English", "Hinglish"], horizontal=True)
     lang = "hi" if lang_label == "Hinglish" else "en"
 
-    # Class Filter (Nursery to 8th Class)
-    class_options = ["Nursery - KG", "Class 1 - 2", "Class 3 - 5", "Class 6 - 8"]
+    # Class Filter (Nursery to 8th Class: Nursery, LKG, UKG, 1, 2, 3, 4, 5, 6, 7, 8)
+    class_options = ["Nursery", "LKG", "UKG", "1", "2", "3", "4", "5", "6", "7", "8"]
+    saved_class = st.session_state.get("class_level", "5")
+    if saved_class not in class_options:
+        saved_class = "5"
     chosen_class = st.sidebar.select_slider(
         "🎓 " + ("Class Filter (Nursery to 8th)" if lang == "en" else "Class Filter (Nursery se 8th)"),
         options=class_options,
-        value=st.session_state.get("class_level", "Class 3 - 5"),
+        value=saved_class,
         help="Adjusts explanation complexity and vocabulary for your child's class level."
     )
     st.session_state["class_level"] = chosen_class
     class_to_age = {
-        "Nursery - KG": "6-8",
-        "Class 1 - 2": "6-8",
-        "Class 3 - 5": "9-12",
-        "Class 6 - 8": "13-15",
+        "Nursery": "3-5",
+        "LKG": "4-6",
+        "UKG": "5-7",
+        "1": "6-8",
+        "2": "6-8",
+        "3": "8-10",
+        "4": "9-11",
+        "5": "10-12",
+        "6": "11-13",
+        "7": "12-14",
+        "8": "13-15",
     }
-    age = class_to_age.get(chosen_class, "9-12")
+    age = class_to_age.get(chosen_class, "10-12")
 
     st.sidebar.divider()
     api_key = st.sidebar.text_input("Anthropic API key (optional, for parents)", type="password",
@@ -1449,18 +1459,6 @@ def tab_body(lang):
     t = TXT[lang]
     st.subheader(t["tabs"][2])
 
-    body_chips = [
-        ("🧠 Brain", "brain"),
-        ("🫁 Lungs", "lungs"),
-        ("💓 Heart", "heart"),
-        ("🫘 Kidneys", "kidney"),
-        ("🦴 Skeleton", "bones"),
-        ("🍕 Stomach", "stomach"),
-        ("🩸 Liver", "liver"),
-        ("🔬 Nephron", "nephron"),
-    ]
-    render_subject_search("body", "Human Body Anatomy", "Heart, Lungs, Brain, Kidneys, Bones, Digestion...", body_chips, lang)
-
     parts = C.BODY_PARTS
 
     # Body System Filters (per Bing anatomical diagram categories)
@@ -1513,7 +1511,21 @@ def tab_body(lang):
         st.rerun()
 
     b = parts[i]
-    if b["key"] == "kidneys":
+    if b["key"] == "brain":
+        b_view = st.radio(
+            "Brain View Mode",
+            ["🔬 " + ("Detailed Brain Lobes & Functions" if lang == "en" else "Dimaag Ki Banawat & Lobes"),
+             "👤 " + ("Whole Body Position" if lang == "en" else "Sharir Mein Sthiti")],
+            horizontal=True,
+            key="brain_view_selector"
+        )
+        left, right = st.columns([1.2, 1])
+        with left:
+            if "Whole Body" in b_view or "Sharir Mein" in b_view:
+                show_svg(V.body_svg(b["key"], lang), 470)
+            else:
+                show_svg(V.brain_detail_svg(lang), 540)
+    elif b["key"] == "kidneys":
         k_view = st.radio(
             "Kidney View Mode",
             ["🔬 " + ("Realistic Cross-Section & Nephron" if lang == "en" else "Realistic Banawat & Nephron"),
@@ -1538,7 +1550,18 @@ def tab_body(lang):
         st.write(b[lang])
         st.markdown(f"<div class='fact'>💡 <b>{t['fact']}:</b> {b['fact_' + lang]}</div>", unsafe_allow_html=True)
 
-        if b["key"] == "kidneys":
+        if b["key"] == "brain":
+            st.markdown(f"""
+            <div style="margin-top:12px;padding:12px 14px;background:rgba(236,64,122,0.12);border-left:4px solid #ec407a;border-radius:10px;font-size:0.9rem;">
+              <b>🧠 {('Brain Functional Lobes' if lang == 'en' else 'Dimaag Ke 4 Khaas Hisse')}:</b><br>
+              • <b>{('Frontal Lobe' if lang == 'en' else 'Frontal Lobe')}:</b> {('Planning, decisions, emotions & speech.' if lang == 'en' else 'Sochna, faisle lena aur bolna.')}<br>
+              • <b>{('Parietal Lobe' if lang == 'en' else 'Parietal Lobe')}:</b> {('Touch, taste, temperature & spatial awareness.' if lang == 'en' else 'Chhoona, swaad aur disha.')}<br>
+              • <b>{('Temporal Lobe' if lang == 'en' else 'Temporal Lobe')}:</b> {('Memory storage & sound/hearing processing.' if lang == 'en' else 'Yaaddasht aur sunna.')}<br>
+              • <b>{('Occipital Lobe' if lang == 'en' else 'Occipital Lobe')}:</b> {('Processes everything your eyes see.' if lang == 'en' else 'Nazar aur dekhne ka center.')}<br>
+              • <b>{('Cerebellum & Brainstem' if lang == 'en' else 'Cerebellum & Brainstem')}:</b> {('Balance, posture, heart rate & breathing.' if lang == 'en' else 'Santulan aur dil ki dhadkan/saans.')}
+            </div>
+            """, unsafe_allow_html=True)
+        elif b["key"] == "kidneys":
             st.markdown(f"""
             <div style="margin-top:12px;padding:12px 14px;background:rgba(220,38,38,0.12);border-left:4px solid #dc2626;border-radius:10px;font-size:0.9rem;">
               <b>🔬 {('Internal Kidney Anatomy' if lang == 'en' else 'Gurde Ki Andaruni Banawat')}:</b><br>
@@ -1590,17 +1613,6 @@ def tab_body(lang):
 def tab_physics(lang):
     t = TXT[lang]
     st.subheader(t["tabs"][3])
-
-    physics_chips = [
-        ("⚽ Projectile", "projectile"),
-        ("⚡ Force", "force"),
-        ("🌌 Blue Sky", "sky"),
-        ("🍎 Gravity", "gravity"),
-        ("🕰️ Pendulum", "pendulum"),
-        ("💡 Ohm's Law", "ohm"),
-        ("🌈 Refraction", "refraction"),
-    ]
-    render_subject_search("physics", "Physics Lab", "Force, Sky, Gravity, Friction, Projectile, Pendulum, Circuit...", physics_chips, lang)
 
     key = st.radio("Experiment", list(C.PHYSICS), horizontal=True,
                    format_func=lambda k: C.PHYSICS[k]["title_" + lang])
@@ -1679,16 +1691,6 @@ def tab_chem(lang):
     t = TXT[lang]
     st.subheader(t["tabs"][4])
 
-    chem_chips = [
-        ("⚛️ Atom", "atom"),
-        ("💧 Water Molecule", "water"),
-        ("🧊 States of Matter", "solid"),
-        ("🍋 pH Scale", "acid"),
-        ("🌋 Volcano Reaction", "volcano"),
-        ("🔩 Rusting", "rust"),
-    ]
-    render_subject_search("chem", "Chemistry Lab", "Atom, Oxygen, Water, States, Acid, Base, Volcano reaction...", chem_chips, lang)
-
     a, m, s, p, rx, h = st.tabs([
         "⚛️ Atom builder", "💧 Molecules", "🧊 States of matter", "🍋 pH scale", "🌋 Virtual Reaction Lab", "🏠 Home experiments"
     ])
@@ -1758,23 +1760,6 @@ def tab_maths(lang):
     st.subheader(t["tabs"][5])
     st.caption("Interactive Visual Geometry, Pythagoras Theorem, Fraction Pizza, Algebra Balance Scale, and Speed Math Arena!" if lang == "en" else
                "Visual Geometry, Pythagoras Pramey, Fraction Pizza, Algebra Tarazu Scale aur Speed Math Challenge!")
-
-    # Dedicated Subject Search for Mathematics
-    math_chips = [
-        ("⭕ Circle", "circle"),
-        ("📐 Rectangle", "rectangle"),
-        ("🔺 Pythagoras", "pythagoras"),
-        ("🥫 Cylinder", "cylinder"),
-        ("🍕 Fractions", "fraction"),
-        ("⚖️ Algebra", "algebra"),
-    ]
-    render_subject_search(
-        "math",
-        "Mathematics / गणित",
-        "Search Circle, Rectangle, Cylinder, Pythagoras, Fractions, Linear Equations...",
-        math_chips,
-        lang
-    )
 
     m_tabs = st.tabs([
         "📐 2D Geometry",
@@ -2030,7 +2015,8 @@ def main():
     apply_theme(st.session_state.get("theme", "🌈 Wonder Academy (Nursery - Class 8)"))
 
     # Top Hero Banner with Class Level & GyaanBuddy
-    class_lvl = st.session_state.get("class_level", "Class 3 - 5")
+    raw_class = str(st.session_state.get("class_level", "5"))
+    class_lvl = f"Class {raw_class}" if raw_class.isdigit() else raw_class
     xp = st.session_state["xp"]
     lvl_num, lvl_en, lvl_hi, _ = get_level(xp)
     lvl_title = lvl_hi if lang == "hi" else lvl_en

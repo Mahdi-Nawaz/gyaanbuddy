@@ -28,7 +28,7 @@ _BODY_IMG_B64: str | None = None
 
 
 def _get_body_img_b64() -> str:
-    """Retrieve base64-encoded string of the high-res child anatomical illustration."""
+    """Retrieve base64-encoded string of the clean child anatomical illustration."""
     global _BODY_IMG_B64
     if _BODY_IMG_B64 is None:
         candidates = [
@@ -54,107 +54,110 @@ def _organs() -> dict[str, dict]:
     return {
         "brain": dict(
             color="#ec407a",
-            anchor=(512, 160),
-            sub_en="Cerebrum • Cerebellum • Brainstem • Control Room",
+            anchor=(760, 185),
+            sub_en="Cerebrum • Cerebellum • Brainstem • 86B Neurons",
             sub_hi="Sochna • Santulan • Yaaddasht • Control Room",
             sys_en="Nervous System",
             sys_hi="Nervous System",
             name_en="Brain",
             name_hi="Dimaag (Brain)",
-            svg='<ellipse cx="512" cy="160" rx="70" ry="60" fill="rgba(236,64,122,0.28)" stroke="#ec407a" stroke-width="5"/>',
+            svg='<g><circle cx="760" cy="185" r="118" fill="rgba(236,64,122,0.18)" stroke="#ec407a" stroke-width="6"/><circle cx="545" cy="115" r="45" fill="rgba(236,64,122,0.22)" stroke="#ec407a" stroke-width="4" stroke-dasharray="6 3"/></g>',
         ),
         "lungs": dict(
             color="#0288d1",
-            anchor=(565, 515),
+            anchor=(560, 515),
             sub_en="Trachea • Bronchi • Alveoli • Oxygen In &amp; CO2 Out",
             sub_hi="Saans Nali • Fefde • Oxygen In &amp; CO2 Out",
             sys_en="Respiratory System",
             sys_hi="Respiratory System",
             name_en="Lungs",
             name_hi="Fefde (Lungs)",
-            svg='<g><ellipse cx="435" cy="515" rx="55" ry="70" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="4"/><ellipse cx="565" cy="515" rx="55" ry="70" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="4"/></g>',
+            svg='<g><ellipse cx="430" cy="515" rx="58" ry="72" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="5"/><ellipse cx="560" cy="515" rx="58" ry="72" fill="rgba(2,136,209,0.25)" stroke="#0288d1" stroke-width="5"/></g>',
         ),
         "heart": dict(
             color="#dc2626",
-            anchor=(520, 545),
+            anchor=(500, 550),
             sub_en="Pumps blood 100,000 times/day • 4 Chambers • Aorta",
             sub_hi="4 Chambers • Khoon Pump Karta Hai • 1 Lakh Dhadkan",
             sys_en="Circulatory System",
             sys_hi="Circulatory System",
             name_en="Heart",
             name_hi="Dil (Heart)",
-            svg='<ellipse cx="520" cy="545" rx="42" ry="46" fill="rgba(220,38,38,0.30)" stroke="#dc2626" stroke-width="5"/>',
+            svg='<ellipse cx="500" cy="550" rx="46" ry="50" fill="rgba(220,38,38,0.28)" stroke="#dc2626" stroke-width="6"/>',
         ),
         "stomach": dict(
             color="#ea580c",
-            anchor=(545, 615),
+            anchor=(550, 615),
             sub_en="Digestive acid &amp; enzymes • Churns and breaks down food",
             sub_hi="Digestive Juices • Acid Se Khana Chhota Karna",
             sys_en="Digestive System",
             sys_hi="Digestive System",
             name_en="Stomach",
             name_hi="Pet / Stomach",
-            svg='<ellipse cx="545" cy="615" rx="50" ry="38" fill="rgba(234,88,12,0.30)" stroke="#ea580c" stroke-width="4.5"/>',
+            svg='<ellipse cx="550" cy="615" rx="54" ry="40" fill="rgba(234,88,12,0.30)" stroke="#ea580c" stroke-width="5"/>',
         ),
         "liver": dict(
             color="#92400e",
-            anchor=(440, 560),
+            anchor=(430, 580),
             sub_en="Largest internal organ • Cleans blood &amp; stores energy",
             sub_hi="Sabse Bada Organ • Khoon Saaf Karna • Bile Banana",
             sys_en="Digestive &amp; Detox",
             sys_hi="Digestive &amp; Detox",
             name_en="Liver",
             name_hi="Jigar (Liver)",
-            svg='<ellipse cx="440" cy="560" rx="52" ry="45" fill="rgba(146,64,14,0.30)" stroke="#92400e" stroke-width="4.5"/>',
+            svg='<ellipse cx="430" cy="580" rx="56" ry="46" fill="rgba(146,64,14,0.30)" stroke="#92400e" stroke-width="5"/>',
         ),
         "kidneys": dict(
             color="#b91c1c",
-            anchor=(385, 665),
+            anchor=(380, 660),
             sub_en="2 Bean-shaped filters • 1M Nephrons each • Cleans blood",
             sub_hi="2 Gurde • Khoon Filter Karna • Urine Banana",
             sys_en="Urinary System",
             sys_hi="Urinary System",
             name_en="Kidneys",
             name_hi="Gurde (Kidneys)",
-            svg='<g><ellipse cx="385" cy="665" rx="30" ry="38" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="4"/><ellipse cx="635" cy="665" rx="30" ry="38" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="4"/></g>',
+            svg='<g><ellipse cx="380" cy="660" rx="32" ry="40" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="5"/><ellipse cx="630" cy="660" rx="32" ry="40" fill="rgba(185,28,28,0.35)" stroke="#b91c1c" stroke-width="5"/></g>',
         ),
         "intestines": dict(
             color="#d97706",
-            anchor=(512, 770),
+            anchor=(500, 780),
             sub_en="Small intestine absorbs nutrients • Large intestine absorbs water",
             sub_hi="Chhoti Aant Poshan Leti Hai • Badi Aant Paani Leti Hai",
             sys_en="Digestive System",
             sys_hi="Digestive System",
             name_en="Intestines",
             name_hi="Aant (Intestines)",
-            svg='<rect x="420" y="690" width="184" height="150" rx="28" fill="rgba(217,119,6,0.25)" stroke="#d97706" stroke-width="4.5"/>',
+            svg='<rect x="400" y="680" width="204" height="160" rx="32" fill="rgba(217,119,6,0.25)" stroke="#d97706" stroke-width="5"/>',
         ),
         "bones": dict(
             color="#475569",
-            anchor=(670, 500),
+            anchor=(640, 500),
             sub_en="206 Bones • Ribcage protects heart &amp; lungs • Strong framework",
             sub_hi="206 Haddiyan • Ribcage Dil &amp; Fefdon Ko Protect Karta Hai",
             sys_en="Skeletal System",
             sys_hi="Skeletal System",
             name_en="Bones (Skeleton)",
             name_hi="Haddiyan (Bones)",
-            svg='<g><ellipse cx="512" cy="510" rx="145" ry="90" fill="none" stroke="#475569" stroke-width="5" stroke-dasharray="8 4"/><line x1="330" y1="440" x2="694" y2="440" stroke="#475569" stroke-width="4"/><line x1="310" y1="520" x2="280" y2="700" stroke="#475569" stroke-width="5"/><line x1="714" y1="520" x2="744" y2="700" stroke="#475569" stroke-width="5"/></g>',
+            svg='<g><ellipse cx="500" cy="520" rx="150" ry="95" fill="none" stroke="#475569" stroke-width="5" stroke-dasharray="8 4"/><line x1="320" y1="440" x2="680" y2="440" stroke="#475569" stroke-width="5"/><line x1="300" y1="520" x2="270" y2="700" stroke="#475569" stroke-width="5"/><line x1="700" y1="520" x2="730" y2="700" stroke="#475569" stroke-width="5"/></g>',
         ),
     }
 
 
 def body_svg(highlight: str | None = None, lang: str = "en") -> str:
-    """Authentic, high-resolution child anatomical illustration with glowing organ highlights and callout badges."""
+    """Authentic, high-resolution child anatomical illustration with clear organ cutaway and callouts."""
     organs = _organs()
     img_b64 = _get_body_img_b64()
 
     parts = []
     labels = []
 
+    # Pure white background card that seamlessly blends with the app light theme
+    parts.append('<rect width="1024" height="1024" rx="24" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>')
+
     if img_b64:
         parts.append(f'<image href="data:image/jpeg;base64,{img_b64}" x="0" y="0" width="1024" height="1024" preserveAspectRatio="xMidYMid meet"/>')
     else:
-        parts.append('<rect width="1024" height="1024" rx="24" fill="#0f172a"/><text x="512" y="512" text-anchor="middle" fill="#94a3b8" font-size="24">Human Anatomy Model</text>')
+        parts.append('<rect width="1024" height="1024" rx="24" fill="#f8fafc"/><text x="512" y="512" text-anchor="middle" fill="#64748b" font-size="28">Human Anatomy Model</text>')
 
     if highlight and highlight in organs:
         o = organs[highlight]
@@ -165,23 +168,23 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
         sub = o["sub_hi"] if lang == "hi" else o["sub_en"]
 
         parts.append(f'<g filter="url(#glow)">{o["svg"]}</g>')
-        parts.append(f'<circle cx="{ax}" cy="{ay}" r="8" fill="{col}" stroke="#ffffff" stroke-width="3"/>')
+        parts.append(f'<circle cx="{ax}" cy="{ay}" r="9" fill="{col}" stroke="#ffffff" stroke-width="3.5"/>')
 
         is_right = ax < 512
-        card_x = 640 if is_right else 40
-        card_y = max(80, min(ay - 60, 840))
-        elbow_x = card_x + (0 if is_right else 340)
+        card_x = 560 if is_right else 30
+        card_y = max(60, min(ay - 80, 800))
+        elbow_x = card_x + (0 if is_right else 420)
 
         labels.append(f"""
         <!-- Connecting Leader Line -->
-        <polyline points="{ax},{ay} {elbow_x + (-20 if is_right else 20)},{ay} {elbow_x},{card_y + 60}" fill="none" stroke="{col}" stroke-width="4" stroke-dasharray="6 3"/>
+        <polyline points="{ax},{ay} {elbow_x + (-24 if is_right else 24)},{ay} {elbow_x},{card_y + 80}" fill="none" stroke="{col}" stroke-width="5" stroke-dasharray="8 4"/>
         <g transform="translate({card_x}, {card_y})">
-          <rect width="340" height="130" rx="16" fill="#ffffff" stroke="{col}" stroke-width="3.5" filter="url(#card-shadow)"/>
-          <rect x="0" y="0" width="12" height="130" rx="6" fill="{col}"/>
-          <text x="24" y="32" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="14" font-weight="800" fill="{col}" letter-spacing="1">{html.escape(sys_name.upper())}</text>
-          <text x="24" y="66" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="24" font-weight="900" fill="#0f172a">{html.escape(name)}</text>
-          <text x="24" y="96" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="13" font-weight="500" fill="#334155">{html.escape(sub[:45])}</text>
-          <text x="24" y="116" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="12" font-weight="500" fill="#64748b">{html.escape(sub[45:90])}</text>
+          <rect width="420" height="160" rx="20" fill="#ffffff" stroke="{col}" stroke-width="4" filter="url(#card-shadow)"/>
+          <rect x="0" y="0" width="14" height="160" rx="7" fill="{col}"/>
+          <text x="28" y="40" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="800" fill="{col}" letter-spacing="1">{html.escape(sys_name.upper())}</text>
+          <text x="28" y="82" font-family="'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" fill="#0f172a">{html.escape(name)}</text>
+          <text x="28" y="118" font-family="'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="600" fill="#334155">{html.escape(sub[:45])}</text>
+          <text x="28" y="142" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="600" fill="#64748b">{html.escape(sub[45:90])}</text>
         </g>
         """)
     else:
@@ -195,11 +198,11 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
             name = o["name_hi"].split("(")[0].strip() if lang == "hi" else o["name_en"].split("(")[0].strip()
             ly = 180 + i * 220
             labels.append(f"""
-            <polyline points="{ax},{ay} 220,{ay} 190,{ly}" fill="none" stroke="{col}" stroke-width="3"/>
-            <circle cx="{ax}" cy="{ay}" r="6" fill="{col}" stroke="#ffffff" stroke-width="2.5"/>
-            <g transform="translate(20, {ly - 22})">
-              <rect width="165" height="44" rx="22" fill="#ffffff" stroke="{col}" stroke-width="2.5" filter="url(#card-shadow)"/>
-              <text x="82" y="27" text-anchor="middle" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">{html.escape(name)}</text>
+            <polyline points="{ax},{ay} 240,{ay} 210,{ly}" fill="none" stroke="{col}" stroke-width="3.5"/>
+            <circle cx="{ax}" cy="{ay}" r="7" fill="{col}" stroke="#ffffff" stroke-width="3"/>
+            <g transform="translate(20, {ly - 26})">
+              <rect width="185" height="52" rx="26" fill="#ffffff" stroke="{col}" stroke-width="3" filter="url(#card-shadow)"/>
+              <text x="92" y="33" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#0f172a">{html.escape(name)}</text>
             </g>
             """)
 
@@ -210,11 +213,11 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
             name = o["name_hi"].split("(")[0].strip() if lang == "hi" else o["name_en"].split("(")[0].strip()
             ly = 150 + i * 160
             labels.append(f"""
-            <polyline points="{ax},{ay} 800,{ay} 830,{ly}" fill="none" stroke="{col}" stroke-width="3"/>
-            <circle cx="{ax}" cy="{ay}" r="6" fill="{col}" stroke="#ffffff" stroke-width="2.5"/>
-            <g transform="translate(835, {ly - 22})">
-              <rect width="165" height="44" rx="22" fill="#ffffff" stroke="{col}" stroke-width="2.5" filter="url(#card-shadow)"/>
-              <text x="82" y="27" text-anchor="middle" font-family="'Segoe UI', Roboto, Arial, sans-serif" font-size="16" font-weight="700" fill="#0f172a">{html.escape(name)}</text>
+            <polyline points="{ax},{ay} 780,{ay} 810,{ly}" fill="none" stroke="{col}" stroke-width="3.5"/>
+            <circle cx="{ax}" cy="{ay}" r="7" fill="{col}" stroke="#ffffff" stroke-width="3"/>
+            <g transform="translate(815, {ly - 26})">
+              <rect width="185" height="52" rx="26" fill="#ffffff" stroke="{col}" stroke-width="3" filter="url(#card-shadow)"/>
+              <text x="92" y="33" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#0f172a">{html.escape(name)}</text>
             </g>
             """)
 
@@ -228,11 +231,159 @@ def body_svg(highlight: str | None = None, lang: str = "en") -> str:
       </feMerge>
     </filter>
     <filter id="card-shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.25"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.18"/>
     </filter>
   </defs>
   {''.join(parts)}
   {''.join(labels)}
+</svg>"""
+
+
+def brain_detail_svg(lang: str = "en") -> str:
+    """Detailed anatomical diagram of the human brain showing 4 lobes, cerebellum, and brainstem."""
+    is_hi = (lang == "hi")
+    title = "HUMAN BRAIN ANATOMY &amp; FUNCTIONAL LOBES" if not is_hi else "INSAANI DIMAAG KI ANATOMY AUR LOBES"
+    sub_title = "86 Billion Neurons • Control Room of the Body" if not is_hi else "86 Arab Neurons • Sharir Ka Control Room"
+
+    labels = {
+        "frontal": ("Frontal Lobe (Decision &amp; Thinking)", "Controls planning, problem-solving, emotions &amp; speech") if not is_hi else ("Frontal Lobe (Sochna &amp; Faisla)", "Planning, problems solve karna aur bolna"),
+        "parietal": ("Parietal Lobe (Sensory &amp; Touch)", "Processes touch, taste, pain &amp; spatial orientation") if not is_hi else ("Parietal Lobe (Chhoone Ka Ehsaas)", "Touch, swaad aur disha ka gyaan"),
+        "occipital": ("Occipital Lobe (Vision &amp; Sight)", "Processes everything your eyes see &amp; colors") if not is_hi else ("Occipital Lobe (Dekhna &amp; Nazar)", "Aankhon se dikhne wali cheezein aur rang"),
+        "temporal": ("Temporal Lobe (Memory &amp; Hearing)", "Stores memories, processes sounds &amp; language") if not is_hi else ("Temporal Lobe (Yaad &amp; Sunna)", "Yaadein store karna aur baatein sunna"),
+        "cerebellum": ("Cerebellum (Balance &amp; Coordination)", "Smooth muscle control, posture &amp; agility") if not is_hi else ("Cerebellum (Santulan &amp; Balance)", "Sharir ka santulan aur chalne-doudne ka control"),
+        "brainstem": ("Brainstem (Heartbeat &amp; Breathing)", "Controls automatic vital functions without thinking") if not is_hi else ("Brainstem (Dhadkan &amp; Saans)", "Bina soche dil ki dhadkan aur saans chalana"),
+    }
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 520" width="680" height="520">
+  <defs>
+    <filter id="b-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="frontal-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <linearGradient id="parietal-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#facc15"/><stop offset="100%" stop-color="#ca8a04"/>
+    </linearGradient>
+    <linearGradient id="occipital-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4ade80"/><stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+    <linearGradient id="temporal-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb923c"/><stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="cerebellum-detail-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f472b6"/><stop offset="100%" stop-color="#be185d"/>
+    </linearGradient>
+    <linearGradient id="stem-detail-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="680" height="520" rx="20" fill="url(#bg-grad)" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Title Header -->
+  <g transform="translate(30, 32)">
+    <text x="0" y="0" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="900" fill="#0f172a" letter-spacing="0.5">{title}</text>
+    <text x="0" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b">{sub_title}</text>
+  </g>
+
+  <!-- Central Brain Sagittal Lateral Illustration -->
+  <g transform="translate(60, 60)">
+    <!-- Brain Silhouette Glow Shadow -->
+    <path d="M120 220 C70 200 40 140 70 80 C100 20 200 10 260 40 C310 65 330 110 320 160 C310 200 270 230 220 230 L210 310 C210 325 180 325 180 310 L180 250 C150 250 130 240 120 220 Z"
+          fill="#f1f5f9" opacity="0.8"/>
+
+    <!-- 1. Frontal Lobe (Blue) -->
+    <path d="M160 30 C110 30 65 75 60 130 C55 185 85 210 130 215 C150 215 165 200 170 170 C175 130 185 80 160 30 Z"
+          fill="url(#frontal-grad)" stroke="#0369a1" stroke-width="2.5"/>
+    <!-- Frontal gyri -->
+    <path d="M80 110 Q110 95 135 115 M75 145 Q105 130 135 150 M85 175 Q115 160 145 180" fill="none" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- 2. Parietal Lobe (Yellow) -->
+    <path d="M162 30 C205 32 250 50 265 95 C250 120 210 135 180 135 C175 95 175 60 162 30 Z"
+          fill="url(#parietal-grad)" stroke="#a16207" stroke-width="2.5"/>
+    <!-- Parietal gyri -->
+    <path d="M185 65 Q215 55 240 75 M190 100 Q215 90 235 110" fill="none" stroke="#fef9c3" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- 3. Occipital Lobe (Green - Vision) -->
+    <path d="M265 95 C295 115 315 150 300 190 C270 195 245 180 235 150 C245 130 255 110 265 95 Z"
+          fill="url(#occipital-grad)" stroke="#15803d" stroke-width="2.5"/>
+    <!-- Occipital gyri -->
+    <path d="M265 135 Q285 145 295 165 M250 165 Q270 170 280 185" fill="none" stroke="#dcfce7" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- 4. Temporal Lobe (Orange - Hearing & Memory) -->
+    <path d="M140 165 C180 155 230 150 240 185 C245 215 210 230 160 225 C135 220 130 190 140 165 Z"
+          fill="url(#temporal-grad)" stroke="#c2410c" stroke-width="2.5"/>
+    <!-- Temporal gyri -->
+    <path d="M155 185 Q185 180 215 190 M150 205 Q180 200 205 210" fill="none" stroke="#ffedd5" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- 5. Cerebellum (Pink - Balance) -->
+    <g id="detail-cerebellum">
+      <ellipse cx="250" cy="235" rx="42" ry="30" fill="url(#cerebellum-detail-grad)" stroke="#9d174d" stroke-width="2.5"/>
+      <path d="M218 225 Q250 215 282 225" fill="none" stroke="#fff1f2" stroke-width="2"/>
+      <path d="M214 235 Q250 225 286 235" fill="none" stroke="#fff1f2" stroke-width="2"/>
+      <path d="M218 245 Q250 235 282 245" fill="none" stroke="#fff1f2" stroke-width="2"/>
+      <path d="M228 255 Q250 248 272 255" fill="none" stroke="#fff1f2" stroke-width="2"/>
+    </g>
+
+    <!-- 6. Brainstem (Spinal Connector & Vitals) -->
+    <path d="M185 215 L208 215 L204 310 C204 316 198 320 192 320 C186 320 180 316 180 310 Z"
+          fill="url(#stem-detail-grad)" stroke="#334155" stroke-width="2.5"/>
+    <path d="M180 230 C172 240 172 255 180 265" fill="none" stroke="#334155" stroke-width="2.5"/>
+  </g>
+
+  <!-- Interactive Callout Legend Cards (Right Column) -->
+  <!-- 1. Frontal -->
+  <g transform="translate(400, 75)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#0284c7" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#0284c7"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#0284c7">{labels['frontal'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['frontal'][1]}</text>
+  </g>
+
+  <!-- 2. Parietal -->
+  <g transform="translate(400, 145)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#ca8a04" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#ca8a04"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ca8a04">{labels['parietal'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['parietal'][1]}</text>
+  </g>
+
+  <!-- 3. Temporal -->
+  <g transform="translate(400, 215)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#ea580c"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#ea580c">{labels['temporal'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['temporal'][1]}</text>
+  </g>
+
+  <!-- 4. Occipital -->
+  <g transform="translate(400, 285)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#16a34a" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#16a34a"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#16a34a">{labels['occipital'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['occipital'][1]}</text>
+  </g>
+
+  <!-- 5. Cerebellum -->
+  <g transform="translate(400, 355)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#be185d" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#be185d"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#be185d">{labels['cerebellum'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['cerebellum'][1]}</text>
+  </g>
+
+  <!-- 6. Brainstem -->
+  <g transform="translate(400, 425)">
+    <rect width="250" height="58" rx="10" fill="#ffffff" stroke="#475569" stroke-width="2" filter="url(#b-shadow)"/>
+    <rect x="0" y="0" width="8" height="58" rx="4" fill="#475569"/>
+    <text x="16" y="22" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="800" fill="#334155">{labels['brainstem'][0]}</text>
+    <text x="16" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="500" fill="#475569">{labels['brainstem'][1]}</text>
+  </g>
 </svg>"""
 
 

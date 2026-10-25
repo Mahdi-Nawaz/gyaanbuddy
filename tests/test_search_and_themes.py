@@ -71,6 +71,6 @@ def test_apptest_with_search_and_theme():
     assert len(class_filter) == 1
     
     # Change class
-    class_filter[0].set_value("Class 6 - 8").run()
+    class_filter[0].set_value("8").run()
     assert not at.exception
-    assert at.session_state["class_level"] == "Class 6 - 8"
+    assert at.session_state["class_level"] == "8"
