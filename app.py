@@ -1370,6 +1370,61 @@ def search_topics(q: str, limit: int = 8) -> list[dict]:
     return [item for _, item in scored[:limit]]
 
 
+def extract_text_from_photo(img_buf, api_key: str | None = None) -> str:
+    """Extract question text from student photo with Claude Vision & multi-angle OCR."""
+    if not img_buf:
+        return ""
+    # 1. Claude Vision (if API key available)
+    if api_key:
+        try:
+            import anthropic, base64
+            img_buf.seek(0)
+            b64_img = base64.b64encode(img_buf.read()).decode("utf-8")
+            client = anthropic.Anthropic(api_key=api_key)
+            msg = client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=120,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": b64_img}},
+                        {"type": "text", "text": "Extract the handwritten or printed school science/math question from this photo. Reply ONLY with the question itself. If not clear, reply UNKNOWN."}
+                    ]
+                }]
+            )
+            v_res = msg.content[0].text.strip()
+            if v_res and "unknown" not in v_res.lower():
+                return v_res
+        except Exception:
+            pass
+
+    # 2. Local OCR with 4-way rotation and contrast enhancement
+    try:
+        import pytesseract
+        from PIL import Image, ImageOps, ImageEnhance
+        img_buf.seek(0)
+        base_img = Image.open(img_buf)
+        try:
+            base_img = ImageOps.exif_transpose(base_img)
+        except Exception:
+            pass
+
+        best_txt = ""
+        # Try 0, 90, 270, 180 degrees rotation for notebook angles
+        for angle in [0, 90, 270, 180]:
+            rot_img = base_img.rotate(angle, expand=True) if angle != 0 else base_img
+            gray = rot_img.convert("L")
+            enh = ImageEnhance.Contrast(gray).enhance(2.0)
+            txt = pytesseract.image_to_string(enh).strip()
+            if len(txt) > len(best_txt):
+                best_txt = txt
+        if len(best_txt) >= 4:
+            return " ".join(best_txt.split())
+    except Exception:
+        pass
+    return ""
+
+
 def handle_section_query(q_text: str, sec_label: str, lang: str, age: str = "10-12", api_key: str | None = None, model: str | None = None):
     """Solve student query in any section, append to chat history (like ChatGPT), and persist permanently."""
     history = [{"q": a["q"], "a": a["text"]} for a in st.session_state.get("messages", [])
@@ -1539,19 +1594,43 @@ def render_section_tools(sec_id: str, sec_label: str, placeholder: str, lang: st
             active_img = cam_img or file_img or pasted_pic
             if active_img:
                 st.image(active_img, caption="✅ Photo Ready", width=320)
+                extracted = st.session_state.get(f"{sec_id}_ocr_detected", "")
+                if not extracted:
+                    extracted = extract_text_from_photo(active_img, api_key)
+                    if extracted:
+                        st.session_state[f"{sec_id}_ocr_detected"] = extracted
+
+                q_val = extracted or query.strip()
+                q_photo_input = st.text_input(
+                    "📝 " + ("Confirm / Edit Question in Photo:" if lang == "en" else "Photo ka sawaal confirm karein:"),
+                    value=q_val,
+                    placeholder="e.g. What is force?, Newton's laws, Gravity...",
+                    key=f"{sec_id}_photo_q_input"
+                )
+
+                topic_suggestions = {
+                    "physics": ["What is Force?", "Newton's Laws of Motion", "What is Gravity?", "What is Friction?"],
+                    "chem": ["What is an Atom?", "What is Acid and pH?", "States of Matter", "Water Molecule H2O"],
+                    "body": ["How does Heart pump blood?", "What are the 4 Brain Lobes?", "How do Lungs work?"],
+                    "nature": ["How does Photosynthesis work?", "What is Food Chain?", "Plant Life Cycle"],
+                    "math": ["Pythagoras Theorem", "Area of Rectangle", "Algebra Balance Scale"]
+                }
+                sec_topics = topic_suggestions.get(sec_id, ["What is Force?", "Newton's Laws of Motion"])
+                st.caption("💡 " + ("Or tap your question below for instant 1-tap solving:" if lang == "en" else "Ya turant hal ke liye topic chunein:"))
+                s_cols = st.columns(len(sec_topics))
+                for idx, t_sug in enumerate(sec_topics):
+                    if s_cols[idx].button(t_sug, key=f"{sec_id}_quick_sug_{idx}"):
+                        ans = handle_section_query(t_sug, sec_label, lang, age, api_key, model)
+                        st.session_state[f"{sec_id}_sol"] = {"q": t_sug, "text": ans.text, "visual": ans.visual}
+                        st.rerun()
+
                 if st.button("🚀 " + ("Solve Question in Photo Now" if lang == "en" else "Photo ka Sawaal Hal Karein"), key=f"{sec_id}_btn_solve_photo", type="primary"):
-                    q_prob = query.strip() or f"{sec_label} question"
-                    try:
-                        import pytesseract
-                        from PIL import Image
-                        active_img.seek(0)
-                        ocr_txt = pytesseract.image_to_string(Image.open(active_img)).strip()
-                        if len(ocr_txt) >= 4:
-                            q_prob = " ".join(ocr_txt.split())
-                    except Exception:
-                        pass
-                    ans = handle_section_query(q_prob, sec_label, lang, age, api_key, model)
-                    st.session_state[f"{sec_id}_sol"] = {"q": q_prob, "text": ans.text, "visual": ans.visual}
+                    target_q = q_photo_input.strip() or extracted.strip() or query.strip()
+                    if not target_q:
+                        target_q = "What is force and Newton's laws of motion?" if sec_id == "physics" else f"{sec_label} question"
+                    ans = handle_section_query(target_q, sec_label, lang, age, api_key, model)
+                    st.session_state[f"{sec_id}_sol"] = {"q": target_q, "text": ans.text, "visual": ans.visual}
+                    st.rerun()
 
     # Voice Recording Drawer
     if st.session_state.get(f"{sec_id}_show_mic", False):

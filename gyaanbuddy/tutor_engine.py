@@ -171,7 +171,7 @@ def find_lesson(query: str, lang: str) -> TutorReply | None:
         key_lower = les["key"].lower()
 
         # Direct topic match in query string
-        if topic_lower in norm_query or key_lower in norm_query:
+        if re.search(r'\b' + re.escape(topic_lower) + r'\b', norm_query) or re.search(r'\b' + re.escape(key_lower) + r'\b', norm_query):
             s += 8
 
         matched_tokens = set()
@@ -179,8 +179,8 @@ def find_lesson(query: str, lang: str) -> TutorReply | None:
             kw_clean = safety.normalize(kw).lower()
             if not kw_clean:
                 continue
-            # Phrase match: "laws of motion", "newtons 2nd law", "ohms law", etc.
-            if kw_clean in norm_query:
+            # Phrase match with word boundaries: "laws of motion", "newtons 2nd law", "ohms law", "ph", etc.
+            if re.search(r'\b' + re.escape(kw_clean) + r'\b', norm_query):
                 s += 8 + len(kw_clean.split()) * 3
             # Collect matching tokens without multiple counting
             kw_tokens = set(kw_clean.split())
